@@ -1,10 +1,20 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from "expo-status-bar";
+import React from "react";
+import { StyleSheet, View } from "react-native";
+
+// ✅ Імпортуємо новий екран профілю користувача
+import UserProfileScreen from "./src/screens/FriendsProfilescreen";
 
 export default function App() {
+  // Функція-заглушка для навігації
+  const handleBack = () => {
+    console.log('Навігація "Назад" наразі не використовується.');
+  };
+
   return (
+    // ➡️ Рендеримо компонент UserProfileScreen
     <View style={styles.container}>
-      <Text>Open up App.tsx to start working on your app!</Text>
+      <UserProfileScreen />
       <StatusBar style="auto" />
     </View>
   );
@@ -13,8 +23,5 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
