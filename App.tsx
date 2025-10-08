@@ -4,7 +4,7 @@ import { StyleSheet, View } from "react-native";
 
 // 🔹 Імпортуємо правильний файл (увага на великі літери у назві файлу)
 
-import DiscoveryPage from "./src/screens/Discovery/DiscoveryPage";
+import Discovery from "./src/screens/Discovery/DiscoveryPage";
 
 export default function App() {
   // Функція-заглушка для навігації (поки не додано навігатор)
@@ -15,7 +15,7 @@ export default function App() {
   return (
     <View style={styles.container}>
       {/* Рендеримо компонент екрану профілю друзів */}
-      <DiscoveryPage />
+      <Discovery />
 
       {/* Статус-бар (від Expo) */}
       <StatusBar style="auto" />
