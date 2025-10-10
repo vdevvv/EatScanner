@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-// --- ІНТЕРФЕЙС ДАНИХ ---
+// --- ІНТЕРФЕЙС ---
 interface MealItem {
   id: string;
   title: string;
@@ -21,7 +21,7 @@ interface MealItem {
   image: any;
 }
 
-// --- МАСИВ СТРАВ ІЗ ЛОКАЛЬНИМИ АСЕТАМИ ---
+// --- ЛОКАЛЬНІ ДАНІ ---
 const mockMeals: MealItem[] = [
   {
     id: "m1",
@@ -62,31 +62,30 @@ const mockMeals: MealItem[] = [
 ];
 
 // --- КАРТКА СТРАВИ ---
-const MealCard: React.FC<{ item: MealItem }> = ({ item }) => {
-  return (
-    <TouchableOpacity style={styles.cardContainer}>
-      <Image source={item.image} style={styles.cardImage} resizeMode="cover" />
-      <View style={styles.cardOverlay}>
-        <Text style={styles.cardTitle}>{item.title}</Text>
-        <View style={styles.cardRestaurant}>
-          <Ionicons name="home-outline" size={14} color="#fff" />
-          <Text style={styles.cardRestaurantText}>{item.restaurant}</Text>
-        </View>
+const MealCard: React.FC<{ item: MealItem }> = ({ item }) => (
+  <TouchableOpacity style={styles.cardContainer}>
+    <Image source={item.image} style={styles.cardImage} resizeMode="cover" />
+    <View style={styles.cardOverlay}>
+      <Text style={styles.cardTitle}>{item.title}</Text>
+      <View style={styles.cardRestaurant}>
+        <Ionicons name="home-outline" size={14} color="#fff" />
+        <Text style={styles.cardRestaurantText}>{item.restaurant}</Text>
       </View>
-    </TouchableOpacity>
-  );
-};
+    </View>
+  </TouchableOpacity>
+);
 
-// --- СЕКЦІЯ СТРАВ ---
+// --- СЕКЦІЯ ---
 const MealSection: React.FC<{ title: string; data: MealItem[] }> = ({
   title,
   data,
 }) => {
+  if (data.length === 0) return null;
   return (
     <View style={styles.sectionContainer}>
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>{title}</Text>
-        <TouchableOpacity onPress={() => console.log(`View all ${title}`)}>
+        <TouchableOpacity>
           <Text style={styles.viewAllText}>View All</Text>
         </TouchableOpacity>
       </View>
@@ -102,7 +101,7 @@ const MealSection: React.FC<{ title: string; data: MealItem[] }> = ({
   );
 };
 
-// --- НИЖНЯ ПАНЕЛЬ НАВІГАЦІЇ ---
+// --- НИЖНЯ ПАНЕЛЬ ---
 const TabBar: React.FC = () => {
   const tabs = [
     { name: "Home", icon: "home-outline", active: false },
@@ -115,11 +114,7 @@ const TabBar: React.FC = () => {
   return (
     <View style={styles.tabBarContainer}>
       {tabs.map((tab) => (
-        <TouchableOpacity
-          key={tab.name}
-          style={styles.tabItem}
-          onPress={() => console.log(`Pressed: ${tab.name}`)}
-        >
+        <TouchableOpacity key={tab.name} style={styles.tabItem}>
           <Ionicons
             name={tab.icon as any}
             size={24}
@@ -142,6 +137,16 @@ const TabBar: React.FC = () => {
 // --- ГОЛОВНИЙ ЕКРАН ---
 const DiscoveryScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
+
+  // --- ФІЛЬТРАЦІЯ ---
+  const filteredMeals = useMemo(() => {
+    if (!searchQuery.trim()) return mockMeals;
+    return mockMeals.filter(
+      (m) =>
+        m.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        m.restaurant.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -176,15 +181,14 @@ const DiscoveryScreen: React.FC = () => {
         </View>
 
         {/* Секції */}
-        <MealSection title="Recommended for you:" data={mockMeals} />
-        <MealSection title="Gluten-Free:" data={mockMeals.slice(1, 4)} />
-        <MealSection title="Vegetarian:" data={mockMeals.slice(0, 3)} />
-        <MealSection title="Vegan:" data={mockMeals.slice(3, 6)} />
+        <MealSection title="Recommended for you:" data={filteredMeals} />
+        <MealSection title="Gluten-Free:" data={filteredMeals.slice(1, 4)} />
+        <MealSection title="Vegetarian:" data={filteredMeals.slice(0, 3)} />
+        <MealSection title="Vegan:" data={filteredMeals.slice(3, 6)} />
 
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      {/* Нижня панель */}
       <TabBar />
     </SafeAreaView>
   );
@@ -201,7 +205,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 10,
   },
-
   locationContainer: {
     marginBottom: 20,
   },
@@ -221,7 +224,6 @@ const styles = StyleSheet.create({
     color: "#000",
     marginLeft: 5,
   },
-
   searchContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -231,9 +233,7 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     paddingLeft: 10,
   },
-  searchIcon: {
-    marginRight: 8,
-  },
+  searchIcon: { marginRight: 8 },
   searchInput: {
     flex: 1,
     fontSize: 16,
@@ -247,10 +247,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-
-  sectionContainer: {
-    marginBottom: 30,
-  },
+  sectionContainer: { marginBottom: 30 },
   sectionHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -267,7 +264,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#E57373",
   },
-
   cardContainer: {
     width: 150,
     height: 220,
@@ -276,26 +272,16 @@ const styles = StyleSheet.create({
     marginRight: 15,
     backgroundColor: "#ddd",
   },
-  cardImage: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 15,
-  },
+  cardImage: { width: "100%", height: "100%", borderRadius: 15 },
   cardOverlay: {
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    backgroundColor: "rgba(0,0,0,0.4)",
     padding: 10,
-    borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 15,
   },
-  cardTitle: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#fff",
-  },
+  cardTitle: { fontSize: 14, fontWeight: "600", color: "#fff" },
   cardRestaurant: {
     flexDirection: "row",
     alignItems: "center",
@@ -306,7 +292,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginLeft: 3,
   },
-
   tabBarContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -321,17 +306,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  tabItem: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 5,
-  },
-  tabText: {
-    fontSize: 12,
-    marginTop: 2,
-    fontWeight: "600",
-  },
+  tabItem: { flex: 1, alignItems: "center", justifyContent: "center" },
+  tabText: { fontSize: 12, marginTop: 2, fontWeight: "600" },
 });
 
 export default DiscoveryScreen;

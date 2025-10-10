@@ -11,22 +11,32 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../App";
+
+type SignUpScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "SignUp"
+>;
 
 export default function SignUpScreen() {
+  const navigation = useNavigation<SignUpScreenNavigationProp>();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [accepted, setAccepted] = useState(false);
 
-  const isValid =
-    email.includes("@") &&
-    password.length >= 8 &&
-    /[0-9]/.test(password) &&
-    /[^A-Za-z0-9]/.test(password) &&
-    accepted;
+  // ✅ Спрощена логіка валідації
+  const isValid = email.includes("@") && password.length >= 6 && accepted;
 
   const handleSubmit = () => {
-    alert("✅ Account created successfully!");
+    if (isValid) {
+      navigation.navigate("MyProfileScreen"); // ✅ Перехід
+    } else {
+      alert("❌ Please fill all fields correctly!");
+    }
   };
 
   return (
@@ -128,13 +138,13 @@ export default function SignUpScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "transparent", // 🔥 прибираємо білу підкладку
+    backgroundColor: "#fff",
   },
   scrollContent: {
     flexGrow: 1,
     alignItems: "center",
     justifyContent: "flex-start",
-    backgroundColor: "transparent", // 🔥 прозорий фон
+    backgroundColor: "#fff",
     paddingHorizontal: 30,
     paddingBottom: 40,
   },
@@ -142,34 +152,32 @@ const styles = StyleSheet.create({
   // --- Лого ---
   logoContainer: {
     position: "absolute",
-    top: 30,
+    top: 60,
     alignSelf: "center",
     zIndex: 10,
-    left: 90, // ✅ зміщення вправо на 30px
   },
-
   logo: {
-    width: 300,
-    height: 300,
+    width: 240,
+    height: 240,
     resizeMode: "contain",
   },
 
-  // --- Контент ближче до лого ---
+  // --- Контент ---
   content: {
-    marginTop: 210,
+    marginTop: 280,
     width: "100%",
     alignItems: "center",
-    backgroundColor: "#fff", // ✅ чіткий білий фон, перекриє прозорість картинки
+    backgroundColor: "#fff",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 20,
-    zIndex: 20, // поверх картинки
   },
 
   title: {
     fontSize: 22,
     fontWeight: "700",
     marginBottom: 6,
+    color: "#000",
   },
   subtitle: {
     color: "#555",
@@ -195,7 +203,8 @@ const styles = StyleSheet.create({
     paddingRight: 44,
     fontSize: 16,
     marginBottom: 14,
-    backgroundColor: "#fff", // чіткий білий фон тільки для інпутів
+    backgroundColor: "#fff",
+    color: "#000",
   },
   eyeButton: {
     position: "absolute",
@@ -220,7 +229,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff", // щоб не просвічувався фон
+    backgroundColor: "#fff",
   },
   checkboxChecked: {
     borderColor: "#000",

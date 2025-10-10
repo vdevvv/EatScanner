@@ -30,11 +30,11 @@ const COLORS = {
 // 💡 ЛОКАЛЬНІ ЗОБРАЖЕННЯ
 // Залишаємо ваші шляхи require()
 const AVATAR_SOURCE =
-  require("../components/profile-avatar.jpg") as ImageSourcePropType;
+  require("../../assets/profile-avatar.jpg") as ImageSourcePropType;
 const DISH_1_SOURCE =
-  require("../components/sushi-dragons.jpg") as ImageSourcePropType;
+  require("../../assets/sushi-dragons.jpg") as ImageSourcePropType;
 const DISH_2_SOURCE =
-  require("../components/potatoes-square.jpg") as ImageSourcePropType;
+  require("../../assets/potatoes-square.jpg") as ImageSourcePropType;
 
 // Дані профілю (ВЛАСНИЙ ПРОФІЛЬ)
 const USER_DATA = {

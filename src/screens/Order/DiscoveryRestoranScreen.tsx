@@ -15,10 +15,10 @@ import {
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
 // Використовуємо локальні ассети згідно з вашими шляхами
-const MAIN_IMAGE = require("../components/dumplings-top.jpg");
-const SUSHI_IMAGE = require("../components/sushi-dragons.jpg");
-const POTATOES_IMAGE = require("../components/potato-green.jpg");
-const PASTA_SMALL_IMAGE = require("../components/pasta.jpg");
+const MAIN_IMAGE = require("../../assets/dumplings-top.jpg");
+const SUSHI_IMAGE = require("../../assets/sushi-dragons.jpg");
+const POTATOES_IMAGE = require("../../assets/potato-green.jpg");
+const PASTA_SMALL_IMAGE = require("../../assets/pasta.jpg");
 
 const { width } = Dimensions.get("window");
 

@@ -1,4 +1,3 @@
-// screens/CreatePasswordScreen.tsx
 import React, { useState } from "react";
 import {
   View,
@@ -12,23 +11,33 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../App";
+
+type CreatePasswordScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 export default function CreatePasswordScreen() {
+  const navigation = useNavigation<CreatePasswordScreenNavigationProp>();
+
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [accepted, setAccepted] = useState(false);
 
-  const isValid =
-    password.length >= 8 &&
-    /[0-9]/.test(password) &&
-    /[^A-Za-z0-9]/.test(password) &&
-    password === repeatPassword &&
-    accepted;
+  // 🔹 Тепер кнопка активна, якщо користувач прийняв умови
+  const isActive = accepted;
 
   const handleSubmit = () => {
-    alert("✅ Password created successfully!");
+    if (password.length < 8) {
+      alert("❌ Password must be at least 8 characters long!");
+    } else if (password !== repeatPassword) {
+      alert("❌ Passwords do not match!");
+    } else {
+      navigation.navigate("SignUp");
+    }
   };
 
   return (
@@ -40,7 +49,7 @@ export default function CreatePasswordScreen() {
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
       >
-        {/* Лого */}
+        {/* 🔹 Лого */}
         <View style={styles.logoContainer}>
           <Image
             source={require("../../assets/logoScaner.png")}
@@ -120,11 +129,11 @@ export default function CreatePasswordScreen() {
 
           {/* Button */}
           <TouchableOpacity
-            disabled={!isValid}
+            disabled={!isActive}
             onPress={handleSubmit}
-            style={[styles.createButton, isValid && styles.createButtonActive]}
+            style={[styles.createButton, isActive && styles.createButtonActive]}
           >
-            <Text style={[styles.createText, isValid && { color: "#fff" }]}>
+            <Text style={[styles.createText, isActive && { color: "#fff" }]}>
               Create Password
             </Text>
           </TouchableOpacity>
@@ -174,17 +183,17 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: "center",
-    marginTop: 30,
-    marginBottom: 4, // 🔹 стало мінімальним
+    marginTop: 10,
   },
   logo: {
-    width: 220,
-    height: 180,
+    width: 280,
+    height: 280,
     resizeMode: "contain",
   },
   content: {
     width: "85%",
     alignItems: "center",
+    marginTop: -10,
   },
   tabs: {
     flexDirection: "row",
@@ -192,7 +201,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
-    marginBottom: 10, // 🔹 менше відстані
+    marginBottom: 10,
   },
   tabText: {
     fontSize: 16,
@@ -210,17 +219,17 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     marginTop: 8,
-    marginBottom: 4, // 🔹 зменшено
+    marginBottom: 4,
   },
   subtitle: {
     color: "#777",
     textAlign: "center",
-    marginBottom: 10, // 🔹 ближче до полів
+    marginBottom: 12,
   },
   inputWrapper: {
     width: "100%",
     position: "relative",
-    marginBottom: 8,
+    marginBottom: 10,
   },
   input: {
     width: "100%",
@@ -241,7 +250,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    marginBottom: 10,
+    marginBottom: 12,
   },
   checkbox: {
     width: 20,
@@ -254,12 +263,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   checkboxChecked: {
-    borderColor: "#000",
+    borderColor: "#D06B5C",
   },
   checkboxInner: {
     width: 10,
     height: 10,
-    backgroundColor: "#000",
+    backgroundColor: "#D06B5C",
     borderRadius: 5,
   },
   checkboxLabel: {
@@ -271,7 +280,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
-    marginBottom: 14,
+    marginBottom: 16,
   },
   createButtonActive: {
     backgroundColor: "#D06B5C",

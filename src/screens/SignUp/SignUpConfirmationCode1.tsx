@@ -10,10 +10,19 @@ import {
   Platform,
   TextInput as RNTextInput,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../App"; // 👈 перевір правильний шлях до App.tsx
 
 const CODE_LENGTH = 6;
 
-export default function ConfirmCodeScreen() {
+type NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "SignUpConfirmationCode1"
+>;
+
+export default function SignUpConfirmationCode1() {
+  const navigation = useNavigation<NavigationProp>();
   const [code, setCode] = useState<string[]>(Array(CODE_LENGTH).fill(""));
   const [timer, setTimer] = useState<number>(20);
   const inputs = useRef<Array<RNTextInput | null>>([]);
@@ -29,22 +38,6 @@ export default function ConfirmCodeScreen() {
   const focusPrev = (index: number) => inputs.current[index - 1]?.focus();
 
   const handleChange = (text: string, index: number) => {
-    if (text.length > 1) {
-      const chars = text.split("").slice(0, CODE_LENGTH - index);
-      const newCode = [...code];
-      for (let i = 0; i < chars.length; i++) {
-        newCode[index + i] = chars[i];
-      }
-      setCode(newCode);
-      const nextIndex = index + chars.length - 1;
-      if (nextIndex < CODE_LENGTH - 1) {
-        inputs.current[nextIndex + 1]?.focus();
-      } else {
-        inputs.current[CODE_LENGTH - 1]?.blur();
-      }
-      return;
-    }
-
     const newCode = [...code];
     newCode[index] = text;
     setCode(newCode);
@@ -61,7 +54,9 @@ export default function ConfirmCodeScreen() {
   const isFilled = code.every((c) => c !== "");
 
   const handleConfirm = () => {
-    alert(`Entered code: ${code.join("")}`);
+    if (isFilled) {
+      navigation.navigate("SignUpSetPassword1"); // ✅ Перехід на наступний екран
+    }
   };
 
   const resendCode = () => {
@@ -75,14 +70,15 @@ export default function ConfirmCodeScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
-      {/* Абсолютно позиціонована картинка */}
+      {/* 🔹 Лого */}
       <Image
         source={require("../../assets/logoScaner.png")}
         style={styles.logo}
       />
 
-      {/* Основний контент */}
+      {/* 🔹 Основний контент */}
       <View style={styles.content}>
+        {/* Tabs */}
         <View style={styles.tabs}>
           <Text style={[styles.tabText, styles.inactiveTab]}>Sign In</Text>
           <Text style={[styles.tabText, styles.activeTab]}>Sign Up</Text>
@@ -94,6 +90,7 @@ export default function ConfirmCodeScreen() {
           example@gmail.com
         </Text>
 
+        {/* 🔹 Поля для коду */}
         <View style={styles.codeContainer}>
           {code.map((value, index) => (
             <TextInput
@@ -115,6 +112,7 @@ export default function ConfirmCodeScreen() {
           ))}
         </View>
 
+        {/* 🔹 Кнопка підтвердження */}
         <TouchableOpacity
           style={[styles.confirmButton, isFilled && styles.confirmButtonActive]}
           disabled={!isFilled}
@@ -125,6 +123,7 @@ export default function ConfirmCodeScreen() {
           </Text>
         </TouchableOpacity>
 
+        {/* 🔹 Таймер */}
         <TouchableOpacity onPress={resendCode}>
           <Text style={styles.resendText}>
             Send code again{" "}
@@ -136,11 +135,29 @@ export default function ConfirmCodeScreen() {
           </Text>
         </TouchableOpacity>
 
+        {/* 🔹 Divider */}
         <View style={styles.dividerContainer}>
           <View style={styles.dividerLine} />
           <Text style={styles.dividerText}>Or with</Text>
           <View style={styles.dividerLine} />
         </View>
+
+        {/* 🔹 Соцмережі */}
+        <TouchableOpacity style={styles.socialButton}>
+          <Image
+            source={require("../../assets/google.png")}
+            style={styles.socialIcon}
+          />
+          <Text style={styles.socialText}>Continue with Google</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.socialButton}>
+          <Image
+            source={require("../../assets/facebook.png")}
+            style={styles.socialIcon}
+          />
+          <Text style={styles.socialText}>Continue with Facebook</Text>
+        </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
@@ -153,20 +170,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  // 🔹 Абсолютна позиція картинки
   logo: {
     position: "absolute",
-    top: 40,
+    top: 20,
     alignSelf: "center",
-    width: 230,
-    height: 230,
+    width: 280,
+    height: 280,
     resizeMode: "contain",
     zIndex: 10,
   },
 
-  // 🔹 Контент, що не залежить від картинки
   content: {
-    marginTop: 260, // починається нижче картинки
+    marginTop: 260,
     width: "100%",
     alignItems: "center",
     paddingHorizontal: 30,
@@ -210,13 +225,13 @@ const styles = StyleSheet.create({
     marginBottom: 18,
   },
   codeInput: {
-    width: 56,
-    height: 56,
+    width: 50,
+    height: 50,
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 12,
+    borderRadius: 10,
     textAlign: "center",
-    fontSize: 22,
+    fontSize: 20,
   },
   confirmButton: {
     width: "100%",
@@ -242,7 +257,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
-    marginBottom: 10,
+    marginBottom: 14,
   },
   dividerLine: {
     flex: 1,
@@ -252,5 +267,28 @@ const styles = StyleSheet.create({
   dividerText: {
     marginHorizontal: 8,
     color: "#999",
+  },
+  socialButton: {
+    width: "100%",
+    flexDirection: "row",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    paddingVertical: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 12,
+    backgroundColor: "#fff",
+  },
+  socialIcon: {
+    width: 20,
+    height: 20,
+    marginRight: 8,
+    resizeMode: "contain",
+  },
+  socialText: {
+    fontSize: 15,
+    color: "#222",
+    fontWeight: "500",
   },
 });

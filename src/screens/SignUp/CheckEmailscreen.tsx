@@ -8,25 +8,40 @@ import {
   StyleSheet,
   SafeAreaView,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../App"; // Імпорт типів навігації
+
+type AuthScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "AuthScreen"
+>;
 
 const AuthScreen = () => {
-  const [activeTab, setActiveTab] = useState<"signin" | "signup">("signup");
+  const [activeTab, setActiveTab] = useState("signup");
   const [email, setEmail] = useState("");
+  const navigation = useNavigation<AuthScreenNavigationProp>();
 
   const handleSubmit = () => {
-    console.log(activeTab === "signup" ? "Sign Up" : "Sign In", email);
+    if (activeTab === "signup") {
+      navigation.navigate("SignUpConfirmationCode1"); // 🔥 перехід на екран підтвердження
+    } else {
+      console.log("Sign In with:", email);
+    }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
-        {/* Логотип */}
+      {/* Лого позаду */}
+      <View style={styles.logoContainer}>
         <Image
-          source={require("../../assets/logoScaner.png")} // поклади свій логотип сюди
+          source={require("../../assets/logoScaner.png")}
           style={styles.logo}
           resizeMode="contain"
         />
+      </View>
 
+      <View style={styles.content}>
         {/* Tabs */}
         <View style={styles.tabContainer}>
           <TouchableOpacity
@@ -68,7 +83,7 @@ const AuthScreen = () => {
           />
         </View>
 
-        {/* Заголовок */}
+        {/* Заголовки */}
         <Text style={styles.title}>Enter your email</Text>
         <Text style={styles.subtitle}>
           We asking your email to send you verification code{"\n"}to confirm
@@ -110,7 +125,7 @@ const AuthScreen = () => {
         {/* Social buttons */}
         <TouchableOpacity style={styles.socialButton}>
           <Image
-            source={require("../../assets/google.png")} // логотип Google
+            source={require("../../assets/google.png")}
             style={styles.socialIcon}
           />
           <Text style={styles.socialText}>Continue with Google</Text>
@@ -118,7 +133,7 @@ const AuthScreen = () => {
 
         <TouchableOpacity style={styles.socialButton}>
           <Image
-            source={require("../../assets/facebook.png")} // логотип Facebook
+            source={require("../../assets/facebook.png")}
             style={styles.socialIcon}
           />
           <Text style={styles.socialText}>Continue with Facebook</Text>
@@ -135,18 +150,31 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  container: {
-    flex: 1,
-    alignItems: "center",
-    paddingHorizontal: 24,
-    backgroundColor: "#fff",
+
+  // --- Лого ---
+  logoContainer: {
+    position: "absolute",
+    top: 20, // 🔼 зміщено вище
+    alignSelf: "center",
+    zIndex: -1,
+    pointerEvents: "none",
   },
   logo: {
-    width: 180,
-    height: 100,
-    marginTop: 40,
-    marginBottom: 10,
+    width: 300,
+    height: 300,
+    resizeMode: "contain",
+    opacity: 0.95,
   },
+
+  // --- Основний контент ---
+  content: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingHorizontal: 24,
+    marginTop: 180,
+  },
+
   tabContainer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -201,6 +229,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#000",
     marginBottom: 16,
+    backgroundColor: "#fff",
   },
   submitButton: {
     width: "100%",
@@ -244,6 +273,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 12,
+    backgroundColor: "#fff",
   },
   socialIcon: {
     width: 20,
