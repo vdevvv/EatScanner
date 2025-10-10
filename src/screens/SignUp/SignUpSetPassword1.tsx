@@ -9,6 +9,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -35,119 +36,129 @@ export default function CreatePasswordScreen() {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      {/* Logo */}
-      <Image
-        source={require("../../assets/logoScaner.png")}
-        style={styles.logo}
-      />
-
-      {/* Tabs */}
-      <View style={styles.tabs}>
-        <Text style={[styles.tabText, styles.inactiveTab]}>Sign In</Text>
-        <Text style={[styles.tabText, styles.activeTab]}>Sign Up</Text>
-      </View>
-
-      {/* Title */}
-      <Text style={styles.title}>Create your password</Text>
-      <Text style={styles.subtitle}>
-        Your password must be at least 8 characters,{"\n"}including a number and
-        a symbol.
-      </Text>
-
-      {/* Password input */}
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry={!showPassword}
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TouchableOpacity
-          onPress={() => setShowPassword((prev) => !prev)}
-          style={styles.eyeButton}
-        >
-          <Ionicons
-            name={showPassword ? "eye-off-outline" : "eye-outline"}
-            size={22}
-            color="#888"
-          />
-        </TouchableOpacity>
-      </View>
-
-      {/* Repeat password input */}
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder="Repeat Password"
-          secureTextEntry={!showRepeatPassword}
-          value={repeatPassword}
-          onChangeText={setRepeatPassword}
-        />
-        <TouchableOpacity
-          onPress={() => setShowRepeatPassword((prev) => !prev)}
-          style={styles.eyeButton}
-        >
-          <Ionicons
-            name={showRepeatPassword ? "eye-off-outline" : "eye-outline"}
-            size={22}
-            color="#888"
-          />
-        </TouchableOpacity>
-      </View>
-
-      {/* Checkbox */}
-      <TouchableOpacity
-        style={styles.checkboxContainer}
-        onPress={() => setAccepted(!accepted)}
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
       >
-        <View style={[styles.checkbox, accepted && styles.checkboxChecked]}>
-          {accepted && <View style={styles.checkboxInner} />}
+        {/* Лого */}
+        <View style={styles.logoContainer}>
+          <Image
+            source={require("../../assets/logoScaner.png")}
+            style={styles.logo}
+          />
         </View>
-        <Text style={styles.checkboxLabel}>
-          I accept the terms and privacy policy
-        </Text>
-      </TouchableOpacity>
 
-      {/* Create Password Button */}
-      <TouchableOpacity
-        disabled={!isValid}
-        onPress={handleSubmit}
-        style={[styles.createButton, isValid && styles.createButtonActive]}
-      >
-        <Text style={[styles.createText, isValid && { color: "#fff" }]}>
-          Create Password
-        </Text>
-      </TouchableOpacity>
+        {/* Контент */}
+        <View style={styles.content}>
+          {/* Tabs */}
+          <View style={styles.tabs}>
+            <Text style={[styles.tabText, styles.inactiveTab]}>Sign In</Text>
+            <Text style={[styles.tabText, styles.activeTab]}>Sign Up</Text>
+          </View>
 
-      {/* Divider */}
-      <View style={styles.dividerContainer}>
-        <View style={styles.dividerLine} />
-        <Text style={styles.dividerText}>Or with</Text>
-        <View style={styles.dividerLine} />
-      </View>
+          {/* Title */}
+          <Text style={styles.title}>Create your password</Text>
+          <Text style={styles.subtitle}>
+            Your password must be at least 8 characters,{"\n"}including a number
+            and a symbol.
+          </Text>
 
-      {/* Google Button */}
-      <TouchableOpacity style={styles.socialButton}>
-        <Ionicons
-          name="logo-google"
-          size={20}
-          color="#DB4437"
-          style={{ marginRight: 10 }}
-        />
-        <Text style={styles.socialText}>Continue with Google</Text>
-      </TouchableOpacity>
+          {/* Password */}
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+            />
+            <TouchableOpacity
+              onPress={() => setShowPassword((prev) => !prev)}
+              style={styles.eyeButton}
+            >
+              <Ionicons
+                name={showPassword ? "eye-off-outline" : "eye-outline"}
+                size={22}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </View>
 
-      {/* Facebook Button */}
-      <TouchableOpacity style={styles.socialButton}>
-        <Ionicons
-          name="logo-facebook"
-          size={20}
-          color="#4267B2"
-          style={{ marginRight: 10 }}
-        />
-        <Text style={styles.socialText}>Continue with Facebook</Text>
-      </TouchableOpacity>
+          {/* Repeat Password */}
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Repeat Password"
+              secureTextEntry={!showRepeatPassword}
+              value={repeatPassword}
+              onChangeText={setRepeatPassword}
+            />
+            <TouchableOpacity
+              onPress={() => setShowRepeatPassword((prev) => !prev)}
+              style={styles.eyeButton}
+            >
+              <Ionicons
+                name={showRepeatPassword ? "eye-off-outline" : "eye-outline"}
+                size={22}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Checkbox */}
+          <TouchableOpacity
+            style={styles.checkboxContainer}
+            onPress={() => setAccepted(!accepted)}
+          >
+            <View style={[styles.checkbox, accepted && styles.checkboxChecked]}>
+              {accepted && <View style={styles.checkboxInner} />}
+            </View>
+            <Text style={styles.checkboxLabel}>
+              I accept the terms and privacy policy
+            </Text>
+          </TouchableOpacity>
+
+          {/* Button */}
+          <TouchableOpacity
+            disabled={!isValid}
+            onPress={handleSubmit}
+            style={[styles.createButton, isValid && styles.createButtonActive]}
+          >
+            <Text style={[styles.createText, isValid && { color: "#fff" }]}>
+              Create Password
+            </Text>
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View style={styles.dividerContainer}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>Or with</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          {/* Google */}
+          <TouchableOpacity style={styles.socialButton}>
+            <Ionicons
+              name="logo-google"
+              size={20}
+              color="#DB4437"
+              style={{ marginRight: 10 }}
+            />
+            <Text style={styles.socialText}>Continue with Google</Text>
+          </TouchableOpacity>
+
+          {/* Facebook */}
+          <TouchableOpacity style={styles.socialButton}>
+            <Ionicons
+              name="logo-facebook"
+              size={20}
+              color="#4267B2"
+              style={{ marginRight: 10 }}
+            />
+            <Text style={styles.socialText}>Continue with Facebook</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -156,15 +167,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+  },
+  scrollContainer: {
     alignItems: "center",
-    paddingHorizontal: 30,
-    paddingTop: 80,
+    paddingBottom: 40,
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginTop: 30,
+    marginBottom: 4, // 🔹 стало мінімальним
   },
   logo: {
-    width: 230,
-    height: 250,
+    width: 220,
+    height: 180,
     resizeMode: "contain",
-    marginBottom: 16,
+  },
+  content: {
+    width: "85%",
+    alignItems: "center",
   },
   tabs: {
     flexDirection: "row",
@@ -172,11 +192,11 @@ const styles = StyleSheet.create({
     width: "100%",
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
-    marginBottom: 24,
+    marginBottom: 10, // 🔹 менше відстані
   },
   tabText: {
     fontSize: 16,
-    paddingVertical: 8,
+    paddingVertical: 6,
   },
   inactiveTab: {
     color: "#999",
@@ -189,25 +209,25 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "600",
-    marginTop: 18,
-    marginBottom: 6,
+    marginTop: 8,
+    marginBottom: 4, // 🔹 зменшено
   },
   subtitle: {
     color: "#777",
     textAlign: "center",
-    marginBottom: 18,
+    marginBottom: 10, // 🔹 ближче до полів
   },
   inputWrapper: {
     width: "100%",
     position: "relative",
-    marginBottom: 12,
+    marginBottom: 8,
   },
   input: {
     width: "100%",
-    height: 50,
+    height: 48,
     borderWidth: 1,
     borderColor: "#ccc",
-    borderRadius: 12,
+    borderRadius: 10,
     paddingLeft: 16,
     paddingRight: 44,
     fontSize: 16,
@@ -215,14 +235,13 @@ const styles = StyleSheet.create({
   eyeButton: {
     position: "absolute",
     right: 14,
-    top: 14,
+    top: 13,
   },
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    marginTop: 4,
-    marginBottom: 16,
+    marginBottom: 10,
   },
   checkbox: {
     width: 20,
@@ -230,7 +249,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 1.5,
     borderColor: "#aaa",
-    marginRight: 10,
+    marginRight: 8,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -249,10 +268,10 @@ const styles = StyleSheet.create({
   createButton: {
     width: "100%",
     backgroundColor: "#f2f2f2",
-    paddingVertical: 14,
+    paddingVertical: 12,
     borderRadius: 8,
     alignItems: "center",
-    marginBottom: 20,
+    marginBottom: 14,
   },
   createButtonActive: {
     backgroundColor: "#D06B5C",
@@ -266,7 +285,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
-    marginBottom: 20,
+    marginBottom: 14,
   },
   dividerLine: {
     flex: 1,
@@ -285,8 +304,8 @@ const styles = StyleSheet.create({
     borderColor: "#ddd",
     borderRadius: 8,
     width: "100%",
-    paddingVertical: 14,
-    marginBottom: 10,
+    paddingVertical: 12,
+    marginBottom: 8,
   },
   socialText: {
     fontSize: 15,

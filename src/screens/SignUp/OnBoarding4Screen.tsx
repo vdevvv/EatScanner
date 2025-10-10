@@ -1,4 +1,3 @@
-// screens/AllergiesScreen.tsx
 import React, { useState } from "react";
 import {
   View,
@@ -8,6 +7,13 @@ import {
   FlatList,
   SafeAreaView,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../App"; // 👈 імпортуємо тип стеку
+
+// ---- тип навігації ----
+type AllergiesScreenNavigationProp =
+  NativeStackNavigationProp<RootStackParamList>;
 
 interface Category {
   id: string;
@@ -30,6 +36,7 @@ const categories: Category[] = [
 
 const AllergiesScreen = () => {
   const [selected, setSelected] = useState<string[]>([]);
+  const navigation = useNavigation<AllergiesScreenNavigationProp>(); // 👈 підключення навігації
 
   const toggleSelect = (id: string) => {
     setSelected((prev) =>
@@ -42,6 +49,12 @@ const AllergiesScreen = () => {
   };
 
   const isContinueDisabled = selected.length === 0;
+
+  const handleContinue = () => {
+    if (!isContinueDisabled) {
+      navigation.navigate("OnBoarding5Screen"); // 👈 перехід на наступний екран
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -98,6 +111,7 @@ const AllergiesScreen = () => {
             isContinueDisabled && styles.disabledButton,
           ]}
           disabled={isContinueDisabled}
+          onPress={handleContinue}
         >
           <Text
             style={[
@@ -148,7 +162,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   option: {
-    flex: 0.48, // щоб не виходило за межі
+    flex: 0.48,
     borderWidth: 1,
     borderColor: "#E0E0E0",
     backgroundColor: "#fff",
@@ -187,9 +201,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#E57373",
   },
   continueButton: {
-    alignSelf: "center", // щоб не виходила за рамки SafeArea
+    alignSelf: "center",
     width: "100%",
-    maxWidth: 360, // обмеження ширини на великих екранах
+    maxWidth: 360,
     backgroundColor: "#E57373",
     borderRadius: 12,
     paddingVertical: 16,

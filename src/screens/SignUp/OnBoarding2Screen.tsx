@@ -2,102 +2,139 @@ import React from "react";
 import {
   View,
   Text,
-  Image,
-  ScrollView,
-  TouchableOpacity,
   StyleSheet,
-  Dimensions,
+  Image,
+  TouchableOpacity,
+  SafeAreaView,
+  ScrollView,
+  StatusBar,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../App"; // якщо RootStackParamList визначений у App.tsx
 
-const { width } = Dimensions.get("window");
+const foodImages = [
+  require("../../assets/food1.jpg"),
+  require("../../assets/food2.jpg"),
+  require("../../assets/food3.jpg"),
+  require("../../assets/food4.jpg"),
+  require("../../assets/food5.jpg"),
+  require("../../assets/food6.jpg"),
+  require("../../assets/food7.jpg"),
+  require("../../assets/food8.jpg"),
+];
 
-export default function OnboardingScreen() {
+type OnBoarding2NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "OnBoarding2Screen"
+>;
+
+const OnBoarding2Screen: React.FC = () => {
+  const navigation = useNavigation<OnBoarding2NavigationProp>();
+
+  const handleContinue = () => {
+    navigation.navigate("OnBoarding3Screen");
+  };
+
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ alignItems: "center" }}
-      showsVerticalScrollIndicator={false}
-    >
-      {/* === Images Grid === */}
-      <View style={styles.grid}>
-        {[
-          require("../../assets/img1.jpg"),
-          require("../../assets/img2.jpg"),
-          require("../../assets/img3.jpg"),
-          require("../../assets/img4.jpg"),
-          require("../../assets/img5.jpg"),
-          require("../../assets/img6.jpg"),
-          require("../../assets/img7.jpg"),
-        ].map((img, i) => (
-          <Image key={i} source={img} style={styles.image} resizeMode="cover" />
-        ))}
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar barStyle="dark-content" />
+
+      {/* Сітка зображень */}
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.imageGrid}>
+          {foodImages.map((img, index) => (
+            <Image key={index} source={img} style={styles.foodImage} />
+          ))}
+        </View>
+      </ScrollView>
+
+      {/* Нижня частина */}
+      <View style={styles.fixedBottom}>
+        <Text style={styles.title}>Find Your Favorite{"\n"}Meals Easily!</Text>
+
+        {/* Прогрес-бар під текстом */}
+        <View style={styles.progressContainer}>
+          <View style={styles.progressBar} />
+          <View style={[styles.progressBar, styles.activeBar]} />
+          <View style={styles.progressBar} />
+          <View style={styles.progressBar} />
+        </View>
+
+        {/* Кнопка */}
+        <TouchableOpacity
+          style={styles.continueButton}
+          onPress={handleContinue}
+        >
+          <Text style={styles.continueText}>Continue</Text>
+        </TouchableOpacity>
       </View>
-
-      {/* === Text === */}
-      <Text style={styles.title}>Order in One Tap!</Text>
-
-      {/* === Pagination === */}
-      <View style={styles.pagination}>
-        {[0, 1, 2, 3].map((dot, i) => (
-          <View key={i} style={[styles.dot, i === 1 && styles.activeDot]} />
-        ))}
-      </View>
-
-      {/* === Button === */}
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Continue</Text>
-      </TouchableOpacity>
-    </ScrollView>
+    </SafeAreaView>
   );
-}
+};
+
+export default OnBoarding2Screen;
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: "#fff",
   },
-  grid: {
-    width: "100%",
+  container: {
+    flexGrow: 1,
+    backgroundColor: "#fff",
+    paddingBottom: 150,
+  },
+  imageGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
   },
-  image: {
-    width: width / 3,
-    height: width / 3,
+  foodImage: {
+    width: "33.33%",
+    height: 120,
+  },
+
+  fixedBottom: {
+    position: "absolute",
+    bottom: 50,
+    left: 20,
+    right: 20,
+    alignItems: "center",
   },
   title: {
-    fontSize: 26,
-    fontWeight: "600",
+    fontSize: 24,
+    fontWeight: "700",
     textAlign: "center",
-    marginTop: 30,
+    color: "#000",
+    marginBottom: 20,
   },
-  pagination: {
+  progressContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginVertical: 20,
+    marginBottom: 20,
   },
-  dot: {
-    width: 20,
+  progressBar: {
+    width: 25,
     height: 4,
     borderRadius: 2,
-    backgroundColor: "#ddd",
-    marginHorizontal: 4,
+    backgroundColor: "#E0E0E0",
+    marginHorizontal: 5,
   },
-  activeDot: {
-    backgroundColor: "#D9644A",
-    width: 24,
+  activeBar: {
+    backgroundColor: "#E57373",
   },
-  button: {
-    backgroundColor: "#D9644A",
+  continueButton: {
+    backgroundColor: "#E57373",
     borderRadius: 10,
-    paddingVertical: 14,
-    paddingHorizontal: 60,
-    marginBottom: 40,
+    paddingVertical: 16,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  buttonText: {
+  continueText: {
     color: "#fff",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "600",
   },
 });

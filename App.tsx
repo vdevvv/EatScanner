@@ -1,32 +1,46 @@
+// App.tsx
 import React from "react";
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import WelcomeScreen from "./src/screens/SignUp/SplashScreen";
+import OnBoarding1Screen from "./src/screens/SignUp/OnBoarding1Screen";
+import OnBoarding2Screen from "./src/screens/SignUp/OnBoarding2Screen";
+import OnBoarding3Screen from "./src/screens/SignUp/OnBoarding3Screen";
+import OnBoarding4Screen from "./src/screens/SignUp/OnBoarding4Screen";
+import OnBoarding5Screen from "./src/screens/SignUp/OnBoarding5Screen";
+import CheckEmailscreen from "./src/screens/SignUp/CheckEmailscreen";
+import SignUpConfirmationCode1 from "./src/screens/SignUp/SignUpConfirmationCode1";
+export type RootStackParamList = {
+  Welcome: undefined;
+  OnBoarding1Screen: undefined;
+  OnBoarding2Screen: undefined;
+  OnBoarding3Screen: undefined;
+  OnBoarding4Screen: undefined;
+  OnBoarding5Screen: undefined;
+  CheckEmailscreen: undefined;
+  SignUpConfirmationCode1: undefined;
+};
 
-// 🔹 Імпортуємо правильний файл (увага на великі літери у назві файлу)
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
-import Discovery from "./src/screens/Discovery/DiscoveryPage";
-
-export default function App() {
-  // Функція-заглушка для навігації (поки не додано навігатор)
-  const handleBack = () => {
-    console.log('Навігація "Назад" наразі не використовується.');
-  };
-
+const App: React.FC = () => {
   return (
-    <View style={styles.container}>
-      {/* Рендеримо компонент екрану профілю друзів */}
-      <Discovery />
-
-      {/* Статус-бар (від Expo) */}
-      <StatusBar style="auto" />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="OnBoarding1Screen" component={OnBoarding1Screen} />
+        <Stack.Screen name="OnBoarding2Screen" component={OnBoarding2Screen} />
+        <Stack.Screen name="OnBoarding3Screen" component={OnBoarding3Screen} />
+        <Stack.Screen name="OnBoarding4Screen" component={OnBoarding4Screen} />
+        <Stack.Screen name="OnBoarding5Screen" component={OnBoarding5Screen} />
+        <Stack.Screen name="CheckEmailscreen" component={CheckEmailscreen} />
+        <Stack.Screen
+          name="SignUpConfirmationCode1"
+          component={SignUpConfirmationCode1}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
-}
+};
 
-// 🔹 Стилі для базового контейнера
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-});
+export default App;

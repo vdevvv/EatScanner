@@ -1,4 +1,3 @@
-// screens/ConfirmCodeScreen.tsx
 import React, { useEffect, useRef, useState } from "react";
 import {
   View,
@@ -9,7 +8,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
-  TextInput as RNTextInput, // тип для рефів
+  TextInput as RNTextInput,
 } from "react-native";
 
 const CODE_LENGTH = 6;
@@ -17,7 +16,7 @@ const CODE_LENGTH = 6;
 export default function ConfirmCodeScreen() {
   const [code, setCode] = useState<string[]>(Array(CODE_LENGTH).fill(""));
   const [timer, setTimer] = useState<number>(20);
-  const inputs = useRef<Array<RNTextInput | null>>([]); // <- типізовано
+  const inputs = useRef<Array<RNTextInput | null>>([]);
 
   useEffect(() => {
     if (timer > 0) {
@@ -26,18 +25,10 @@ export default function ConfirmCodeScreen() {
     }
   }, [timer]);
 
-  const focusNext = (index: number) => {
-    const next = inputs.current[index + 1];
-    next?.focus();
-  };
-
-  const focusPrev = (index: number) => {
-    const prev = inputs.current[index - 1];
-    prev?.focus();
-  };
+  const focusNext = (index: number) => inputs.current[index + 1]?.focus();
+  const focusPrev = (index: number) => inputs.current[index - 1]?.focus();
 
   const handleChange = (text: string, index: number) => {
-    // Якщо вставили відразу кілька символів (paste)
     if (text.length > 1) {
       const chars = text.split("").slice(0, CODE_LENGTH - index);
       const newCode = [...code];
@@ -45,48 +36,32 @@ export default function ConfirmCodeScreen() {
         newCode[index + i] = chars[i];
       }
       setCode(newCode);
-      // фокус на наступне вільне поле
       const nextIndex = index + chars.length - 1;
       if (nextIndex < CODE_LENGTH - 1) {
         inputs.current[nextIndex + 1]?.focus();
       } else {
-        // якщо останнє поле заповнене — сховати клавіатуру (необов'язково)
         inputs.current[CODE_LENGTH - 1]?.blur();
       }
       return;
     }
 
-    // Одна цифра
     const newCode = [...code];
     newCode[index] = text;
     setCode(newCode);
 
-    if (text && index < CODE_LENGTH - 1) {
-      focusNext(index);
-    }
-
-    // якщо користувач стер символ (натиснув backspace), автоматично фокус на попереднє
-    if (!text && index > 0) {
-      focusPrev(index);
-    }
+    if (text && index < CODE_LENGTH - 1) focusNext(index);
+    if (!text && index > 0) focusPrev(index);
   };
 
-  const handleKeyPress = (
-    e: { nativeEvent: { key: string } },
-    index: number
-  ) => {
-    // обробка Backspace на деяких платформах
-    if (e.nativeEvent.key === "Backspace" && !code[index] && index > 0) {
+  const handleKeyPress = (e: any, index: number) => {
+    if (e.nativeEvent.key === "Backspace" && !code[index] && index > 0)
       focusPrev(index);
-    }
   };
 
   const isFilled = code.every((c) => c !== "");
 
   const handleConfirm = () => {
-    const joined = code.join("");
-    // тут валідація / запит на сервер
-    alert(`Entered code: ${joined}`);
+    alert(`Entered code: ${code.join("")}`);
   };
 
   const resendCode = () => {
@@ -100,71 +75,73 @@ export default function ConfirmCodeScreen() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
+      {/* Абсолютно позиціонована картинка */}
       <Image
-        source={require("../../assets/logoScaner.png")} // поклади логотип у assets
+        source={require("../../assets/logoScaner.png")}
         style={styles.logo}
       />
 
-      <View style={styles.tabs}>
-        <Text style={[styles.tabText, styles.inactiveTab]}>Sign In</Text>
-        <Text style={[styles.tabText, styles.activeTab]}>Sign Up</Text>
-      </View>
+      {/* Основний контент */}
+      <View style={styles.content}>
+        <View style={styles.tabs}>
+          <Text style={[styles.tabText, styles.inactiveTab]}>Sign In</Text>
+          <Text style={[styles.tabText, styles.activeTab]}>Sign Up</Text>
+        </View>
 
-      <Text style={styles.title}>Enter confirmation code</Text>
-      <Text style={styles.subtitle}>
-        We’ve sent an SMS with an activation code to your{"\n"}email
-        example@gmail.com
-      </Text>
-
-      <View style={styles.codeContainer}>
-        {code.map((value, index) => (
-          <TextInput
-            key={index}
-            ref={(ref) => {
-              inputs.current[index] = ref;
-            }} // зберігаємо реф у масив
-            value={value}
-            onChangeText={(text) =>
-              handleChange(text.replace(/\D/g, ""), index)
-            } // тільки цифри
-            onKeyPress={(e) => handleKeyPress(e, index)}
-            keyboardType="number-pad"
-            maxLength={1}
-            style={styles.codeInput}
-            returnKeyType="done"
-            textContentType="oneTimeCode" // iOS автозаповнення
-          />
-        ))}
-      </View>
-
-      <TouchableOpacity
-        style={[styles.confirmButton, isFilled && styles.confirmButtonActive]}
-        disabled={!isFilled}
-        onPress={handleConfirm}
-      >
-        <Text style={[styles.confirmText, isFilled && { color: "#fff" }]}>
-          Confirm
+        <Text style={styles.title}>Enter confirmation code</Text>
+        <Text style={styles.subtitle}>
+          We’ve sent an SMS with an activation code to your{"\n"}email
+          example@gmail.com
         </Text>
-      </TouchableOpacity>
 
-      <TouchableOpacity onPress={resendCode}>
-        <Text style={styles.resendText}>
-          Send code again{" "}
-          {timer > 0 && (
-            <Text style={{ color: "#999" }}>
-              {timer < 10 ? `00:0${timer}` : `00:${timer}`}
-            </Text>
-          )}
-        </Text>
-      </TouchableOpacity>
+        <View style={styles.codeContainer}>
+          {code.map((value, index) => (
+            <TextInput
+              key={index}
+              ref={(ref) => {
+                inputs.current[index] = ref;
+              }}
+              value={value}
+              onChangeText={(text) =>
+                handleChange(text.replace(/\D/g, ""), index)
+              }
+              onKeyPress={(e) => handleKeyPress(e, index)}
+              keyboardType="number-pad"
+              maxLength={1}
+              style={styles.codeInput}
+              returnKeyType="done"
+              textContentType="oneTimeCode"
+            />
+          ))}
+        </View>
 
-      <View style={styles.dividerContainer}>
-        <View style={styles.dividerLine} />
-        <Text style={styles.dividerText}>Or with</Text>
-        <View style={styles.dividerLine} />
+        <TouchableOpacity
+          style={[styles.confirmButton, isFilled && styles.confirmButtonActive]}
+          disabled={!isFilled}
+          onPress={handleConfirm}
+        >
+          <Text style={[styles.confirmText, isFilled && { color: "#fff" }]}>
+            Confirm
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={resendCode}>
+          <Text style={styles.resendText}>
+            Send code again{" "}
+            {timer > 0 && (
+              <Text style={{ color: "#999" }}>
+                {timer < 10 ? `00:0${timer}` : `00:${timer}`}
+              </Text>
+            )}
+          </Text>
+        </TouchableOpacity>
+
+        <View style={styles.dividerContainer}>
+          <View style={styles.dividerLine} />
+          <Text style={styles.dividerText}>Or with</Text>
+          <View style={styles.dividerLine} />
+        </View>
       </View>
-
-      {/* Тут можна додати кнопки соцмереж */}
     </KeyboardAvoidingView>
   );
 }
@@ -174,15 +151,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
-    paddingHorizontal: 30,
-    paddingTop: 80,
   },
+
+  // 🔹 Абсолютна позиція картинки
   logo: {
-    width: 160,
-    height: 50,
+    position: "absolute",
+    top: 40,
+    alignSelf: "center",
+    width: 230,
+    height: 230,
     resizeMode: "contain",
-    marginBottom: 24,
+    zIndex: 10,
   },
+
+  // 🔹 Контент, що не залежить від картинки
+  content: {
+    marginTop: 260, // починається нижче картинки
+    width: "100%",
+    alignItems: "center",
+    paddingHorizontal: 30,
+  },
+
   tabs: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -206,7 +195,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "600",
-    marginTop: 18,
+    marginTop: 12,
     marginBottom: 6,
   },
   subtitle: {

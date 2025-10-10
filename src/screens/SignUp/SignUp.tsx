@@ -8,6 +8,7 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -33,80 +34,93 @@ export default function SignUpScreen() {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      {/* Logo */}
-      <Image
-        source={require("../../assets/logoScaner.png")}
-        style={styles.logo}
-      />
-
-      {/* Title */}
-      <Text style={styles.title}>Welcome!</Text>
-      <Text style={styles.subtitle}>
-        Discover meals you love.{"\n"}Watch it. Want it. Get it.
-      </Text>
-
-      {/* Email Input */}
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
-
-      {/* Password Input */}
-      <View style={styles.inputWrapper}>
-        <TextInput
-          style={styles.input}
-          placeholder="Password"
-          secureTextEntry={!showPassword}
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TouchableOpacity
-          onPress={() => setShowPassword((prev) => !prev)}
-          style={styles.eyeButton}
-        >
-          <Ionicons
-            name={showPassword ? "eye-off-outline" : "eye-outline"}
-            size={22}
-            color="#888"
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Лого */}
+        <View style={styles.logoContainer}>
+          <Image
+            source={require("../../assets/logoScaner.png")}
+            style={styles.logo}
           />
-        </TouchableOpacity>
-      </View>
-
-      {/* Checkbox */}
-      <TouchableOpacity
-        style={styles.checkboxContainer}
-        onPress={() => setAccepted(!accepted)}
-      >
-        <View style={[styles.checkbox, accepted && styles.checkboxChecked]}>
-          {accepted && <View style={styles.checkboxInner} />}
         </View>
-        <Text style={styles.checkboxLabel}>
-          I accept the terms and privacy policy
-        </Text>
-      </TouchableOpacity>
 
-      {/* Sign Up Button */}
-      <TouchableOpacity
-        disabled={!isValid}
-        onPress={handleSubmit}
-        style={[styles.signUpButton, isValid && styles.signUpButtonActive]}
-      >
-        <Text style={[styles.signUpText, isValid && { color: "#fff" }]}>
-          Sign Up
-        </Text>
-      </TouchableOpacity>
+        {/* Контент */}
+        <View style={styles.content}>
+          <Text style={styles.title}>Welcome!</Text>
+          <Text style={styles.subtitle}>
+            Discover meals you love.{"\n"}Watch it. Want it. Get it.
+          </Text>
 
-      {/* Reset Password */}
-      <View style={styles.resetContainer}>
-        <Text style={styles.resetText}>Forget your password? </Text>
-        <TouchableOpacity>
-          <Text style={styles.resetLink}>Reset Password</Text>
-        </TouchableOpacity>
-      </View>
+          {/* Email */}
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor="#999"
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
+          />
+
+          {/* Password */}
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              placeholderTextColor="#999"
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+            />
+            <TouchableOpacity
+              onPress={() => setShowPassword((prev) => !prev)}
+              style={styles.eyeButton}
+            >
+              <Ionicons
+                name={showPassword ? "eye-off-outline" : "eye-outline"}
+                size={22}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Checkbox */}
+          <TouchableOpacity
+            style={styles.checkboxContainer}
+            onPress={() => setAccepted(!accepted)}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.checkbox, accepted && styles.checkboxChecked]}>
+              {accepted && <View style={styles.checkboxInner} />}
+            </View>
+            <Text style={styles.checkboxLabel}>
+              I accept the terms and privacy policy
+            </Text>
+          </TouchableOpacity>
+
+          {/* Sign Up Button */}
+          <TouchableOpacity
+            disabled={!isValid}
+            onPress={handleSubmit}
+            style={[styles.signUpButton, isValid && styles.signUpButtonActive]}
+          >
+            <Text style={[styles.signUpText, isValid && { color: "#fff" }]}>
+              Sign Up
+            </Text>
+          </TouchableOpacity>
+
+          {/* Reset Password */}
+          <View style={styles.resetContainer}>
+            <Text style={styles.resetText}>Forget your password? </Text>
+            <TouchableOpacity>
+              <Text style={styles.resetLink}>Reset Password</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -114,28 +128,58 @@ export default function SignUpScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "transparent", // 🔥 прибираємо білу підкладку
+  },
+  scrollContent: {
+    flexGrow: 1,
     alignItems: "center",
+    justifyContent: "flex-start",
+    backgroundColor: "transparent", // 🔥 прозорий фон
     paddingHorizontal: 30,
-    paddingTop: 80,
+    paddingBottom: 40,
   },
+
+  // --- Лого ---
+  logoContainer: {
+    position: "absolute",
+    top: 30,
+    alignSelf: "center",
+    zIndex: 10,
+    left: 90, // ✅ зміщення вправо на 30px
+  },
+
   logo: {
-    width: 230,
-    height: 250,
+    width: 300,
+    height: 300,
     resizeMode: "contain",
-    marginBottom: 10,
   },
+
+  // --- Контент ближче до лого ---
+  content: {
+    marginTop: 210,
+    width: "100%",
+    alignItems: "center",
+    backgroundColor: "#fff", // ✅ чіткий білий фон, перекриє прозорість картинки
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 20,
+    zIndex: 20, // поверх картинки
+  },
+
   title: {
     fontSize: 22,
     fontWeight: "700",
-    marginBottom: 4,
+    marginBottom: 6,
   },
   subtitle: {
     color: "#555",
     textAlign: "center",
-    marginBottom: 24,
+    marginBottom: 22,
     fontSize: 14,
+    lineHeight: 20,
   },
+
+  // --- Інпути ---
   inputWrapper: {
     width: "100%",
     position: "relative",
@@ -151,17 +195,20 @@ const styles = StyleSheet.create({
     paddingRight: 44,
     fontSize: 16,
     marginBottom: 14,
+    backgroundColor: "#fff", // чіткий білий фон тільки для інпутів
   },
   eyeButton: {
     position: "absolute",
     right: 14,
     top: 14,
   },
+
+  // --- Checkbox ---
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    marginTop: 2,
+    marginTop: 4,
     marginBottom: 16,
   },
   checkbox: {
@@ -173,6 +220,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff", // щоб не просвічувався фон
   },
   checkboxChecked: {
     borderColor: "#000",
@@ -186,6 +234,8 @@ const styles = StyleSheet.create({
   checkboxLabel: {
     color: "#333",
   },
+
+  // --- Кнопка ---
   signUpButton: {
     width: "100%",
     backgroundColor: "#f2f2f2",
@@ -202,9 +252,11 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#999",
   },
+
+  // --- Reset password ---
   resetContainer: {
     flexDirection: "row",
-    marginTop: 10,
+    marginTop: 8,
   },
   resetText: {
     color: "#333",
