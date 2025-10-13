@@ -15,9 +15,11 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../App";
 
+// Ensure that "SignIn" is included in the RootStackParamList
+
 type SignUpScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "SignUp"
+  "SignIn"
 >;
 
 export default function SignUpScreen() {
@@ -28,12 +30,11 @@ export default function SignUpScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [accepted, setAccepted] = useState(false);
 
-  // ✅ Спрощена логіка валідації
   const isValid = email.includes("@") && password.length >= 6 && accepted;
 
   const handleSubmit = () => {
     if (isValid) {
-      navigation.navigate("MyProfileScreen"); // ✅ Перехід
+      navigation.navigate("MyProfileScreen");
     } else {
       alert("❌ Please fill all fields correctly!");
     }
@@ -49,7 +50,23 @@ export default function SignUpScreen() {
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Лого */}
+        <View style={styles.headerTabs}>
+          <TouchableOpacity
+            style={[styles.tabButton, styles.activeTab]}
+            onPress={() => {}}
+          >
+            <Text style={[styles.tabText, styles.activeTabText]}>Sign Up</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.tabButton}
+            onPress={() => navigation.navigate("SignIn")}
+          >
+            <Text style={styles.tabText}>Sign In</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* ---------- ЛОГО ---------- */}
         <View style={styles.logoContainer}>
           <Image
             source={require("../../assets/logoScaner.png")}
@@ -57,11 +74,12 @@ export default function SignUpScreen() {
           />
         </View>
 
-        {/* Контент */}
+        {/* ---------- Основний контент ---------- */}
         <View style={styles.content}>
-          <Text style={styles.title}>Welcome!</Text>
+          <Text style={styles.title}>Enter your email</Text>
           <Text style={styles.subtitle}>
-            Discover meals you love.{"\n"}Watch it. Want it. Get it.
+            We asking your email to send you verification code to confirm your
+            account
           </Text>
 
           {/* Email */}
@@ -111,7 +129,7 @@ export default function SignUpScreen() {
             </Text>
           </TouchableOpacity>
 
-          {/* Sign Up Button */}
+          {/* Sign Up */}
           <TouchableOpacity
             disabled={!isValid}
             onPress={handleSubmit}
@@ -121,12 +139,35 @@ export default function SignUpScreen() {
               Sign Up
             </Text>
           </TouchableOpacity>
+        </View>
 
-          {/* Reset Password */}
-          <View style={styles.resetContainer}>
-            <Text style={styles.resetText}>Forget your password? </Text>
-            <TouchableOpacity>
-              <Text style={styles.resetLink}>Reset Password</Text>
+        {/* ---------- Footer ---------- */}
+        <View style={styles.footer}>
+          <View style={styles.dividerContainer}>
+            <View style={styles.line} />
+            <Text style={styles.dividerText}>Or with</Text>
+            <View style={styles.line} />
+          </View>
+
+          <View style={styles.socialButtons}>
+            <TouchableOpacity style={styles.socialButton}>
+              <Ionicons
+                name="logo-google"
+                size={18}
+                color="#000"
+                style={styles.socialIcon}
+              />
+              <Text style={styles.socialText}>Continue with Google</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.socialButton}>
+              <Ionicons
+                name="logo-facebook"
+                size={18}
+                color="#1877F2"
+                style={styles.socialIcon}
+              />
+              <Text style={styles.socialText}>Continue with Facebook</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -136,89 +177,90 @@ export default function SignUpScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
+  container: { flex: 1, backgroundColor: "#fff" },
   scrollContent: {
     flexGrow: 1,
-    alignItems: "center",
-    justifyContent: "flex-start",
     backgroundColor: "#fff",
     paddingHorizontal: 30,
     paddingBottom: 40,
   },
 
-  // --- Лого ---
+  /* --- HEADER TABS --- */
+  headerTabs: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 60,
+    marginBottom: 20,
+  },
+  tabButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 22,
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+  },
+  tabText: {
+    fontSize: 18,
+    color: "#999",
+    fontWeight: "600",
+  },
+  activeTab: {
+    borderBottomColor: "#D06B5C",
+  },
+  activeTabText: {
+    color: "#000",
+  },
+
   logoContainer: {
-    position: "absolute",
-    top: 60,
     alignSelf: "center",
-    zIndex: 10,
+    marginBottom: 20,
   },
   logo: {
-    width: 240,
-    height: 240,
+    width: 277,
+    height: 118,
     resizeMode: "contain",
   },
 
-  // --- Контент ---
   content: {
-    marginTop: 280,
-    width: "100%",
     alignItems: "center",
-    backgroundColor: "#fff",
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingTop: 20,
   },
-
   title: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "700",
-    marginBottom: 6,
+    marginBottom: 10,
     color: "#000",
   },
   subtitle: {
     color: "#555",
     textAlign: "center",
-    marginBottom: 22,
     fontSize: 14,
+    marginBottom: 26,
     lineHeight: 20,
+    maxWidth: 300,
   },
 
-  // --- Інпути ---
-  inputWrapper: {
-    width: "100%",
-    position: "relative",
-    marginBottom: 14,
-  },
+  inputWrapper: { width: "100%", position: "relative" },
   input: {
     width: "100%",
-    height: 50,
+    height: 48,
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 12,
-    paddingLeft: 16,
+    borderColor: "#ddd",
+    borderRadius: 10,
+    paddingLeft: 14,
     paddingRight: 44,
-    fontSize: 16,
-    marginBottom: 14,
-    backgroundColor: "#fff",
+    fontSize: 15,
+    marginBottom: 12,
     color: "#000",
+    backgroundColor: "#fff",
   },
-  eyeButton: {
-    position: "absolute",
-    right: 14,
-    top: 14,
-  },
+  eyeButton: { position: "absolute", right: 12, top: 12 },
 
-  // --- Checkbox ---
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
     alignSelf: "flex-start",
-    marginTop: 4,
-    marginBottom: 16,
+    marginTop: 6,
+    marginBottom: 20,
   },
   checkbox: {
     width: 20,
@@ -229,49 +271,53 @@ const styles = StyleSheet.create({
     marginRight: 10,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#fff",
   },
-  checkboxChecked: {
-    borderColor: "#000",
-  },
+  checkboxChecked: { borderColor: "#000" },
   checkboxInner: {
     width: 10,
     height: 10,
     backgroundColor: "#000",
     borderRadius: 5,
   },
-  checkboxLabel: {
-    color: "#333",
-  },
+  checkboxLabel: { color: "#333", fontSize: 13.5 },
 
-  // --- Кнопка ---
   signUpButton: {
     width: "100%",
-    backgroundColor: "#f2f2f2",
+    backgroundColor: "#f3f3f3",
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: "center",
-    marginBottom: 20,
   },
-  signUpButtonActive: {
-    backgroundColor: "#D06B5C",
-  },
-  signUpText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#999",
-  },
+  signUpButtonActive: { backgroundColor: "#D06B5C" },
+  signUpText: { fontSize: 16, fontWeight: "600", color: "#999" },
 
-  // --- Reset password ---
-  resetContainer: {
+  footer: {
+    marginTop: "auto",
+    alignItems: "center",
+    width: "100%",
+    paddingBottom: 30,
+  },
+  dividerContainer: {
     flexDirection: "row",
-    marginTop: 8,
+    alignItems: "center",
+    marginTop: 40,
+    marginBottom: 24,
+    alignSelf: "center",
+    width: "100%",
   },
-  resetText: {
-    color: "#333",
+  line: { flex: 1, height: 1, backgroundColor: "#ddd" },
+  dividerText: { marginHorizontal: 12, color: "#999", fontSize: 13 },
+
+  socialButtons: { width: "100%", gap: 12 },
+  socialButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    paddingVertical: 12,
+    justifyContent: "center",
   },
-  resetLink: {
-    color: "#000",
-    fontWeight: "600",
-  },
+  socialIcon: { marginRight: 10 },
+  socialText: { fontSize: 15, color: "#000", fontWeight: "500" },
 });

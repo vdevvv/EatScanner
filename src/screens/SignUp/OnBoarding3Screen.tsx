@@ -6,23 +6,11 @@ import {
   Image,
   TouchableOpacity,
   SafeAreaView,
-  ScrollView,
   StatusBar,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../App"; // імпорт стеку з App.tsx
-
-const foodImages = [
-  require("../../assets/OnBoarding3.jpg"),
-  require("../../assets/OnBoarding3Two.jpg"),
-  require("../../assets/OnBoarding3Three.jpg"),
-  require("../../assets/OnBoarding3Four.jpg"),
-  require("../../assets/OnBoarding3Five.jpg"),
-  require("../../assets/OnBoarding3Six.jpg"),
-  require("../../assets/OnBoarding3seven.jpg"),
-  require("../../assets/OnBoarding3Eight.jpg"),
-];
+import { RootStackParamList } from "../../../App";
 
 type OnBoarding3NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -33,27 +21,24 @@ const OnBoarding3Screen: React.FC = () => {
   const navigation = useNavigation<OnBoarding3NavigationProp>();
 
   const handleContinue = () => {
-    navigation.navigate("OnBoarding4Screen"); // перехід на наступний екран
+    navigation.navigate("OnBoarding4Screen");
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Верхня частина — фото */}
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.imageGrid}>
-          {foodImages.map((img, index) => (
-            <Image key={index} source={img} style={styles.foodImage} />
-          ))}
-        </View>
-      </ScrollView>
+      {/* 🖼 Один фон замість 8 фото */}
+      <Image
+        source={require("../../assets/OnBoarding3.png")}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      />
 
-      {/* Нижня частина з текстом, індикаторами та кнопкою */}
-      <View style={styles.bottomContainer}>
+      {/* Контент поверх */}
+      <View style={styles.overlay}>
         <Text style={styles.title}>Discover Delicious{"\n"}Food Nearby!</Text>
 
-        {/* Індикатори прогресу */}
         <View style={styles.progressContainer}>
           <View style={styles.progressBar} />
           <View style={styles.progressBar} />
@@ -61,7 +46,6 @@ const OnBoarding3Screen: React.FC = () => {
           <View style={styles.progressBar} />
         </View>
 
-        {/* Кнопка Continue */}
         <TouchableOpacity
           style={styles.continueButton}
           onPress={handleContinue}
@@ -80,27 +64,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  container: {
-    flexGrow: 1,
-    backgroundColor: "#fff",
-  },
-  imageGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  foodImage: {
-    width: "50%", // 2 зображення в ряд
-    height: 180,
+
+  // 🖼 Фон
+  backgroundImage: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 440,
+    height: 510,
+    marginTop: 0,
   },
 
-  // --- Нижня частина ---
-  bottomContainer: {
-    position: "absolute",
-    bottom: 40,
-    left: 24,
-    right: 24,
+  // Контент поверх фону
+  overlay: {
+    flex: 1,
+    justifyContent: "flex-end",
     alignItems: "center",
+    paddingHorizontal: 24,
+    paddingBottom: 60,
+    zIndex: 1,
   },
+
   title: {
     fontSize: 26,
     fontWeight: "700",
@@ -108,12 +92,14 @@ const styles = StyleSheet.create({
     color: "#000",
     marginBottom: 30,
   },
+
   progressContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 30,
   },
+
   progressBar: {
     width: 25,
     height: 4,
@@ -121,9 +107,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#E0E0E0",
     marginHorizontal: 5,
   },
+
   activeBar: {
     backgroundColor: "#E57373",
   },
+
   continueButton: {
     backgroundColor: "#E57373",
     borderRadius: 12,
@@ -137,6 +125,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+
   continueText: {
     color: "#fff",
     fontSize: 16,

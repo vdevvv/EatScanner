@@ -7,10 +7,9 @@ import {
   TouchableOpacity,
   ScrollView,
 } from "react-native";
-// Припускаємо, що використовується Expo або схожа бібліотека для іконок
 import { Ionicons } from "@expo/vector-icons";
 
-// --- ДАНІ УМОВ ТА ПОЛОЖЕНЬ ---
+// --- УМОВИ ТА ПОЛОЖЕННЯ ---
 const termsAndConditionsContent = {
   introduction:
     'Welcome to EatScanner. These Terms & Conditions ("Terms") govern your use of our mobile application and related services. By accessing or using the app, you agree to these Terms. If you do not agree, please do not use the app.',
@@ -37,27 +36,62 @@ const termsAndConditionsContent = {
       title: "Ordering Food",
       paragraphs: [
         "All food orders are fulfilled by third-party restaurants.",
-        "We are not responsible for the quality, preparation, or safety of the food provided by third-party vendors. Any issues related to food quality or delivery should be directed to the restaurant or delivery platform used for the order.",
+        "We are not responsible for the quality, preparation, or delivery of meals.",
+        "Prices and availability are subject to change and may vary by provider.",
+        "Refunds, cancellations, and complaints must be handled directly with the restaurant or delivery platform unless otherwise specified.",
       ],
     },
     {
-      title: "Intellectual Property",
+      title: "Payments",
       paragraphs: [
-        "All content, logos, designs, and features within the EatScanner app are owned by EatScanner or our licensors and are protected by copyright and other intellectual property laws.",
-        "You may not copy, modify, distribute, or create derivative works based on our content without express written permission.",
+        "Payments are processed securely via third-party providers (e.g., Stripe, Apple Pay).",
+        "We do not store your payment details directly.",
+        "You are responsible for ensuring your payment information is accurate and up to date.",
       ],
     },
     {
-      title: "Disclaimers",
+      title: "User Content",
       paragraphs: [
-        'The app is provided on an "as-is" and "as-available" basis.',
-        "We do not guarantee that the app will be uninterrupted, error-free, or completely secure. We are not liable for any damages arising from your use of the app.",
+        "By uploading or saving videos, reviews, or other content, you grant us a non-exclusive, royalty-free license to use, display, and distribute that content for app-related purposes.",
+        "We reserve the right to remove content that violates community guidelines or is deemed inappropriate.",
+      ],
+    },
+    {
+      title: "Privacy",
+      paragraphs: [
+        "Your use of the app is also governed by our Privacy Policy. Please review it to understand how we collect, use, and protect your personal data.",
+      ],
+    },
+    {
+      title: "Limitation of Liability",
+      paragraphs: [
+        "We provide the app on an “as-is” basis. We are not liable for:",
+      ],
+      list: [
+        "Delays or errors caused by third-party restaurants or services",
+        "Loss of data",
+        "Technical failures or interruptions",
+        "User misconduct or unauthorized account access",
+      ],
+      footer:
+        "To the fullest extent permitted by law, our liability is limited to the amount you paid for the service (if any).",
+    },
+    {
+      title: "Third-Party Links",
+      paragraphs: [
+        "The app may link to third-party websites or services. We are not responsible for the content, terms, or privacy practices of those external platforms.",
+      ],
+    },
+    {
+      title: "Changes to Terms",
+      paragraphs: [
+        "We may update these Terms from time to time. You will be notified of major changes via the app or email. Continued use of the app means you accept the revised Terms.",
       ],
     },
   ],
 };
 
-// --- ІНТЕРФЕЙСИ ---
+// --- Типи ---
 interface TermsSectionData {
   title: string;
   paragraphs: string[];
@@ -69,111 +103,99 @@ interface TermsSectionProps {
   section: TermsSectionData;
 }
 
-// --- КОМПОНЕНТ: РОЗДІЛ УМОВ ---
+// --- Компонент розділу ---
 const TermsSection: React.FC<TermsSectionProps> = ({ section }) => (
   <View style={styles.sectionContainer}>
     <Text style={styles.sectionTitle}>{section.title}</Text>
 
-    {/* Параграфи */}
     {section.paragraphs.map((paragraph, index) => (
       <Text key={`p-${index}`} style={styles.sectionText}>
         {paragraph}
       </Text>
     ))}
 
-    {/* Список (якщо є) */}
     {section.list && (
       <View style={styles.listContainer}>
-        {section.list.map((listItem, liIndex) => (
-          <View key={liIndex} style={styles.listItem}>
+        {section.list.map((item, idx) => (
+          <View key={idx} style={styles.listItem}>
             <Text style={styles.listItemBullet}>•</Text>
-            <Text style={styles.listItemText}>{listItem}</Text>
+            <Text style={styles.listItemText}>{item}</Text>
           </View>
         ))}
       </View>
     )}
 
-    {/* Футер/додатковий текст */}
     {section.footer && <Text style={styles.sectionText}>{section.footer}</Text>}
   </View>
 );
 
-// --- ОСНОВНИЙ ЕКРАН УМОВ ТА ПОЛОЖЕНЬ ---
+// --- Головний екран ---
 const TermsAndConditionsScreen: React.FC = () => {
   const handleBack = () => {
-    // Логіка навігації: navigation.goBack();
-    console.log("Натиснуто Назад");
+    // navigation.goBack();
+    console.log("Back pressed");
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Шапка */}
+      {/* Header */}
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-          {/* Використовуємо таку ж іконку назад, як на скріншоті */}
           <Ionicons name="chevron-back" size={28} color="#000" />
         </TouchableOpacity>
         <Text style={styles.screenTitle}>Terms & Conditions</Text>
       </View>
 
-      {/* Скролюваний контент */}
+      {/* Content */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Вступний параграф */}
         <Text style={styles.introductionText}>
           {termsAndConditionsContent.introduction}
         </Text>
 
-        {/* Рендеринг розділів */}
-        {termsAndConditionsContent.sections.map((section, index) => (
-          <TermsSection key={index} section={section as TermsSectionData} />
+        {termsAndConditionsContent.sections.map((section, i) => (
+          <TermsSection key={i} section={section} />
         ))}
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-// --- СТИЛІ ---
-
+// --- Стилі ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#fff",
   },
-  scrollContent: {
-    paddingHorizontal: 20,
-    paddingVertical: 15,
-  },
-
-  // --- Стилі Шапки (ідентичні Privacy Policy) ---
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: "#f5f5f5",
+    borderBottomColor: "#f2f2f2",
     backgroundColor: "#fff",
   },
   backButton: {
-    padding: 10,
+    padding: 8,
   },
   screenTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "700",
     color: "#000",
     marginLeft: 5,
   },
-
-  // --- Контент Умов ---
+  scrollContent: {
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+  },
   introductionText: {
     fontSize: 16,
     color: "#444",
     marginBottom: 20,
     lineHeight: 24,
   },
-
   sectionContainer: {
-    marginBottom: 30,
+    marginBottom: 28,
   },
   sectionTitle: {
     fontSize: 20,
@@ -184,11 +206,9 @@ const styles = StyleSheet.create({
   sectionText: {
     fontSize: 16,
     color: "#444",
-    marginBottom: 10,
     lineHeight: 24,
+    marginBottom: 10,
   },
-
-  // Стилі для списку (імітація маркера '•')
   listContainer: {
     marginLeft: 5,
     marginBottom: 10,
@@ -202,7 +222,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#444",
     marginRight: 8,
-    // Налаштовуємо позицію маркера
     lineHeight: 24,
   },
   listItemText: {

@@ -6,11 +6,9 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ScrollView,
-  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-// --- ДАНІ ПОЛІТИКИ КОНФІДЕНЦІЙНОСТІ (СКОПІЙОВАНО З ВАШОГО HTML) ---
 const privacyPolicyContent = {
   introduction:
     "Thank you for using EatScanner. Your privacy is important to us. This Privacy Policy explains how we collect, use, store, and protect your information when you use our mobile application.",
@@ -76,6 +74,34 @@ const privacyPolicyContent = {
       footerText:
         "All third parties are contractually required to protect your data.",
     },
+    {
+      title: "Data Retention",
+      text: "We keep your information only as long as necessary for:",
+      list: [
+        "Providing services",
+        "Legal obligations",
+        "Improving app functionality",
+      ],
+      footerText: "You may request account deletion at any time.",
+    },
+    {
+      title: "Your Rights",
+      text: "Depending on your location (e.g., EU/California), you have the right to:",
+      list: [
+        "Access your data",
+        "Correct inaccurate information",
+        "Request deletion of your data",
+        "Opt-out of marketing communications",
+      ],
+    },
+    {
+      title: "Children’s Privacy",
+      text: "This app is not intended for children under 13. We do not knowingly collect personal data from children.",
+    },
+    {
+      title: "Changes to This Policy",
+      text: "We may update this Privacy Policy from time to time. We will notify you of major changes via in-app notice or email.",
+    },
   ],
 };
 
@@ -88,7 +114,6 @@ interface PolicyItem {
 
 interface PolicySectionData {
   title: string;
-  introduction?: string;
   text?: string;
   list?: string[];
   items?: PolicyItem[];
@@ -99,14 +124,14 @@ interface PolicySectionProps {
   section: PolicySectionData;
 }
 
-// --- КОМПОНЕНТ: РОЗДІЛ ПОЛІТИКИ ---
+// --- КОМПОНЕНТ ОКРЕМОГО РОЗДІЛУ ---
 const PolicySection: React.FC<PolicySectionProps> = ({ section }) => (
   <View style={styles.sectionContainer}>
     <Text style={styles.sectionTitle}>{section.title}</Text>
 
     {section.text && <Text style={styles.sectionText}>{section.text}</Text>}
 
-    {/* Підрозділи (якщо є) */}
+    {/* Якщо є підрозділи */}
     {section.items &&
       section.items.map((item, index) => (
         <View key={index} style={styles.itemContainer}>
@@ -114,7 +139,6 @@ const PolicySection: React.FC<PolicySectionProps> = ({ section }) => (
             <Text style={styles.itemSubtitle}>{item.subtitle}</Text>
           )}
           {item.text && <Text style={styles.sectionText}>{item.text}</Text>}
-
           {item.list && (
             <View style={styles.listContainer}>
               {item.list.map((listItem, liIndex) => (
@@ -128,7 +152,7 @@ const PolicySection: React.FC<PolicySectionProps> = ({ section }) => (
         </View>
       ))}
 
-    {/* Список головного рівня (якщо немає підрозділів) */}
+    {/* Якщо просто список */}
     {!section.items && section.list && (
       <View style={styles.listContainer}>
         {section.list.map((listItem, liIndex) => (
@@ -146,16 +170,15 @@ const PolicySection: React.FC<PolicySectionProps> = ({ section }) => (
   </View>
 );
 
-// --- ОСНОВНИЙ ЕКРАН ПОЛІТИКИ КОНФІДЕНЦІЙНОСТІ ---
+// --- ГОЛОВНИЙ КОМПОНЕНТ ---
 const PrivacyPolicyScreen: React.FC = () => {
   const handleBack = () => {
-    // Логіка навігації: navigation.goBack();
-    console.log("Натиснуто Назад");
+    console.log("Back pressed");
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Шапка */}
+      {/* Header */}
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <Ionicons name="chevron-back" size={28} color="#000" />
@@ -163,14 +186,12 @@ const PrivacyPolicyScreen: React.FC = () => {
         <Text style={styles.screenTitle}>Privacy Policy</Text>
       </View>
 
-      {/* Скролюваний контент */}
+      {/* Content */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Вступний параграф */}
         <Text style={styles.introductionText}>
           {privacyPolicyContent.introduction}
         </Text>
 
-        {/* Рендеринг розділів */}
         {privacyPolicyContent.sections.map((section, index) => (
           <PolicySection key={index} section={section} />
         ))}
@@ -180,7 +201,6 @@ const PrivacyPolicyScreen: React.FC = () => {
 };
 
 // --- СТИЛІ ---
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -190,8 +210,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 15,
   },
-
-  // --- Стилі Шапки ---
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -199,7 +217,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#f5f5f5",
-    backgroundColor: "#fff",
   },
   backButton: {
     padding: 10,
@@ -210,15 +227,12 @@ const styles = StyleSheet.create({
     color: "#000",
     marginLeft: 5,
   },
-
-  // --- Контент Політики ---
   introductionText: {
     fontSize: 16,
     color: "#444",
     marginBottom: 20,
     lineHeight: 24,
   },
-
   sectionContainer: {
     marginBottom: 30,
   },
@@ -234,7 +248,6 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     lineHeight: 24,
   },
-
   itemContainer: {
     marginBottom: 15,
   },
@@ -244,8 +257,6 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 5,
   },
-
-  // Стилі для списку (імітація маркера '•')
   listContainer: {
     marginLeft: 5,
     marginBottom: 10,
@@ -259,7 +270,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#444",
     marginRight: 8,
-    // Налаштовуємо позицію маркера
     lineHeight: 24,
   },
   listItemText: {

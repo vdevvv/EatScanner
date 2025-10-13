@@ -6,23 +6,11 @@ import {
   Image,
   TouchableOpacity,
   SafeAreaView,
-  ScrollView,
   StatusBar,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../App"; // якщо RootStackParamList визначений у App.tsx
-
-const foodImages = [
-  require("../../assets/food1.jpg"),
-  require("../../assets/food2.jpg"),
-  require("../../assets/food3.jpg"),
-  require("../../assets/food4.jpg"),
-  require("../../assets/food5.jpg"),
-  require("../../assets/food6.jpg"),
-  require("../../assets/food7.jpg"),
-  require("../../assets/food8.jpg"),
-];
+import { RootStackParamList } from "../../../App";
 
 type OnBoarding2NavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -40,20 +28,17 @@ const OnBoarding2Screen: React.FC = () => {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Сітка зображень */}
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.imageGrid}>
-          {foodImages.map((img, index) => (
-            <Image key={index} source={img} style={styles.foodImage} />
-          ))}
-        </View>
-      </ScrollView>
+      {/* 🖼 Один фон замість сітки */}
+      <Image
+        source={require("../../assets/OnBoarding2.png")}
+        style={styles.backgroundImage}
+        resizeMode="cover"
+      />
 
-      {/* Нижня частина */}
-      <View style={styles.fixedBottom}>
+      {/* Контент поверх */}
+      <View style={styles.overlay}>
         <Text style={styles.title}>Find Your Favorite{"\n"}Meals Easily!</Text>
 
-        {/* Прогрес-бар під текстом */}
         <View style={styles.progressContainer}>
           <View style={styles.progressBar} />
           <View style={[styles.progressBar, styles.activeBar]} />
@@ -61,7 +46,6 @@ const OnBoarding2Screen: React.FC = () => {
           <View style={styles.progressBar} />
         </View>
 
-        {/* Кнопка */}
         <TouchableOpacity
           style={styles.continueButton}
           onPress={handleContinue}
@@ -80,27 +64,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  container: {
-    flexGrow: 1,
-    backgroundColor: "#fff",
-    paddingBottom: 150,
-  },
-  imageGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  foodImage: {
-    width: "33.33%",
-    height: 120,
+
+  // 🖼 Фонове зображення (точно 250×250, не перекриває контент)
+  backgroundImage: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 440,
+    height: 510,
+    marginTop: 0,
   },
 
-  fixedBottom: {
-    position: "absolute",
-    bottom: 50,
-    left: 20,
-    right: 20,
+  // Контент поверх
+  overlay: {
+    flex: 1,
+    justifyContent: "flex-end",
     alignItems: "center",
+    paddingHorizontal: 20,
+    paddingBottom: 60,
+    zIndex: 1,
   },
+
   title: {
     fontSize: 24,
     fontWeight: "700",
@@ -108,12 +92,14 @@ const styles = StyleSheet.create({
     color: "#000",
     marginBottom: 20,
   },
+
   progressContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 20,
   },
+
   progressBar: {
     width: 25,
     height: 4,
@@ -121,9 +107,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#E0E0E0",
     marginHorizontal: 5,
   },
+
   activeBar: {
     backgroundColor: "#E57373",
   },
+
   continueButton: {
     backgroundColor: "#E57373",
     borderRadius: 10,
@@ -132,6 +120,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+
   continueText: {
     color: "#fff",
     fontSize: 16,

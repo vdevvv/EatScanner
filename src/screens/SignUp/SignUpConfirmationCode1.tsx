@@ -9,10 +9,11 @@ import {
   KeyboardAvoidingView,
   Platform,
   TextInput as RNTextInput,
+  ScrollView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../App"; // 👈 перевір правильний шлях до App.tsx
+import { RootStackParamList } from "../../../App";
 
 const CODE_LENGTH = 6;
 
@@ -55,7 +56,7 @@ export default function SignUpConfirmationCode1() {
 
   const handleConfirm = () => {
     if (isFilled) {
-      navigation.navigate("SignUpSetPassword1"); // ✅ Перехід на наступний екран
+      navigation.navigate("SignUpSetPassword1");
     }
   };
 
@@ -70,95 +71,108 @@ export default function SignUpConfirmationCode1() {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
-      {/* 🔹 Лого */}
-      <Image
-        source={require("../../assets/logoScaner.png")}
-        style={styles.logo}
-      />
-
-      {/* 🔹 Основний контент */}
-      <View style={styles.content}>
-        {/* Tabs */}
-        <View style={styles.tabs}>
-          <Text style={[styles.tabText, styles.inactiveTab]}>Sign In</Text>
-          <Text style={[styles.tabText, styles.activeTab]}>Sign Up</Text>
-        </View>
-
-        <Text style={styles.title}>Enter confirmation code</Text>
-        <Text style={styles.subtitle}>
-          We’ve sent an SMS with an activation code to your{"\n"}email
-          example@gmail.com
-        </Text>
-
-        {/* 🔹 Поля для коду */}
-        <View style={styles.codeContainer}>
-          {code.map((value, index) => (
-            <TextInput
-              key={index}
-              ref={(ref) => {
-                inputs.current[index] = ref;
-              }}
-              value={value}
-              onChangeText={(text) =>
-                handleChange(text.replace(/\D/g, ""), index)
-              }
-              onKeyPress={(e) => handleKeyPress(e, index)}
-              keyboardType="number-pad"
-              maxLength={1}
-              style={styles.codeInput}
-              returnKeyType="done"
-              textContentType="oneTimeCode"
-            />
-          ))}
-        </View>
-
-        {/* 🔹 Кнопка підтвердження */}
-        <TouchableOpacity
-          style={[styles.confirmButton, isFilled && styles.confirmButtonActive]}
-          disabled={!isFilled}
-          onPress={handleConfirm}
-        >
-          <Text style={[styles.confirmText, isFilled && { color: "#fff" }]}>
-            Confirm
-          </Text>
-        </TouchableOpacity>
-
-        {/* 🔹 Таймер */}
-        <TouchableOpacity onPress={resendCode}>
-          <Text style={styles.resendText}>
-            Send code again{" "}
-            {timer > 0 && (
-              <Text style={{ color: "#999" }}>
-                {timer < 10 ? `00:0${timer}` : `00:${timer}`}
-              </Text>
-            )}
-          </Text>
-        </TouchableOpacity>
-
-        {/* 🔹 Divider */}
-        <View style={styles.dividerContainer}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>Or with</Text>
-          <View style={styles.dividerLine} />
-        </View>
-
-        {/* 🔹 Соцмережі */}
-        <TouchableOpacity style={styles.socialButton}>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* 🔹 ЛОГО — абсолютно позиціоноване, не зсуває layout */}
+        <View style={styles.logoContainer}>
           <Image
-            source={require("../../assets/google.png")}
-            style={styles.socialIcon}
+            source={require("../../assets/logoScaner.png")}
+            style={styles.logo}
           />
-          <Text style={styles.socialText}>Continue with Google</Text>
-        </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity style={styles.socialButton}>
-          <Image
-            source={require("../../assets/facebook.png")}
-            style={styles.socialIcon}
-          />
-          <Text style={styles.socialText}>Continue with Facebook</Text>
-        </TouchableOpacity>
-      </View>
+        {/* 🔹 Основний контент */}
+        <View style={styles.content}>
+          {/* Tabs */}
+          <View style={styles.tabs}>
+            <Text style={[styles.tabText, styles.inactiveTab]}>Sign In</Text>
+            <Text style={[styles.tabText, styles.activeTab]}>Sign Up</Text>
+          </View>
+
+          <Text style={styles.title}>Enter confirmation code</Text>
+          <Text style={styles.subtitle}>
+            We’ve sent an SMS with an activation code to your{"\n"}email
+            example@gmail.com
+          </Text>
+
+          {/* 🔹 Поля для коду */}
+          <View style={styles.codeContainer}>
+            {code.map((value, index) => (
+              <TextInput
+                key={index}
+                ref={(ref) => {
+                  inputs.current[index] = ref;
+                }}
+                value={value}
+                onChangeText={(text) =>
+                  handleChange(text.replace(/\D/g, ""), index)
+                }
+                onKeyPress={(e) => handleKeyPress(e, index)}
+                keyboardType="number-pad"
+                maxLength={1}
+                style={styles.codeInput}
+                returnKeyType="done"
+                textContentType="oneTimeCode"
+              />
+            ))}
+          </View>
+
+          {/* 🔹 Кнопка підтвердження */}
+          <TouchableOpacity
+            style={[
+              styles.confirmButton,
+              isFilled && styles.confirmButtonActive,
+            ]}
+            disabled={!isFilled}
+            onPress={handleConfirm}
+          >
+            <Text style={[styles.confirmText, isFilled && { color: "#fff" }]}>
+              Confirm
+            </Text>
+          </TouchableOpacity>
+
+          {/* 🔹 Таймер */}
+          <TouchableOpacity onPress={resendCode}>
+            <Text style={styles.resendText}>
+              Send code again{" "}
+              {timer > 0 && (
+                <Text style={{ color: "#999" }}>
+                  {timer < 10 ? `00:0${timer}` : `00:${timer}`}
+                </Text>
+              )}
+            </Text>
+          </TouchableOpacity>
+
+          {/* 🔹 Divider */}
+          <View style={styles.dividerContainer}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>Or with</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          {/* 🔹 Соцмережі */}
+          <View style={styles.socialButtons}>
+            <TouchableOpacity style={styles.socialButton}>
+              <Image
+                source={require("../../assets/google.png")}
+                style={styles.socialIcon}
+              />
+              <Text style={styles.socialText}>Continue with Google</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.socialButton}>
+              <Image
+                source={require("../../assets/facebook.png")}
+                style={styles.socialIcon}
+              />
+              <Text style={styles.socialText}>Continue with Facebook</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -167,24 +181,30 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
-    alignItems: "center",
   },
 
-  logo: {
+  scrollContent: {
+    flexGrow: 1,
+    backgroundColor: "#fff",
+    paddingHorizontal: 30,
+    paddingBottom: 40,
+  },
+
+  logoContainer: {
     position: "absolute",
-    top: 20,
+    top: 60,
     alignSelf: "center",
-    width: 280,
-    height: 280,
-    resizeMode: "contain",
     zIndex: 10,
+  },
+  logo: {
+    width: 250,
+    height: 250,
+    resizeMode: "contain",
   },
 
   content: {
-    marginTop: 260,
-    width: "100%",
+    marginTop: 280,
     alignItems: "center",
-    paddingHorizontal: 30,
   },
 
   tabs: {
@@ -212,11 +232,14 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     marginTop: 12,
     marginBottom: 6,
+    color: "#000",
   },
   subtitle: {
     color: "#777",
     textAlign: "center",
     marginBottom: 18,
+    fontSize: 14,
+    lineHeight: 20,
   },
   codeContainer: {
     flexDirection: "row",
@@ -232,6 +255,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     textAlign: "center",
     fontSize: 20,
+    color: "#000",
+    backgroundColor: "#fff",
   },
   confirmButton: {
     width: "100%",
@@ -268,6 +293,10 @@ const styles = StyleSheet.create({
     marginHorizontal: 8,
     color: "#999",
   },
+  socialButtons: {
+    width: "100%",
+    gap: 12,
+  },
   socialButton: {
     width: "100%",
     flexDirection: "row",
@@ -277,7 +306,6 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 12,
     backgroundColor: "#fff",
   },
   socialIcon: {

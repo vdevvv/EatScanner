@@ -1,4 +1,5 @@
-import React from "react";
+// src/screens/UserProfileScreen.tsx
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -12,41 +13,40 @@ import {
   FlatList,
   ImageSourcePropType,
   ImageBackground,
+  Modal,
+  Animated,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-// --- КОНФІГУРАЦІЯ ТА ДАНІ ---
 const { width } = Dimensions.get("window");
 
 const COLORS = {
-  primary: "#E9725C", // Червоно-помаранчевий для кнопки "Send message"
+  primary: "#E9725C",
   background: "#FFFFFF",
-  textDark: "#1F2937", // Темний текст
-  textGrey: "#6B7280", // Сірий текст
+  textDark: "#1F2937",
+  textGrey: "#6B7280",
   white: "#FFFFFF",
   divider: "#E5E7EB",
+  overlay: "rgba(0,0,0,0.4)",
 };
 
-// 💡 ЛОКАЛЬНІ ЗОБРАЖЕННЯ
-// Залишаємо ваші шляхи require(), як ви просили.
-// Примітка: ці файли мають існувати за вказаними шляхами!
-
+// Локальні зображення
 const AVATAR_SOURCE =
-  require("../components/profile-avatar.jpg") as ImageSourcePropType;
+  require("../../assets/profile-avatar.jpg") as ImageSourcePropType;
 const DISH_1_SOURCE =
-  require("../components/sushi-dragons.jpg") as ImageSourcePropType;
+  require("../../assets/sushi-dragons.jpg") as ImageSourcePropType;
 const DISH_2_SOURCE =
-  require("../components/potatoes-square.jpg") as ImageSourcePropType;
+  require("../../assets/potatoes-square.jpg") as ImageSourcePropType;
 const FRIEND_1_SOURCE =
-  require("../components/friend1.jpg") as ImageSourcePropType;
+  require("../../assets/friend1.jpg") as ImageSourcePropType;
 const FRIEND_2_SOURCE =
-  require("../components/friend2.jpg") as ImageSourcePropType;
+  require("../../assets/friend2.jpg") as ImageSourcePropType;
 const FRIEND_3_SOURCE =
-  require("../components/friend3.jpg") as ImageSourcePropType;
+  require("../../assets/friend3.jpg") as ImageSourcePropType;
 const FRIEND_4_SOURCE =
-  require("../components/friend4.jpg") as ImageSourcePropType;
+  require("../../assets/friend4.jpg") as ImageSourcePropType;
 
-// Дані профілю
 const USER_DATA = {
   handle: "@foodie_iryna",
   name: "Talia Gomez",
@@ -60,7 +60,6 @@ const USER_DATA = {
   avatar: AVATAR_SOURCE,
 };
 
-// Імітація даних для розділу "Past Orders" (Сітка)
 const PAST_ORDERS_DATA = [
   {
     id: "1",
@@ -74,102 +73,94 @@ const PAST_ORDERS_DATA = [
     restaurant: "A Mano",
     image: DISH_2_SOURCE,
   },
-  {
-    id: "3",
-    dishName: "Sushi Dragons",
-    restaurant: "Chefs Hall",
-    image: DISH_1_SOURCE,
-  },
-  {
-    id: "4",
-    dishName: "Herbed Golden Potatoes",
-    restaurant: "A Mano",
-    image: DISH_2_SOURCE,
-  },
-  {
-    id: "5",
-    dishName: "Sushi Dragons",
-    restaurant: "Chefs Hall",
-    image: DISH_1_SOURCE,
-  },
-  {
-    id: "6",
-    dishName: "Herbed Golden Potatoes",
-    restaurant: "A Mano",
-    image: DISH_2_SOURCE,
-  },
 ];
 
-// Імітація аватарів спільних друзів
-// Додано більше друзів для демонстрації скролу
 const MUTUAL_FRIENDS = [
   { id: "m1", avatar: FRIEND_1_SOURCE, name: "Max" },
   { id: "m2", avatar: FRIEND_2_SOURCE, name: "Anna" },
   { id: "m3", avatar: FRIEND_3_SOURCE, name: "Tom" },
   { id: "m4", avatar: FRIEND_4_SOURCE, name: "Ira" },
-  { id: "m5", avatar: FRIEND_1_SOURCE, name: "Lena" },
-  { id: "m6", avatar: FRIEND_2_SOURCE, name: "Nick" },
-  { id: "m7", avatar: FRIEND_3_SOURCE, name: "Eva" },
-  { id: "m8", avatar: FRIEND_4_SOURCE, name: "Sasha" },
 ];
 
-// --- ДОПОМІЖНІ КОМПОНЕНТИ ---
+// --------------------------------------------------
+// 👇 Popup меню опції
+const MENU_OPTIONS = [
+  "Share Profile",
+  "Add to the Group",
+  "Remove Friend",
+  "Block User",
+  "Report",
+];
 
-// Статистична картка (46 Saved, 212 Friends, ...)
-interface StatItemProps {
-  count: number;
-  label: string;
-}
-
-const StatItem: React.FC<StatItemProps> = ({ count, label }) => (
-  <View style={styles.statItem}>
-    <Text style={styles.statCount}>{count}</Text>
-    <Text style={styles.statLabel}>{label}</Text>
-  </View>
-);
-
-// Елемент сітки "Past Orders"
-const GRID_ITEM_SIZE = width / 3;
-
-interface OrderItemProps {
-  dishName: string;
-  restaurant: string;
-  image: ImageSourcePropType;
-}
-
-const OrderItem: React.FC<OrderItemProps> = ({
-  dishName,
-  restaurant,
-  image,
-}) => (
-  <TouchableOpacity style={styles.orderItemContainer}>
-    <ImageBackground
-      source={image}
-      style={styles.orderImage}
-      resizeMode="cover"
-    >
-      <View style={styles.orderTextOverlay}>
-        <Text style={styles.orderDishName}>{dishName}</Text>
-        <Text style={styles.orderRestaurantName}>{restaurant}</Text>
-      </View>
-    </ImageBackground>
-  </TouchableOpacity>
-);
-
-// --- ОСНОВНИЙ ЕКРАН ---
-
+// --------------------------------------------------
+// Головний компонент
 const UserProfileScreen: React.FC = () => {
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [fadeAnim] = useState(new Animated.Value(0));
+
+  const toggleMenu = () => {
+    if (menuVisible) {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 150,
+        useNativeDriver: true,
+      }).start(() => setMenuVisible(false));
+    } else {
+      setMenuVisible(true);
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      }).start();
+    }
+  };
+
+  // -----------------------------------
+  // Допоміжні компоненти
+  const StatItem = ({ count, label }: { count: number; label: string }) => (
+    <View style={styles.statItem}>
+      <Text style={styles.statCount}>{count}</Text>
+      <Text style={styles.statLabel}>{label}</Text>
+    </View>
+  );
+
+  const OrderItem = ({
+    dishName,
+    restaurant,
+    image,
+  }: {
+    dishName: string;
+    restaurant: string;
+    image: ImageSourcePropType;
+  }) => (
+    <TouchableOpacity style={styles.orderItemContainer} activeOpacity={0.8}>
+      <ImageBackground
+        source={image}
+        style={styles.orderImage}
+        resizeMode="cover"
+      >
+        <View style={styles.orderTextOverlay}>
+          <Text style={styles.orderDishName}>{dishName}</Text>
+          <Text style={styles.orderRestaurantName}>{restaurant}</Text>
+        </View>
+      </ImageBackground>
+    </TouchableOpacity>
+  );
+
+  // -----------------------------------
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Хедер */}
+      {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => console.log("Go Back")}>
+        <TouchableOpacity onPress={() => console.log("Back")}>
           <Ionicons name="chevron-back" size={28} color={COLORS.textDark} />
         </TouchableOpacity>
+
         <Text style={styles.headerTitle}>{USER_DATA.handle}</Text>
-        <TouchableOpacity onPress={() => console.log("More Options")}>
+
+        <TouchableOpacity onPress={toggleMenu}>
           <Ionicons
             name="ellipsis-horizontal"
             size={24}
@@ -179,62 +170,50 @@ const UserProfileScreen: React.FC = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Блок Профілю */}
+        {/* Profile */}
         <View style={styles.profileBlock}>
           <View style={styles.topRow}>
-            {/* Аватар */}
             <Image source={USER_DATA.avatar} style={styles.avatar} />
-
-            {/* Статистика */}
             <View style={styles.statsContainer}>
-              {USER_DATA.stats.map((stat, index) => (
-                <StatItem key={index} count={stat.count} label={stat.label} />
+              {USER_DATA.stats.map((s, i) => (
+                <StatItem key={i} count={s.count} label={s.label} />
               ))}
             </View>
           </View>
 
-          {/* Ім'я */}
           <Text style={styles.userName}>{USER_DATA.name}</Text>
 
-          {/* Кнопка "Send message" */}
-          <TouchableOpacity
-            style={styles.messageButton}
-            onPress={() => console.log("Send Message")}
-          >
+          <TouchableOpacity style={styles.messageButton}>
             <Text style={styles.messageButtonText}>Send message</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Спільні друзі (Горизонтальний скрол) */}
-        <View style={styles.friendsBlockWrapper}>
-          <Text style={styles.mutualFriendsText}>
-            <Text style={{ fontWeight: "bold" }}>
+        {/* Mutual friends */}
+        <View style={styles.mutualRow}>
+          <View style={styles.mutualLeft}>
+            <Text style={styles.mutualCount}>
               {USER_DATA.mutualFriendsCount}
-            </Text>{" "}
-            Mutual Friends
-          </Text>
-
-          {/* ✅ ВИПРАВЛЕНО: Горизонтальний скрол */}
+            </Text>
+            <Text style={styles.mutualLabel}>Mutual Friends</Text>
+          </View>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.friendsAvatarsScroll}
           >
-            {MUTUAL_FRIENDS.map((friend) => (
-              <View key={friend.id} style={styles.friendPill}>
-                <Image source={friend.avatar} style={styles.friendAvatar} />
-                <Text style={styles.friendName}>{friend.name}</Text>
+            {MUTUAL_FRIENDS.map((f) => (
+              <View key={f.id} style={styles.friendPill}>
+                <Image source={f.avatar} style={styles.friendAvatar} />
+                <Text style={styles.friendName}>{f.name}</Text>
               </View>
             ))}
           </ScrollView>
         </View>
 
-        {/* Розділювач та Заголовок "Past Orders" */}
+        {/* Past Orders */}
         <View style={styles.pastOrdersHeader}>
           <Text style={styles.pastOrdersTitle}>Past Orders</Text>
         </View>
-
-        {/* Сітка замовлень */}
         <FlatList
           data={PAST_ORDERS_DATA}
           renderItem={({ item }) => (
@@ -246,32 +225,71 @@ const UserProfileScreen: React.FC = () => {
           )}
           keyExtractor={(item) => item.id}
           numColumns={3}
-          scrollEnabled={false} // Нехай ScrollView обробляє скролінг
-          columnWrapperStyle={styles.columnWrapper}
+          scrollEnabled={false}
         />
-
-        {/* Додатковий простір для скролінгу */}
-        <View style={{ height: 50 }} />
       </ScrollView>
+
+      {/* Popup Menu */}
+      <Modal visible={menuVisible} transparent animationType="none">
+        <TouchableWithoutFeedback onPress={toggleMenu}>
+          <Animated.View style={[styles.overlay, { opacity: fadeAnim }]} />
+        </TouchableWithoutFeedback>
+
+        <Animated.View
+          style={[
+            styles.menuContainer,
+            { opacity: fadeAnim, transform: [{ scale: fadeAnim }] },
+          ]}
+        >
+          {MENU_OPTIONS.map((option, index) => (
+            <TouchableOpacity
+              key={index}
+              style={[
+                styles.menuItem,
+                option === "Report" && {
+                  borderTopWidth: 1,
+                  borderColor: COLORS.divider,
+                },
+              ]}
+              onPress={() => {
+                console.log(option);
+                toggleMenu();
+              }}
+            >
+              <Text
+                style={[
+                  styles.menuText,
+                  option === "Report" && { color: "#E53E3E" },
+                ]}
+              >
+                {option}
+              </Text>
+              <Ionicons
+                name="person-outline"
+                size={18}
+                color={option === "Report" ? "#E53E3E" : COLORS.textDark}
+              />
+            </TouchableOpacity>
+          ))}
+        </Animated.View>
+      </Modal>
     </SafeAreaView>
   );
 };
 
-// --- СТИЛІЗАЦІЯ ---
+export default UserProfileScreen;
 
+// --------------------------------------------------
+// Стилі
 const PADDING_HORIZONTAL = 20;
 const AVATAR_SIZE = 80;
-const FRIEND_AVATAR_SIZE = 50; // Розмір для скролу
+const FRIEND_AVATAR_SIZE = 56;
+const GRID_ITEM_SIZE = width / 3;
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  scrollContent: {
-    paddingBottom: 20,
-  },
-  // --- Хедер (Навігаційна панель) ---
+  safeArea: { flex: 1, backgroundColor: COLORS.background },
+  scrollContent: { paddingBottom: 20 },
+
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -279,145 +297,105 @@ const styles = StyleSheet.create({
     paddingHorizontal: PADDING_HORIZONTAL,
     paddingVertical: 10,
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: COLORS.textDark,
-  },
+  headerTitle: { fontSize: 18, fontWeight: "600", color: COLORS.textDark },
 
-  // --- Блок Профілю ---
   profileBlock: {
     paddingHorizontal: PADDING_HORIZONTAL,
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.divider,
   },
-  topRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
-  },
+  topRow: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
   avatar: {
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
     borderRadius: AVATAR_SIZE / 2,
     marginRight: 20,
-    borderWidth: 2,
-    borderColor: COLORS.divider, // Невеликий обідок навколо аватара
   },
   statsContainer: {
     flex: 1,
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  statItem: {
-    alignItems: "center",
-    flex: 1, // Розподіл простору між статистичними даними
-  },
-  statCount: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: COLORS.textDark,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: COLORS.textGrey,
-    textAlign: "center",
-  },
+  statItem: { alignItems: "center", flex: 1 },
+  statCount: { fontSize: 20, fontWeight: "700", color: COLORS.textDark },
+  statLabel: { fontSize: 12, color: COLORS.textGrey, textAlign: "center" },
   userName: {
     fontSize: 22,
-    fontWeight: "bold",
+    fontWeight: "700",
     color: COLORS.textDark,
-    marginBottom: 15,
+    marginBottom: 12,
   },
   messageButton: {
     backgroundColor: COLORS.primary,
-    borderRadius: 8,
+    borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center",
-    marginBottom: 20,
   },
-  messageButtonText: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: COLORS.white,
-  },
+  messageButtonText: { fontSize: 16, fontWeight: "700", color: COLORS.white },
 
-  // --- Спільні друзі (Горизонтальний скрол) ---
-  friendsBlockWrapper: {
-    // Контейнер, який містить заголовок і скрол
-    paddingTop: 10,
+  mutualRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: PADDING_HORIZONTAL,
+    paddingVertical: 14,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.divider,
-    marginBottom: 10,
   },
-  mutualFriendsText: {
-    fontSize: 16,
-    color: COLORS.textDark,
-    fontWeight: "500",
-    marginBottom: 10,
-    paddingHorizontal: PADDING_HORIZONTAL, // Відступ для заголовка
-  },
-  friendsAvatarsScroll: {
-    paddingHorizontal: PADDING_HORIZONTAL, // Відступ для початку та кінця скролу
-    paddingBottom: 15,
-  },
-  friendPill: {
-    alignItems: "center",
-    marginRight: 15, // Відступ між елементами друзів
-    width: 70, // Фіксована ширина для кожного елемента (аватар + ім'я)
-  },
+  mutualLeft: { width: 96, alignItems: "center" },
+  mutualCount: { fontSize: 20, fontWeight: "700", color: COLORS.textDark },
+  mutualLabel: { fontSize: 12, color: COLORS.textGrey },
+  friendsAvatarsScroll: { paddingLeft: 10, paddingRight: 20 },
+  friendPill: { alignItems: "center", marginRight: 14 },
   friendAvatar: {
     width: FRIEND_AVATAR_SIZE,
     height: FRIEND_AVATAR_SIZE,
     borderRadius: FRIEND_AVATAR_SIZE / 2,
-    borderWidth: 2,
-    borderColor: COLORS.divider,
-    marginBottom: 5,
   },
-  friendName: {
-    fontSize: 12,
-    color: COLORS.textGrey,
-    textAlign: "center",
-    maxWidth: FRIEND_AVATAR_SIZE + 10,
-  },
-  // --- Сітка замовлень ---
+  friendName: { fontSize: 11, color: COLORS.textGrey, textAlign: "center" },
+
   pastOrdersHeader: {
-    paddingHorizontal: PADDING_HORIZONTAL,
-    paddingVertical: 10,
+    paddingVertical: 12,
+    alignItems: "center",
   },
-  pastOrdersTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: COLORS.textDark,
-    marginBottom: 10,
-  },
-  columnWrapper: {
-    justifyContent: "flex-start",
-  },
+  pastOrdersTitle: { fontSize: 18, fontWeight: "600", color: COLORS.textDark },
   orderItemContainer: {
     width: GRID_ITEM_SIZE,
-    height: GRID_ITEM_SIZE * 1.5, // Приблизно 2:3 співвідношення сторін для вертикальних зображень
-    padding: 1, // Невеликий простір між плитками
+    height: GRID_ITEM_SIZE * 1.5,
   },
-  orderImage: {
-    flex: 1,
-    justifyContent: "flex-end",
-    borderRadius: 0,
+  orderImage: { flex: 1, justifyContent: "flex-end" },
+  orderTextOverlay: { padding: 8, backgroundColor: "rgba(0,0,0,0.35)" },
+  orderDishName: { fontSize: 12, fontWeight: "600", color: COLORS.white },
+  orderRestaurantName: { fontSize: 10, color: COLORS.white },
+
+  // modal
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: COLORS.overlay,
   },
-  orderTextOverlay: {
-    padding: 8,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
+  menuContainer: {
+    position: "absolute",
+    top: 80,
+    right: 20,
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    paddingVertical: 6,
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 6,
   },
-  orderDishName: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: COLORS.white,
+  menuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 14,
+    paddingHorizontal: 18,
   },
-  orderRestaurantName: {
-    fontSize: 10,
-    color: COLORS.white,
+  menuText: {
+    fontSize: 16,
+    color: COLORS.textDark,
+    fontWeight: "500",
   },
 });
-
-export default UserProfileScreen;

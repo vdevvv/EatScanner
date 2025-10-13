@@ -19,13 +19,8 @@ export default function AuthScreen() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignIn = () => {
-    console.log("Sign In:", email, password);
-  };
-
-  const handleSignUp = () => {
-    console.log("Sign Up:", email, password);
-  };
+  const handleSignIn = () => console.log("Sign In:", email, password);
+  const handleSignUp = () => console.log("Sign Up:", email, password);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -36,12 +31,12 @@ export default function AuthScreen() {
         <ScrollView
           style={styles.container}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ flexGrow: 1, justifyContent: "center" }}
+          contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
         >
-          {/* Logo */}
+          {/* Logo — не перекриває нічого */}
           <View style={styles.logoContainer}>
             <Image
-              source={require("../../assets/logoScaner.png")} // заміни на свій логотип
+              source={require("../../assets/logoScaner.png")}
               style={styles.logo}
               resizeMode="contain"
             />
@@ -169,21 +164,22 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: "center",
-    marginBottom: 20,
+    marginTop: 40,
+    marginBottom: 10,
   },
   logo: {
-    width: 160,
-    height: 70,
+    width: 250,
+    height: 250,
   },
   tabContainer: {
     flexDirection: "row",
     justifyContent: "center",
     borderBottomWidth: 1,
     borderColor: "#ddd",
-    marginBottom: 30,
+    marginBottom: 24,
   },
   tab: {
-    paddingVertical: 10,
+    paddingVertical: 8,
     width: "45%",
     alignItems: "center",
   },
@@ -201,13 +197,13 @@ const styles = StyleSheet.create({
   },
   welcomeContainer: {
     alignItems: "center",
-    marginBottom: 25,
+    marginBottom: 24,
   },
   welcomeTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "700",
     color: "#000",
-    marginBottom: 8,
+    marginBottom: 6,
   },
   welcomeSubtitle: {
     textAlign: "center",
@@ -217,11 +213,11 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#ddd",
+    borderWidth: 1.3,
+    borderColor: "#ccc",
     borderRadius: 10,
-    height: 50,
-    marginBottom: 15,
+    height: 48,
+    marginBottom: 14,
     justifyContent: "center",
     paddingHorizontal: 14,
   },
@@ -235,11 +231,11 @@ const styles = StyleSheet.create({
   },
   button: {
     borderRadius: 10,
-    height: 50,
+    height: 48,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 10,
-    marginBottom: 20,
+    marginTop: 6,
+    marginBottom: 18,
   },
   signInButton: {
     backgroundColor: "#C8644D",
@@ -255,7 +251,7 @@ const styles = StyleSheet.create({
   resetContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginBottom: 30,
+    marginBottom: 28,
   },
   resetText: {
     color: "#555",
@@ -271,6 +267,7 @@ const styles = StyleSheet.create({
     color: "#888",
     lineHeight: 18,
     paddingHorizontal: 20,
+    marginBottom: 20,
   },
   link: {
     color: "#C8644D",
