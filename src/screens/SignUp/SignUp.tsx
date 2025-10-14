@@ -19,7 +19,7 @@ import { RootStackParamList } from "../../../App";
 
 type SignUpScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "SignIn"
+  "AuthScreen"
 >;
 
 export default function SignUpScreen() {
@@ -60,7 +60,7 @@ export default function SignUpScreen() {
 
           <TouchableOpacity
             style={styles.tabButton}
-            onPress={() => navigation.navigate("SignIn")}
+            onPress={() => navigation.navigate("AuthScreen")}
           >
             <Text style={styles.tabText}>Sign In</Text>
           </TouchableOpacity>

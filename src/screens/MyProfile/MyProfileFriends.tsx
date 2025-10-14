@@ -129,9 +129,11 @@ const getAvatarSource = (key: AvatarKey): ImageSourcePropType => {
 
 const FriendListItemFixed: React.FC<{ friend: Friend }> = ({ friend }) => {
   const buttonText = friend.isFriend ? "Remove" : "Add";
-  // Стиль кнопки однаковий (світла рамка)
-  const buttonStyle = styles.actionButtonContainer;
-  // Стиль тексту залежить від стану (червоний для Remove, чорний для Add)
+  // Стиль кнопки залежить від стану
+  const buttonStyle = friend.isFriend
+    ? styles.removeButtonContainer
+    : styles.addButtonContainer;
+  // Стиль тексту залежить від стану
   const textStyle = friend.isFriend ? styles.removeText : styles.addText;
 
   const handleAction = () => {
@@ -327,14 +329,23 @@ const styles = StyleSheet.create({
   },
 
   // --- Стилі Кнопок ---
-  // Єдиний стиль контейнера кнопки з тонкою сірою рамкою
-  actionButtonContainer: {
+  // Стиль для кнопки "Add" (сіра рамка)
+  addButtonContainer: {
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 20,
     backgroundColor: "#fff",
     borderWidth: 1,
     borderColor: "#e5e5e5",
+  },
+  // Стиль для кнопки "Remove" (прозорий червоний фон з червоними контурами)
+  removeButtonContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: "rgba(229, 115, 115, 0.1)", // Прозорий червоний фон
+    borderWidth: 1,
+    borderColor: "#E57373", // Червона рамка
   },
   // Стилі для тексту всередині кнопки
   addText: {
@@ -345,7 +356,7 @@ const styles = StyleSheet.create({
   removeText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#e57373", // Червоний текст для "Remove"
+    color: "#E57373", // Червоний текст для "Remove"
   },
   noResultsContainer: {
     alignItems: "center",

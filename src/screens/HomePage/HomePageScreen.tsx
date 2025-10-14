@@ -7,18 +7,18 @@ import {
   TouchableOpacity,
   SafeAreaView,
   StatusBar,
-  ScrollView,
+  Image,
   ImageSourcePropType,
 } from "react-native";
-
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 
-// 💡 НОВЕ: 1. Імпортуємо локальне зображення з папки assets
-// Вам потрібно переконатися, що файл 'potato-green.jpg' знаходиться у папці 'assets/'
+// 💡 Імпорт локальних зображень
 const localImage = require("../../assets/potato-green.jpg");
+const shareIcon = require("../../assets/Telegram.png");
+const saveIcon = require("../../assets/Save.png");
 
-// --- Конфігурація ---
+// --- Конфігурація кольорів ---
 const COLORS = {
   primary: "#E9725C",
   secondary: "#A8574B",
@@ -49,7 +49,7 @@ const DISH_DATA: DishData = {
   imageSource: localImage,
 };
 
-// --- Компонент Головного Екрану ---
+// --- Головний компонент ---
 const HomePageScreen: React.FC = () => {
   const {
     title,
@@ -70,15 +70,18 @@ const HomePageScreen: React.FC = () => {
         translucent
       />
 
-      {/* 🖼️ Фонове зображення та верхній контент */}
+      {/* 🖼️ Фон */}
       <ImageBackground source={imageSource} style={styles.imageBackground}>
-        {/* Градієнт внизу для кращої видимості тексту */}
+        {/* 🖤 Напівпрозорий чорний фон */}
+        <View style={styles.darkOverlay} />
+
+        {/* Градієнт */}
         <LinearGradient
           colors={["transparent", "transparent", COLORS.shadow]}
           style={styles.bottomGradient}
         />
 
-        {/* ⬆️ Верхня панель (Час та Іконки) */}
+        {/* Верхня панель */}
         <SafeAreaView style={styles.header}>
           <TouchableOpacity
             style={styles.headerIcon}
@@ -98,41 +101,28 @@ const HomePageScreen: React.FC = () => {
           </TouchableOpacity>
         </SafeAreaView>
 
-        {/* Основний вміст екрану (всередині зображення) */}
+        {/* Контент */}
         <View style={styles.contentWrapper}>
-          {/* 🍽️ Заголовок страви */}
           <Text style={styles.dishTitle}>{title}</Text>
 
-          {/* ⭐️ Бокові іконки (Share/Save) */}
+          {/* 🧭 Іконки Share / Save */}
           <View style={styles.sideIcons}>
-            {/* 💡 ВИПРАВЛЕНО: Змінено іконку на 'send-outline' для "Телеграми" */}
             <TouchableOpacity style={styles.sideIconItem}>
-              <Ionicons
-                name="send-outline"
-                size={28} // Збільшено розмір іконки
-                color={COLORS.white}
-              />
-              {/* 💡 ВИПРАВЛЕНО: Збільшено розмір шрифту */}
+              <Image source={shareIcon} style={styles.sideIconImage} />
               <Text style={styles.sideIconTextLarge}>Share</Text>
             </TouchableOpacity>
-            {/* Іконка Save */}
+
             <TouchableOpacity style={styles.sideIconItem}>
-              <Ionicons
-                name="bookmark-outline"
-                size={28} // Збільшено розмір іконки
-                color={COLORS.white}
-              />
-              {/* 💡 ВИПРАВЛЕНО: Збільшено розмір шрифту */}
+              <Image source={saveIcon} style={styles.sideIconImage} />
               <Text style={styles.sideIconTextLarge}>Save</Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* 🏢 Блок з інформацією про ресторан та кнопки */}
+        {/* 🏢 Блок з інформацією */}
         <View style={styles.infoBlock}>
           <Text style={styles.restaurantTitle}>{restaurant}</Text>
 
-          {/* Місцезнаходження та рейтинги */}
           <View style={styles.metaRow}>
             <Ionicons
               name="location-sharp"
@@ -144,6 +134,7 @@ const HomePageScreen: React.FC = () => {
             <Text style={styles.metaTextDivider}>•</Text>
             <Text style={styles.metaText}>{distance}</Text>
           </View>
+
           <View style={styles.ratingRow}>
             <View style={styles.ratingBox}>
               <Ionicons name="star" size={12} color={COLORS.white} />
@@ -156,21 +147,19 @@ const HomePageScreen: React.FC = () => {
             </View>
           </View>
 
-          {/* Кнопки замовлення та перегляду */}
+          {/* Кнопки */}
           <View style={styles.buttonRow}>
-            {/* Кнопка View Dish */}
             <TouchableOpacity
               style={[styles.actionButton, styles.viewDishButton]}
             >
               <LinearGradient
-                colors={["#A8574B", "#924B42"]} // Трохи темніший градієнт
+                colors={["#A8574B", "#924B42"]}
                 style={styles.gradientFill}
               >
                 <Text style={styles.viewDishText}>View Dish</Text>
               </LinearGradient>
             </TouchableOpacity>
 
-            {/* Кнопка Order Now */}
             <TouchableOpacity
               style={[styles.actionButton, styles.orderNowButton]}
             >
@@ -180,7 +169,7 @@ const HomePageScreen: React.FC = () => {
         </View>
       </ImageBackground>
 
-      {/* ⬇️ Фіксована нижня навігація */}
+      {/* ⬇️ Нижня навігація */}
       <View style={styles.bottomNav}>
         <BottomNavItem iconName="home" label="Home" active />
         <BottomNavItem iconName="search-outline" label="Discovery" />
@@ -192,7 +181,7 @@ const HomePageScreen: React.FC = () => {
   );
 };
 
-// --- Компонент Нижнього Навігатора ---
+// --- Компонент нижнього меню ---
 interface NavItemProps {
   iconName: keyof typeof Ionicons.glyphMap;
   label: string;
@@ -224,7 +213,7 @@ const BottomNavItem: React.FC<NavItemProps> = ({
   </TouchableOpacity>
 );
 
-// --- Стилізація ---
+// --- Стилі ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -235,12 +224,16 @@ const styles = StyleSheet.create({
     width: "100%",
     justifyContent: "flex-end",
   },
+  darkOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.4)", // 🖤 затемнення (0.4 = 40%)
+  },
   bottomGradient: {
     position: "absolute",
     left: 0,
     right: 0,
     bottom: 0,
-    height: "60%", // Висота градієнта
+    height: "60%",
   },
   header: {
     position: "absolute",
@@ -250,7 +243,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     paddingHorizontal: 15,
-    paddingTop: 45, // Відступ під iOS StatusBar
+    paddingTop: 45,
   },
   headerIcon: {
     padding: 5,
@@ -265,37 +258,27 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: "900",
     color: COLORS.white,
-    // Розташовуємо заголовок ближче до верху
     position: "absolute",
     top: 100,
     left: 20,
-    right: 150, // Щоб не наїжджало на іконки
+    right: 150,
     textShadowColor: "rgba(0, 0, 0, 0.5)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
   sideIcons: {
     position: "absolute",
-    top: 430, // 💡 ВИПРАВЛЕНО: Опустили блок іконок ще нижче (з 380 до 430)
+    top: 430,
     right: 20,
     alignItems: "center",
   },
   sideIconItem: {
     alignItems: "center",
-    marginBottom: 35, // Збільшили відступ між іконками
-  },
-  sideIconText: {
-    fontSize: 12, // Старий розмір
-    color: COLORS.white,
-    marginTop: 2,
-    textShadowColor: "rgba(0, 0, 0, 0.5)",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 1,
+    marginBottom: 35,
   },
   sideIconTextLarge: {
-    fontSize: 14, // 💡 НОВЕ: Збільшений розмір шрифту
+    fontSize: 14,
     color: COLORS.white,
-    marginTop: 4,
     fontWeight: "bold",
     textShadowColor: "rgba(0, 0, 0, 0.5)",
     textShadowOffset: { width: 1, height: 1 },
@@ -336,7 +319,7 @@ const styles = StyleSheet.create({
   ratingBox: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.3)", // Напівпрозорий білий фон
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
     borderRadius: 5,
     paddingVertical: 5,
     paddingHorizontal: 8,
@@ -356,7 +339,7 @@ const styles = StyleSheet.create({
   actionButton: {
     height: 50,
     borderRadius: 10,
-    overflow: "hidden", // Для градієнта
+    overflow: "hidden",
     shadowColor: COLORS.shadow,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -380,7 +363,7 @@ const styles = StyleSheet.create({
   },
   orderNowButton: {
     flex: 1.5,
-    backgroundColor: COLORS.primary, // Фон для кнопки "Order Now"
+    backgroundColor: COLORS.primary,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -389,12 +372,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: COLORS.white,
   },
-  // --- Стилі нижньої навігації ---
   bottomNav: {
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    height: 70, // Висота панелі
+    height: 70,
     backgroundColor: COLORS.white,
     borderTopWidth: 1,
     borderTopColor: "#EEEEEE",
@@ -403,6 +385,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 5,
   },
+  sideIconImage: {
+    width: 56,
+    height: 56,
+    resizeMode: "contain",
+    marginBottom: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 5,
+  },
+
   navText: {
     fontSize: 12,
     marginTop: 2,
