@@ -1,6 +1,6 @@
 import { View, StyleSheet } from "react-native";
 
-import RessetPassword3 from "./src/screens/MyProfile/MyProfileFriends";
+import RessetPassword3 from "./src/screens/HomePage/HomePageScreen";
 
 import { StatusBar } from "expo-status-bar";
 
