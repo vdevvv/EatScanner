@@ -86,90 +86,98 @@ export default function SignUpConfirmationCode1() {
 
         {/* 🔹 Основний контент */}
         <View style={styles.content}>
-          {/* Tabs */}
-          <View style={styles.tabs}>
-            <Text style={[styles.tabText, styles.inactiveTab]}>Sign In</Text>
-            <Text style={[styles.tabText, styles.activeTab]}>Sign Up</Text>
-          </View>
+          {/* Верхня частина */}
+          <View style={styles.topSection}>
+            {/* Tabs */}
+            <View style={styles.tabs}>
+              <Text style={[styles.tabText, styles.inactiveTab]}>Sign In</Text>
+              <Text style={[styles.tabText, styles.activeTab]}>Sign Up</Text>
+            </View>
 
-          <Text style={styles.title}>Enter confirmation code</Text>
-          <Text style={styles.subtitle}>
-            We’ve sent an SMS with an activation code to your{"\n"}email
-            example@gmail.com
-          </Text>
-
-          {/* 🔹 Поля для коду */}
-          <View style={styles.codeContainer}>
-            {code.map((value, index) => (
-              <TextInput
-                key={index}
-                ref={(ref) => {
-                  inputs.current[index] = ref;
-                }}
-                value={value}
-                onChangeText={(text) =>
-                  handleChange(text.replace(/\D/g, ""), index)
-                }
-                onKeyPress={(e) => handleKeyPress(e, index)}
-                keyboardType="number-pad"
-                maxLength={1}
-                style={styles.codeInput}
-                returnKeyType="done"
-                textContentType="oneTimeCode"
-              />
-            ))}
-          </View>
-
-          {/* 🔹 Кнопка підтвердження */}
-          <TouchableOpacity
-            style={[
-              styles.confirmButton,
-              isFilled && styles.confirmButtonActive,
-            ]}
-            disabled={!isFilled}
-            onPress={handleConfirm}
-          >
-            <Text style={[styles.confirmText, isFilled && { color: "#fff" }]}>
-              Confirm
+            <Text style={styles.title}>Enter confirmation code</Text>
+            <Text style={styles.subtitle}>
+              We've sent an SMS with an activation code to your{"\n"}email
+              example@gmail.com
             </Text>
-          </TouchableOpacity>
 
-          {/* 🔹 Таймер */}
-          <TouchableOpacity onPress={resendCode}>
-            <Text style={styles.resendText}>
-              Send code again{" "}
-              {timer > 0 && (
-                <Text style={{ color: "#999" }}>
-                  {timer < 10 ? `00:0${timer}` : `00:${timer}`}
-                </Text>
-              )}
-            </Text>
-          </TouchableOpacity>
+            {/* 🔹 Поля для коду */}
+            <View style={styles.codeContainer}>
+              {code.map((value, index) => (
+                <TextInput
+                  key={index}
+                  ref={(ref) => {
+                    inputs.current[index] = ref;
+                  }}
+                  value={value}
+                  onChangeText={(text) =>
+                    handleChange(text.replace(/\D/g, ""), index)
+                  }
+                  onKeyPress={(e) => handleKeyPress(e, index)}
+                  keyboardType="number-pad"
+                  maxLength={1}
+                  style={styles.codeInput}
+                  returnKeyType="done"
+                  textContentType="oneTimeCode"
+                />
+              ))}
+            </View>
 
-          {/* 🔹 Divider */}
-          <View style={styles.dividerContainer}>
-            <View style={styles.dividerLine} />
-            <Text style={styles.dividerText}>Or with</Text>
-            <View style={styles.dividerLine} />
-          </View>
-
-          {/* 🔹 Соцмережі */}
-          <View style={styles.socialButtons}>
-            <TouchableOpacity style={styles.socialButton}>
-              <Image
-                source={require("../../assets/google.png")}
-                style={styles.socialIcon}
-              />
-              <Text style={styles.socialText}>Continue with Google</Text>
+            {/* 🔹 Кнопка підтвердження */}
+            <TouchableOpacity
+              style={[
+                styles.confirmButton,
+                isFilled && styles.confirmButtonActive,
+              ]}
+              disabled={!isFilled}
+              onPress={handleConfirm}
+            >
+              <Text style={[styles.confirmText, isFilled && { color: "#fff" }]}>
+                Confirm
+              </Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.socialButton}>
-              <Image
-                source={require("../../assets/facebook.png")}
-                style={styles.socialIcon}
-              />
-              <Text style={styles.socialText}>Continue with Facebook</Text>
+            {/* 🔹 Таймер */}
+            <TouchableOpacity onPress={resendCode}>
+              <Text style={styles.resendText}>
+                Send code again{" "}
+                {timer > 0 && (
+                  <Text style={{ color: "#999" }}>
+                    {timer < 10 ? `00:0${timer}` : `00:${timer}`}
+                  </Text>
+                )}
+              </Text>
             </TouchableOpacity>
+          </View>
+
+          {/* Нижня частина - соціальні кнопки */}
+          <View style={styles.bottomSection}>
+            {/* 🔹 Divider */}
+            <View style={styles.dividerContainer}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>Or with</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            {/* 🔹 Соцмережі */}
+            <View style={styles.socialButtons}>
+              <TouchableOpacity style={styles.socialButton}>
+                <Image
+                  source={require("../../assets/google.png")}
+                  style={styles.socialIcon}
+                />
+                <Text style={styles.socialText}>Continue with Google</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.socialButton, styles.lastSocialButton]}
+              >
+                <Image
+                  source={require("../../assets/facebook.png")}
+                  style={styles.socialIcon}
+                />
+                <Text style={styles.socialText}>Continue with Facebook</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -203,8 +211,18 @@ const styles = StyleSheet.create({
   },
 
   content: {
+    flex: 1,
     marginTop: 280,
     alignItems: "center",
+    justifyContent: "space-between",
+  },
+  topSection: {
+    alignItems: "center",
+    width: "100%",
+  },
+  bottomSection: {
+    alignItems: "center",
+    width: "100%",
   },
 
   tabs: {
@@ -264,7 +282,7 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: "center",
-    marginBottom: 12,
+    marginBottom: 0,
   },
   confirmButtonActive: {
     backgroundColor: "#D06B5C",
@@ -276,13 +294,14 @@ const styles = StyleSheet.create({
   },
   resendText: {
     color: "#000",
-    marginBottom: 20,
+    marginBottom: 0,
   },
   dividerContainer: {
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
     marginBottom: 14,
+    marginTop: 20,
   },
   dividerLine: {
     flex: 1,
@@ -318,5 +337,8 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#222",
     fontWeight: "500",
+  },
+  lastSocialButton: {
+    marginBottom: 0,
   },
 });

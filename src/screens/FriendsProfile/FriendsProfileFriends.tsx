@@ -10,6 +10,21 @@ import {
   Image,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+// Типи для навігації
+type RootStackParamList = {
+  HomePageScreen: undefined;
+  DiscoveryScreen: undefined;
+  ChatsScreen: undefined;
+  FriendsScreen: undefined;
+  FriendsProfileFriends: undefined;
+  ProfileScreen: undefined;
+  MyProfileScreen: undefined;
+  DishDetailScreen: undefined;
+  OrderScreen: undefined;
+};
 
 const COLORS = {
   primary: "#E9725C",
@@ -79,8 +94,40 @@ const FRIENDS = [
   },
 ];
 
+type FriendsListNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "FriendsProfileFriends"
+>;
+
 export default function FriendsListScreen() {
+  const navigation = useNavigation<FriendsListNavigationProp>();
   const [search, setSearch] = useState("");
+
+  const handleBack = () => {
+    navigation.goBack();
+  };
+
+  // Навігаційні функції для нижнього таб меню
+  const handleHomePress = () => {
+    navigation.navigate("HomePageScreen");
+  };
+
+  const handleDiscoveryPress = () => {
+    navigation.navigate("DiscoveryScreen");
+  };
+
+  const handleChatsPress = () => {
+    navigation.navigate("ChatsScreen");
+  };
+
+  const handleFriendsPress = () => {
+    // Вже на FriendsProfileFriends
+    console.log("Friends pressed");
+  };
+
+  const handleProfilePress = () => {
+    navigation.navigate("MyProfileScreen");
+  };
 
   const filtered = FRIENDS.filter((f) =>
     f.name.toLowerCase().includes(search.toLowerCase())
@@ -97,9 +144,8 @@ export default function FriendsListScreen() {
         );
       case "cancel":
         return (
-          <TouchableOpacity style={styles.cancelBtn}>
-            <Ionicons name="remove-outline" size={18} color="#6B7280" />
-            <Text style={styles.actionTextCancel}>Cancel Request</Text>
+          <TouchableOpacity style={styles.removeBtn}>
+            <Text style={styles.actionTextRemove}>Remove</Text>
           </TouchableOpacity>
         );
       case "message":
@@ -122,7 +168,7 @@ export default function FriendsListScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleBack}>
           <Ionicons name="chevron-back" size={26} color={COLORS.textDark} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Talia`s Friends (212)</Text>
@@ -163,9 +209,62 @@ export default function FriendsListScreen() {
         contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 10 }}
         showsVerticalScrollIndicator={false}
       />
+
+      {/* 🔻 Bottom Navigation */}
+      <View style={styles.bottomTabBar}>
+        <TabBarItem
+          iconName="home-outline"
+          label="Home"
+          active={false}
+          onPress={handleHomePress}
+        />
+        <TabBarItem
+          iconName="search-outline"
+          label="Discovery"
+          active={false}
+          onPress={handleDiscoveryPress}
+        />
+        <TabBarItem
+          iconName="chatbubble-outline"
+          label="Chats"
+          active={false}
+          onPress={handleChatsPress}
+        />
+        <TabBarItem
+          iconName="people-outline"
+          label="My Friends"
+          active={true}
+          onPress={handleFriendsPress}
+        />
+        <TabBarItem
+          iconName="person-outline"
+          label="Profile"
+          active={false}
+          onPress={handleProfilePress}
+        />
+      </View>
     </SafeAreaView>
   );
 }
+
+/* --- Tab Bar Item --- */
+const TabBarItem = ({ iconName, label, active, onPress }: any) => (
+  <TouchableOpacity style={styles.tabBarItem} onPress={onPress}>
+    <Ionicons
+      name={iconName}
+      size={24}
+      color={active ? COLORS.primary : COLORS.textGrey}
+    />
+    <Text
+      style={[
+        styles.tabBarLabel,
+        { color: active ? COLORS.primary : COLORS.textGrey },
+      ]}
+    >
+      {label}
+    </Text>
+  </TouchableOpacity>
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -229,9 +328,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  cancelBtn: {
+  removeBtn: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
   },
   actionTextAdd: {
     color: COLORS.primary,
@@ -239,10 +344,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginLeft: 4,
   },
-  actionTextCancel: {
-    color: COLORS.textGrey,
-    fontWeight: "500",
+  actionTextRemove: {
+    color: COLORS.primary,
+    fontWeight: "600",
     fontSize: 14,
-    marginLeft: 4,
   },
+
+  /* --- Bottom Navigation --- */
+  bottomTabBar: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    height: 80,
+    borderTopColor: "#E0E0E0",
+    backgroundColor: COLORS.background,
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  tabBarItem: { alignItems: "center", flex: 1 },
+  tabBarLabel: { fontSize: 10, marginTop: 2, fontWeight: "500" },
 });

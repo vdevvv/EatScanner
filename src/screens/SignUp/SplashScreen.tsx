@@ -19,7 +19,7 @@ const WelcomeScreen: React.FC = () => {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      navigation.navigate("OnBoarding1Screen");
+      navigation.navigate("HomePageScreen");
     }, 2000); // 2 секунди
 
     return () => clearTimeout(timeout);

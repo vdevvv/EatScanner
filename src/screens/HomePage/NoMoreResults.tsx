@@ -4,18 +4,16 @@ import {
   Text,
   StyleSheet,
   Image,
-  FlatList,
   TouchableOpacity,
   Modal,
   Dimensions,
-  SafeAreaView,
   StatusBar,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
-// 🖼️ Приклади фото для фону (замінити своїми)
+// 🖼️ Приклади фото для фону
 const IMAGES = [
   require("../../assets/food1.jpg"),
   require("../../assets/food2.jpg"),
@@ -41,22 +39,24 @@ const NoMoreResultsScreen = () => {
   const [modalVisible, setModalVisible] = useState(true);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <StatusBar
         barStyle="light-content"
         translucent
         backgroundColor="transparent"
       />
 
-      {/* 🖼️ Сітка зображень */}
-      <FlatList
-        data={IMAGES}
-        keyExtractor={(_, index) => index.toString()}
-        numColumns={2}
-        renderItem={({ item }) => (
-          <Image source={item} style={styles.gridImage} resizeMode="cover" />
-        )}
-      />
+      {/* 🖼️ Сітка зображень на весь екран */}
+      <View style={styles.imageGrid}>
+        {IMAGES.map((image, index) => (
+          <Image
+            key={index}
+            source={image}
+            style={styles.gridImage}
+            resizeMode="cover"
+          />
+        ))}
+      </View>
 
       {/* ⚪️ Модальне вікно */}
       <Modal visible={modalVisible} transparent animationType="fade">
@@ -95,7 +95,7 @@ const NoMoreResultsScreen = () => {
           </View>
         </View>
       </Modal>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -105,12 +105,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.white,
   },
+  imageGrid: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    width: width,
+    height: height,
+  },
   gridImage: {
-    width: width / 2,
-    height: width / 2,
+    width: width / 3,
+    height: height / 3,
   },
   modalOverlay: {
-    flex: 1,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: COLORS.overlay,
     justifyContent: "center",
     alignItems: "center",
@@ -123,6 +134,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     alignItems: "center",
     elevation: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
   },
   closeButton: {
     position: "absolute",

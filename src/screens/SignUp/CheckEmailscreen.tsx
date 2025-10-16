@@ -42,102 +42,113 @@ const AuthScreen = () => {
       </View>
 
       <View style={styles.content}>
-        {/* Tabs */}
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            onPress={() => setActiveTab("signin")}
-            style={styles.tab}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === "signin" && styles.tabTextActive,
-              ]}
+        {/* Верхня частина */}
+        <View style={styles.topSection}>
+          {/* Tabs */}
+          <View style={styles.tabContainer}>
+            <TouchableOpacity
+              onPress={() => setActiveTab("signin")}
+              style={styles.tab}
             >
-              Sign In
-            </Text>
-          </TouchableOpacity>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "signin" && styles.tabTextActive,
+                ]}
+              >
+                Sign In
+              </Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => setActiveTab("signup")}
-            style={styles.tab}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === "signup" && styles.tabTextActive,
-              ]}
+            <TouchableOpacity
+              onPress={() => setActiveTab("signup")}
+              style={styles.tab}
             >
-              Sign Up
-            </Text>
-          </TouchableOpacity>
-        </View>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === "signup" && styles.tabTextActive,
+                ]}
+              >
+                Sign Up
+              </Text>
+            </TouchableOpacity>
+          </View>
 
-        {/* Підкреслення активного табу */}
-        <View style={styles.tabUnderlineContainer}>
-          <View
-            style={[
-              styles.tabUnderline,
-              activeTab === "signin" ? { left: "0%" } : { left: "50%" },
-            ]}
-          />
-        </View>
+          {/* Підкреслення активного табу */}
+          <View style={styles.tabUnderlineContainer}>
+            <View
+              style={[
+                styles.tabUnderline,
+                activeTab === "signin" ? { left: "0%" } : { left: "50%" },
+              ]}
+            />
+          </View>
 
-        {/* Заголовки */}
-        <Text style={styles.title}>Enter your email</Text>
-        <Text style={styles.subtitle}>
-          We asking your email to send you verification code{"\n"}to confirm
-          your account
-        </Text>
-
-        {/* Поле вводу */}
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#999"
-          value={email}
-          onChangeText={setEmail}
-        />
-
-        {/* Кнопка */}
-        <TouchableOpacity
-          style={[
-            styles.submitButton,
-            email.length > 0 && styles.submitButtonActive,
-          ]}
-          disabled={email.length === 0}
-          onPress={handleSubmit}
-        >
-          <Text
-            style={[styles.submitText, email.length === 0 && { color: "#aaa" }]}
-          >
-            {activeTab === "signup" ? "Sign Up" : "Sign In"}
+          {/* Заголовки */}
+          <Text style={styles.title}>Enter your email</Text>
+          <Text style={styles.subtitle}>
+            We asking your email to send you verification code{"\n"}to confirm
+            your account
           </Text>
-        </TouchableOpacity>
 
-        {/* Divider */}
-        <View style={styles.dividerContainer}>
-          <View style={styles.line} />
-          <Text style={styles.orText}>Or with</Text>
-          <View style={styles.line} />
+          {/* Поле вводу */}
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor="#999"
+            value={email}
+            onChangeText={setEmail}
+          />
+
+          {/* Кнопка */}
+          <TouchableOpacity
+            style={[
+              styles.submitButton,
+              email.length > 0 && styles.submitButtonActive,
+            ]}
+            disabled={email.length === 0}
+            onPress={handleSubmit}
+          >
+            <Text
+              style={[
+                styles.submitText,
+                email.length === 0 && { color: "#aaa" },
+              ]}
+            >
+              {activeTab === "signup" ? "Sign Up" : "Sign In"}
+            </Text>
+          </TouchableOpacity>
         </View>
 
-        {/* Social buttons */}
-        <TouchableOpacity style={styles.socialButton}>
-          <Image
-            source={require("../../assets/google.png")}
-            style={styles.socialIcon}
-          />
-          <Text style={styles.socialText}>Continue with Google</Text>
-        </TouchableOpacity>
+        {/* Нижня частина - соціальні кнопки */}
+        <View style={styles.bottomSection}>
+          {/* Divider */}
+          <View style={styles.dividerContainer}>
+            <View style={styles.line} />
+            <Text style={styles.orText}>Or with</Text>
+            <View style={styles.line} />
+          </View>
 
-        <TouchableOpacity style={styles.socialButton}>
-          <Image
-            source={require("../../assets/facebook.png")}
-            style={styles.socialIcon}
-          />
-          <Text style={styles.socialText}>Continue with Facebook</Text>
-        </TouchableOpacity>
+          {/* Social buttons */}
+          <TouchableOpacity style={styles.socialButton}>
+            <Image
+              source={require("../../assets/google.png")}
+              style={styles.socialIcon}
+            />
+            <Text style={styles.socialText}>Continue with Google</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.socialButton, styles.lastSocialButton]}
+          >
+            <Image
+              source={require("../../assets/facebook.png")}
+              style={styles.socialIcon}
+            />
+            <Text style={styles.socialText}>Continue with Facebook</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -170,9 +181,18 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "flex-start",
+    justifyContent: "space-between",
     paddingHorizontal: 24,
     marginTop: 180,
+    paddingBottom: 40,
+  },
+  topSection: {
+    alignItems: "center",
+    width: "100%",
+  },
+  bottomSection: {
+    alignItems: "center",
+    width: "100%",
   },
 
   tabContainer: {
@@ -237,7 +257,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 10,
     alignItems: "center",
-    marginBottom: 40,
+    marginBottom: 0,
   },
   submitButtonActive: {
     backgroundColor: "#E57373",
@@ -252,6 +272,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
     marginBottom: 20,
+    marginTop: 20,
   },
   line: {
     flex: 1,
@@ -285,5 +306,8 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#222",
     fontWeight: "500",
+  },
+  lastSocialButton: {
+    marginBottom: 0,
   },
 });

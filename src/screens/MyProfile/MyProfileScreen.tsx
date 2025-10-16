@@ -14,6 +14,9 @@ import {
   ImageBackground,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../App";
 
 // --- КОНФІГУРАЦІЯ ТА ДАНІ ---
 const { width } = Dimensions.get("window");
@@ -132,9 +135,13 @@ const OrderItem: React.FC<OrderItemProps> = ({
   </TouchableOpacity>
 );
 
+// --- ТИП НАВІГАЦІЇ ---
+type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
 // --- ОСНОВНИЙ ЕКРАН ПРОФІЛЮ ---
 
 const ProfileScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp>();
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
@@ -206,23 +213,36 @@ const ProfileScreen: React.FC = () => {
 
       {/* Навігаційна панель (Бачимо на скріншоті, додамо для повноти) */}
       <View style={styles.bottomTabBar}>
-        <TabBarItem iconName="home-outline" label="Home" active={false} />
+        <TabBarItem
+          iconName="home-outline"
+          label="Home"
+          active={false}
+          onPress={() => navigation.navigate("HomePage")}
+        />
         <TabBarItem
           iconName="search-outline"
           label="Discovery"
           active={false}
+          onPress={() => navigation.navigate("Welcome")}
         />
         <TabBarItem
           iconName="chatbubble-outline"
           label="Chats"
           active={false}
+          onPress={() => console.log("Chats")}
         />
         <TabBarItem
           iconName="people-outline"
           label="My Friends"
           active={false}
+          onPress={() => navigation.navigate("FriendsProfileScreen")}
         />
-        <TabBarItem iconName="person" label="Profile" active={true} />
+        <TabBarItem
+          iconName="person"
+          label="Profile"
+          active={true}
+          onPress={() => console.log("Profile")}
+        />
       </View>
     </SafeAreaView>
   );
@@ -233,10 +253,16 @@ interface TabBarItemProps {
   iconName: keyof typeof Ionicons.glyphMap;
   label: string;
   active: boolean;
+  onPress?: () => void;
 }
 
-const TabBarItem: React.FC<TabBarItemProps> = ({ iconName, label, active }) => (
-  <TouchableOpacity style={styles.tabBarItem}>
+const TabBarItem: React.FC<TabBarItemProps> = ({
+  iconName,
+  label,
+  active,
+  onPress,
+}) => (
+  <TouchableOpacity style={styles.tabBarItem} onPress={onPress}>
     <Ionicons
       name={iconName}
       size={24}
@@ -379,12 +405,23 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
     paddingVertical: 10,
     borderTopWidth: 1,
+    height: 80,
     borderTopColor: COLORS.divider,
     backgroundColor: COLORS.white,
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
+  },
+  bottomNav: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    height: 70,
+    backgroundColor: COLORS.white,
+    borderTopWidth: 1,
+    borderTopColor: "#EEEEEE",
+    marginBottom: 15,
   },
   tabBarItem: {
     alignItems: "center",

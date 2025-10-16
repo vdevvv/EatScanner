@@ -18,6 +18,7 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
@@ -95,8 +96,13 @@ const MENU_OPTIONS = [
 // --------------------------------------------------
 // Головний компонент
 const UserProfileScreen: React.FC = () => {
+  const navigation = useNavigation();
   const [menuVisible, setMenuVisible] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
+
+  const handleBack = () => {
+    navigation.goBack();
+  };
 
   const toggleMenu = () => {
     if (menuVisible) {
@@ -154,7 +160,7 @@ const UserProfileScreen: React.FC = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => console.log("Back")}>
+        <TouchableOpacity onPress={handleBack}>
           <Ionicons name="chevron-back" size={28} color={COLORS.textDark} />
         </TouchableOpacity>
 
