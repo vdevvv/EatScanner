@@ -8,10 +8,24 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+// Типи для навігації
+type RootStackParamList = {
+  ResetPassword2: undefined;
+  ResetPassword3: undefined;
+};
+
+type ResetPassword2NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "ResetPassword2"
+>;
 
 const CODE_LENGTH = 5;
 
 export default function VerifyCodeScreen() {
+  const navigation = useNavigation<ResetPassword2NavigationProp>();
   const [code, setCode] = useState<string[]>(Array(CODE_LENGTH).fill(""));
   const inputs = useRef<Array<TextInput | null>>([]);
 
@@ -37,7 +51,7 @@ export default function VerifyCodeScreen() {
   const isFilled = code.every((digit) => digit !== "");
 
   const handleVerify = () => {
-    alert(`Entered code: ${code.join("")}`);
+    navigation.navigate("ResetPassword3");
   };
 
   return (

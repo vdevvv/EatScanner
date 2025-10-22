@@ -11,9 +11,21 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+// Типи для навігації
+type RootStackParamList = {
+  ResetPassword3: undefined;
+  ResetPassword4: undefined;
+};
+
+type ResetPassword3NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "ResetPassword3"
+>;
 
 export default function SetNewPasswordScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<ResetPassword3NavigationProp>();
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -22,7 +34,7 @@ export default function SetNewPasswordScreen() {
   const isValid = password.length >= 8 && password === repeatPassword; // мінімальна валідація
 
   const handleSubmit = () => {
-    alert("✅ Password updated successfully!");
+    navigation.navigate("ResetPassword4");
   };
 
   return (

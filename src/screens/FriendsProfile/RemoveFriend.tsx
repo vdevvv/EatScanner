@@ -1,4 +1,4 @@
-// src/screens/UserProfileScreen.tsx
+// RemoveFriend.tsx
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -15,6 +15,8 @@ import {
   Modal,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 const { width } = Dimensions.get("window");
 
@@ -27,6 +29,17 @@ const COLORS = {
   divider: "#E5E7EB",
   overlay: "rgba(0,0,0,0.4)",
 };
+
+// Типи для навігації
+type RootStackParamList = {
+  FriendsProfileScreen: undefined;
+  RemoveFriend: undefined;
+};
+
+type RemoveFriendNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "RemoveFriend"
+>;
 
 const AVATAR_SOURCE = require("../../assets/profile-avatar.jpg");
 const DISH_1_SOURCE = require("../../assets/sushi-dragons.jpg");
@@ -86,8 +99,13 @@ const PAST_ORDERS_DATA = [
 const GRID_ITEM_SIZE = width / 3;
 
 // --------------------------------------------------
-const UserProfileScreen: React.FC = () => {
-  const [removeVisible, setRemoveVisible] = useState(true);
+const RemoveFriendScreen: React.FC = () => {
+  const navigation = useNavigation<RemoveFriendNavigationProp>();
+  const [removeVisible, setRemoveVisible] = useState(true); // Модалка з'являється одразу при завантаженні
+
+  const handleBack = () => {
+    navigation.goBack();
+  };
 
   const StatItem = ({ count, label }: { count: number; label: string }) => (
     <View style={styles.statItem}>
@@ -125,7 +143,7 @@ const UserProfileScreen: React.FC = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => console.log("Back")}>
+        <TouchableOpacity onPress={handleBack}>
           <Ionicons name="chevron-back" size={28} color={COLORS.textDark} />
         </TouchableOpacity>
 
@@ -153,6 +171,8 @@ const UserProfileScreen: React.FC = () => {
           </View>
 
           <Text style={styles.userName}>{USER_DATA.name}</Text>
+
+          
         </View>
 
         {/* Past Orders */}
@@ -172,20 +192,23 @@ const UserProfileScreen: React.FC = () => {
         />
       </ScrollView>
 
-      {/* REMOVE FRIEND MODAL */}
+      {/* REMOVE FRIEND MODAL - З'являється одразу при завантаженні сторінки */}
       <Modal visible={removeVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
             <TouchableOpacity
               style={styles.closeIcon}
-              onPress={() => setRemoveVisible(false)}
+              onPress={() => {
+                setRemoveVisible(false);
+                navigation.goBack();
+              }}
             >
               <Ionicons name="close" size={22} color="#374151" />
             </TouchableOpacity>
 
             <Text style={styles.modalTitle}>Remove This Friend?</Text>
             <Text style={styles.modalSubtitle}>
-              You’ll no longer see each other’s shared videos and orders.
+              You'll no longer see each other's shared videos and orders.
             </Text>
 
             <TouchableOpacity
@@ -193,6 +216,7 @@ const UserProfileScreen: React.FC = () => {
               onPress={() => {
                 alert("Friend removed");
                 setRemoveVisible(false);
+                navigation.goBack();
               }}
             >
               <Text style={styles.removeButtonText}>Remove</Text>
@@ -200,7 +224,10 @@ const UserProfileScreen: React.FC = () => {
 
             <TouchableOpacity
               style={styles.cancelButton}
-              onPress={() => setRemoveVisible(false)}
+              onPress={() => {
+                setRemoveVisible(false);
+                navigation.goBack();
+              }}
             >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
@@ -211,7 +238,7 @@ const UserProfileScreen: React.FC = () => {
   );
 };
 
-export default UserProfileScreen;
+export default RemoveFriendScreen;
 
 // --------------------------------------------------
 const AVATAR_SIZE = 80;
@@ -249,6 +276,13 @@ const styles = StyleSheet.create({
   statCount: { fontSize: 20, fontWeight: "700", color: COLORS.textDark },
   statLabel: { fontSize: 12, color: COLORS.textGrey },
   userName: { fontSize: 22, fontWeight: "700", color: COLORS.textDark },
+  messageButton: {
+    backgroundColor: COLORS.primary,
+    borderRadius: 12,
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+  messageButtonText: { fontSize: 16, fontWeight: "700", color: COLORS.white },
 
   orderItemContainer: {
     width: GRID_ITEM_SIZE,

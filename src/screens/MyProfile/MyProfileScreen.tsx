@@ -16,7 +16,19 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../App";
+
+// Типи для навігації
+type RootStackParamList = {
+  HomePageScreen: undefined;
+  Discovery: undefined;
+  ChatsScreen: undefined;
+  FriendsScreen: undefined;
+  FriendsProfileFriends: undefined;
+  ProfileScreen: undefined;
+  MyProfileScreen: undefined;
+  DishDetailScreen: undefined;
+  OrderScreen: undefined;
+};
 
 // --- КОНФІГУРАЦІЯ ТА ДАНІ ---
 const { width } = Dimensions.get("window");
@@ -136,12 +148,37 @@ const OrderItem: React.FC<OrderItemProps> = ({
 );
 
 // --- ТИП НАВІГАЦІЇ ---
-type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type MyProfileNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "MyProfileScreen"
+>;
 
 // --- ОСНОВНИЙ ЕКРАН ПРОФІЛЮ ---
 
 const ProfileScreen: React.FC = () => {
-  const navigation = useNavigation<NavigationProp>();
+  const navigation = useNavigation<MyProfileNavigationProp>();
+
+  // Навігаційні функції для нижнього таб меню
+  const handleHomePress = () => {
+    navigation.navigate("HomePageScreen");
+  };
+
+  const handleDiscoveryPress = () => {
+    navigation.navigate("Discovery");
+  };
+
+  const handleChatsPress = () => {
+    navigation.navigate("ChatsScreen");
+  };
+
+  const handleFriendsPress = () => {
+    navigation.navigate("FriendsProfileFriends");
+  };
+
+  const handleProfilePress = () => {
+    // Вже на MyProfileScreen
+    console.log("Profile pressed");
+  };
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
@@ -211,37 +248,37 @@ const ProfileScreen: React.FC = () => {
         <View style={{ height: 50 }} />
       </ScrollView>
 
-      {/* Навігаційна панель (Бачимо на скріншоті, додамо для повноти) */}
+      {/* Навігаційна панель */}
       <View style={styles.bottomTabBar}>
         <TabBarItem
           iconName="home-outline"
           label="Home"
           active={false}
-          onPress={() => navigation.navigate("HomePage")}
+          onPress={handleHomePress}
         />
         <TabBarItem
           iconName="search-outline"
           label="Discovery"
           active={false}
-          onPress={() => navigation.navigate("Welcome")}
+          onPress={handleDiscoveryPress}
         />
         <TabBarItem
           iconName="chatbubble-outline"
           label="Chats"
           active={false}
-          onPress={() => console.log("Chats")}
+          onPress={handleChatsPress}
         />
         <TabBarItem
           iconName="people-outline"
           label="My Friends"
           active={false}
-          onPress={() => navigation.navigate("FriendsProfileScreen")}
+          onPress={handleFriendsPress}
         />
         <TabBarItem
-          iconName="person"
+          iconName="person-outline"
           label="Profile"
           active={true}
-          onPress={() => console.log("Profile")}
+          onPress={handleProfilePress}
         />
       </View>
     </SafeAreaView>
@@ -406,7 +443,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderTopWidth: 1,
     height: 80,
-    borderTopColor: COLORS.divider,
+    borderTopColor: "#E0E0E0",
     backgroundColor: COLORS.white,
     position: "absolute",
     bottom: 0,

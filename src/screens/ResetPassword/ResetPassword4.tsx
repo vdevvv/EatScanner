@@ -7,11 +7,25 @@ import {
   StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+// Типи для навігації
+type RootStackParamList = {
+  ResetPassword4: undefined;
+  SignIn: undefined;
+};
+
+type ResetPassword4NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "ResetPassword4"
+>;
 
 export default function SuccessScreen() {
+  const navigation = useNavigation<ResetPassword4NavigationProp>();
+  
   const handleContinue = () => {
-    // наприклад, navigation.navigate("Login")
-    alert("Continue to login");
+    navigation.navigate("SignIn");
   };
 
   return (

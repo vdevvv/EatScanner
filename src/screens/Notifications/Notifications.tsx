@@ -9,6 +9,19 @@ import {
   StatusBar,
 } from "react-native";
 import { Ionicons, Feather } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+// Типи для навігації
+type RootStackParamList = {
+  HomePageScreen: undefined;
+  Notifications: undefined;
+};
+
+type NotificationsNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "Notifications"
+>;
 
 // 🔹 Список мокових сповіщень
 const notifications = [
@@ -71,6 +84,12 @@ const notifications = [
 ];
 
 const NotificationsScreen = () => {
+  const navigation = useNavigation<NotificationsNavigationProp>();
+
+  const handleBackPress = () => {
+    navigation.navigate("HomePageScreen");
+  };
+
   // 🔸 Рендер кожного елемента списку
   const renderItem = ({
     item,
@@ -114,10 +133,10 @@ const NotificationsScreen = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.headerLeft}>
+        <TouchableOpacity style={styles.headerLeft} onPress={handleBackPress}>
           <Ionicons name="chevron-back" size={24} color="#222" />
           <Text style={styles.headerTitle}>Notifications</Text>
-        </View>
+        </TouchableOpacity>
         <TouchableOpacity>
           <Text style={styles.markReadText}>Mark all as read</Text>
         </TouchableOpacity>

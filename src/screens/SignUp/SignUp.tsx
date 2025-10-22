@@ -32,7 +32,7 @@ export default function SignUpScreen() {
 
   const handleSubmit = () => {
     if (isValid) {
-      navigation.navigate("HomePage");
+      navigation.navigate("HomePageScreen");
     } else {
       alert("❌ Please fill all fields correctly!");
     }
@@ -43,118 +43,97 @@ export default function SignUpScreen() {
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      {/* Лого */}
-      <View style={styles.logoContainer}>
-        <Image
-          source={require("../../assets/logoScaner.png")}
-          style={styles.logo}
-        />
-      </View>
-
-      {/* Контент */}
-      <View style={styles.content}>
-        {/* Tabs */}
-        <View style={styles.tabs}>
-          <Text style={[styles.tabText, styles.activeTab]}>Sign Up</Text>
-          <Text style={[styles.tabText, styles.inactiveTab]}>Sign In</Text>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Лого */}
+        <View style={styles.logoContainer}>
+          <Image
+            source={require("../../assets/logoScaner.png")}
+            style={styles.logo}
+          />
         </View>
 
-        {/* Title */}
-        <Text style={styles.title}>Enter your email</Text>
-        <Text style={styles.subtitle}>
-          We asking your email to send you verification code to confirm your
-          account
-        </Text>
+        {/* Контент */}
+        <View style={styles.content}>
+          {/* Title */}
+          <Text style={styles.title}>Welcome!</Text>
+          <Text style={styles.subtitle}>
+            Discover meals you love.{"\n"}Watch it. Want it. Get it.
+          </Text>
 
-        {/* Email */}
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          placeholderTextColor="#999"
-          value={email}
-          onChangeText={setEmail}
-          autoCapitalize="none"
-          keyboardType="email-address"
-        />
-
-        {/* Password */}
-        <View style={styles.inputWrapper}>
+          {/* Email */}
           <TextInput
             style={styles.input}
-            placeholder="Password"
+            placeholder="Email"
             placeholderTextColor="#999"
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={setPassword}
+            value={email}
+            onChangeText={setEmail}
+            autoCapitalize="none"
+            keyboardType="email-address"
           />
-          <TouchableOpacity
-            onPress={() => setShowPassword((prev) => !prev)}
-            style={styles.eyeButton}
-          >
-            <Ionicons
-              name={showPassword ? "eye-off-outline" : "eye-outline"}
-              size={22}
-              color="#888"
+
+          {/* Password */}
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              placeholderTextColor="#999"
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
             />
+            <TouchableOpacity
+              onPress={() => setShowPassword((prev) => !prev)}
+              style={styles.eyeButton}
+            >
+              <Ionicons
+                name={showPassword ? "eye-off-outline" : "eye-outline"}
+                size={22}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Checkbox */}
+          <TouchableOpacity
+            style={styles.checkboxContainer}
+            onPress={() => setAccepted(!accepted)}
+            activeOpacity={0.8}
+          >
+            <View style={[styles.checkbox, accepted && styles.checkboxChecked]}>
+              {accepted && <View style={styles.checkboxInner} />}
+            </View>
+            <Text style={styles.checkboxLabel}>
+              I accept the terms and privacy policy
+            </Text>
+          </TouchableOpacity>
+
+          {/* Sign Up Button */}
+          <TouchableOpacity
+            disabled={!isValid}
+            onPress={handleSubmit}
+            style={[styles.signUpButton, isValid && styles.signUpButtonActive]}
+          >
+            <Text style={[styles.signUpText, isValid && { color: "#fff" }]}>
+              Sign Up
+            </Text>
+          </TouchableOpacity>
+
+          {/* Forgot Password Link */}
+          <TouchableOpacity
+            style={styles.forgotPasswordContainer}
+            onPress={() => navigation.navigate("ResetPassword1")}
+          >
+            <Text style={styles.forgotPasswordText}>
+              Forget your password?{" "}
+              <Text style={styles.resetPasswordText}>Reset Password</Text>
+            </Text>
           </TouchableOpacity>
         </View>
-
-        {/* Checkbox */}
-        <TouchableOpacity
-          style={styles.checkboxContainer}
-          onPress={() => setAccepted(!accepted)}
-          activeOpacity={0.8}
-        >
-          <View style={[styles.checkbox, accepted && styles.checkboxChecked]}>
-            {accepted && <View style={styles.checkboxInner} />}
-          </View>
-          <Text style={styles.checkboxLabel}>
-            I accept the terms and privacy policy
-          </Text>
-        </TouchableOpacity>
-
-        {/* Sign Up Button */}
-        <TouchableOpacity
-          disabled={!isValid}
-          onPress={handleSubmit}
-          style={[styles.signUpButton, isValid && styles.signUpButtonActive]}
-        >
-          <Text style={[styles.signUpText, isValid && { color: "#fff" }]}>
-            Sign Up
-          </Text>
-        </TouchableOpacity>
-
-        {/* Divider */}
-        <View style={styles.dividerContainer}>
-          <View style={styles.line} />
-          <Text style={styles.dividerText}>Or with</Text>
-          <View style={styles.line} />
-        </View>
-
-        {/* Google */}
-        <TouchableOpacity
-          style={styles.socialButton}
-          onPress={() => navigation.navigate("SignUpSetPassword1")}
-        >
-          <Image
-            source={require("../../assets/google.png")}
-            style={styles.socialIcon}
-          />
-          <Text style={styles.socialText}>Continue with Google</Text>
-        </TouchableOpacity>
-
-        {/* Facebook */}
-        <TouchableOpacity
-          style={styles.socialButton}
-          onPress={() => navigation.navigate("SignUpSetPassword1")}
-        >
-          <Image
-            source={require("../../assets/facebook.png")}
-            style={styles.socialIcon}
-          />
-          <Text style={styles.socialText}>Continue with Facebook</Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -164,56 +143,43 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-
+  scrollContent: {
+    flexGrow: 1,
+    backgroundColor: "#fff",
+    paddingHorizontal: 30,
+    paddingBottom: 40,
+  },
   logoContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
-    marginBottom: 20,
+    position: "absolute",
+    top: 10,
+    alignSelf: "center",
+    marginLeft: 25,
+    zIndex: 10,
   },
   logo: {
-    width: 180,
-    height: 180,
+    width: 300,
+    height: 300,
     resizeMode: "contain",
   },
   content: {
     flex: 1,
+    marginTop: 210,
     alignItems: "center",
     justifyContent: "flex-start",
     paddingHorizontal: 24,
   },
-  tabs: {
-    flexDirection: "row",
-    justifyContent: "center",
-    width: "100%",
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-    marginBottom: 25,
-  },
-  tabText: {
-    fontSize: 16,
-    paddingVertical: 8,
-    paddingHorizontal: 25,
-  },
-  inactiveTab: {
-    color: "#999",
-  },
-  activeTab: {
-    color: "#000",
-    borderBottomWidth: 2,
-    borderBottomColor: "#000",
-  },
   title: {
-    fontSize: 20,
-    fontWeight: "600",
-    marginTop: 10,
-    marginBottom: 6,
+    fontSize: 24,
+    fontWeight: "700",
+    marginTop: 20,
+    marginBottom: 8,
     textAlign: "center",
+    color: "#000",
   },
   subtitle: {
     color: "#777",
     textAlign: "center",
-    marginBottom: 25,
+    marginBottom: 30,
     fontSize: 14,
     lineHeight: 20,
   },
@@ -232,6 +198,7 @@ const styles = StyleSheet.create({
     paddingRight: 44,
     fontSize: 16,
     backgroundColor: "#fff",
+    marginBottom: 15,
   },
   eyeButton: {
     position: "absolute",
@@ -242,8 +209,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
-    marginTop: 4,
-    marginBottom: 22,
+    marginTop: 10,
+    marginBottom: 30,
   },
   checkbox: {
     width: 22,
@@ -276,7 +243,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 25,
+    marginBottom: 20,
   },
   signUpButtonActive: {
     backgroundColor: "#D06B5C",
@@ -286,41 +253,17 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#999",
   },
-  dividerContainer: {
-    flexDirection: "row",
+  forgotPasswordContainer: {
     alignItems: "center",
-    width: "100%",
-    marginVertical: 25,
+    marginTop: 10,
   },
-  line: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#ccc",
+  forgotPasswordText: {
+    fontSize: 14,
+    color: "#777",
+    textAlign: "center",
   },
-  dividerText: {
-    marginHorizontal: 10,
-    color: "#999",
-  },
-  socialButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 10,
-    width: "100%",
-    paddingVertical: 14,
-    marginBottom: 14,
-    backgroundColor: "#fff",
-  },
-  socialIcon: {
-    width: 22,
-    height: 22,
-    marginRight: 10,
-    resizeMode: "contain",
-  },
-  socialText: {
-    fontSize: 15,
-    color: "#333",
+  resetPasswordText: {
+    color: "#D06B5C",
+    fontWeight: "600",
   },
 });

@@ -1,4 +1,4 @@
-// src/screens/BlockUserModalScreen.tsx
+// RemoveFriend.tsx 
 import React, { useState } from "react";
 import {
   StyleSheet,
@@ -15,6 +15,8 @@ import {
   Modal,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 const { width } = Dimensions.get("window");
 
@@ -25,8 +27,19 @@ const COLORS = {
   textGrey: "#6B7280",
   white: "#FFFFFF",
   divider: "#E5E7EB",
-  overlay: "rgba(0,0,0,0.45)",
+  overlay: "rgba(0,0,0,0.4)",
 };
+
+// Типи для навігації
+type RootStackParamList = {
+  FriendsProfileScreen: undefined;
+  RemoveFriend: undefined;
+};
+
+type RemoveFriendNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "RemoveFriend"
+>;
 
 const AVATAR_SOURCE = require("../../assets/profile-avatar.jpg");
 const DISH_1_SOURCE = require("../../assets/sushi-dragons.jpg");
@@ -85,8 +98,14 @@ const PAST_ORDERS_DATA = [
 
 const GRID_ITEM_SIZE = width / 3;
 
-const BlockUserModalScreen: React.FC = () => {
-  const [visible, setVisible] = useState(true);
+// --------------------------------------------------
+const RemoveFriendScreen: React.FC = () => {
+  const navigation = useNavigation<RemoveFriendNavigationProp>();
+  const [removeVisible, setRemoveVisible] = useState(true);
+
+  const handleBack = () => {
+    navigation.goBack();
+  };
 
   const StatItem = ({ count, label }: { count: number; label: string }) => (
     <View style={styles.statItem}>
@@ -124,13 +143,13 @@ const BlockUserModalScreen: React.FC = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => console.log("Back")}>
+        <TouchableOpacity onPress={handleBack}>
           <Ionicons name="chevron-back" size={28} color={COLORS.textDark} />
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>{USER_DATA.handle}</Text>
 
-        <TouchableOpacity onPress={() => setVisible(true)}>
+        <TouchableOpacity onPress={() => setRemoveVisible(true)}>
           <Ionicons
             name="ellipsis-horizontal"
             size={24}
@@ -171,35 +190,42 @@ const BlockUserModalScreen: React.FC = () => {
         />
       </ScrollView>
 
-      {/* Block User Modal */}
-      <Modal visible={visible} transparent animationType="fade">
+      {/* REMOVE FRIEND MODAL - З'являється одразу при завантаженні */}
+      <Modal visible={removeVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
             <TouchableOpacity
               style={styles.closeIcon}
-              onPress={() => setVisible(false)}
+              onPress={() => {
+                setRemoveVisible(false);
+                navigation.goBack();
+              }}
             >
               <Ionicons name="close" size={22} color="#374151" />
             </TouchableOpacity>
 
-            <Text style={styles.modalTitle}>Block This User?</Text>
+            <Text style={styles.modalTitle}>Remove This Friend?</Text>
             <Text style={styles.modalSubtitle}>
-              They won’t be able to find or contact you.
+              You'll no longer see each other's shared videos and orders.
             </Text>
 
             <TouchableOpacity
-              style={styles.blockButton}
+              style={styles.removeButton}
               onPress={() => {
-                alert("User blocked");
-                setVisible(false);
+                alert("Friend removed");
+                setRemoveVisible(false);
+                navigation.goBack();
               }}
             >
-              <Text style={styles.blockButtonText}>Block</Text>
+              <Text style={styles.removeButtonText}>Remove</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.cancelButton}
-              onPress={() => setVisible(false)}
+              onPress={() => {
+                setRemoveVisible(false);
+                navigation.goBack();
+              }}
             >
               <Text style={styles.cancelButtonText}>Cancel</Text>
             </TouchableOpacity>
@@ -210,8 +236,9 @@ const BlockUserModalScreen: React.FC = () => {
   );
 };
 
-export default BlockUserModalScreen;
+export default RemoveFriendScreen;
 
+// --------------------------------------------------
 const AVATAR_SIZE = 80;
 
 const styles = StyleSheet.create({
@@ -258,19 +285,20 @@ const styles = StyleSheet.create({
   orderDishName: { fontSize: 12, fontWeight: "600", color: COLORS.white },
   orderRestaurantName: { fontSize: 10, color: COLORS.white },
 
+  // MODAL
   modalOverlay: {
     flex: 1,
-    backgroundColor: COLORS.overlay,
+    backgroundColor: "rgba(0,0,0,0.4)",
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
   },
   modalCard: {
     width: "100%",
-    maxWidth: 380,
+    maxWidth: 360,
     backgroundColor: "#fff",
-    borderRadius: 18,
-    paddingHorizontal: 26,
+    borderRadius: 20,
+    paddingHorizontal: 24,
     paddingVertical: 32,
     alignItems: "center",
     position: "relative",
@@ -284,21 +312,21 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   modalSubtitle: {
-    fontSize: 15,
+    fontSize: 14,
     color: "#6B7280",
     textAlign: "center",
-    marginTop: 12,
-    lineHeight: 22,
+    marginTop: 10,
+    lineHeight: 20,
   },
-  blockButton: {
+  removeButton: {
     backgroundColor: "#E9725C",
     borderRadius: 12,
     width: "100%",
     paddingVertical: 14,
     alignItems: "center",
-    marginTop: 24,
+    marginTop: 22,
   },
-  blockButtonText: { fontSize: 16, fontWeight: "700", color: "#fff" },
+  removeButtonText: { fontSize: 16, fontWeight: "700", color: "#fff" },
   cancelButton: { marginTop: 16 },
   cancelButtonText: { fontSize: 15, color: "#6B7280", fontWeight: "600" },
 });

@@ -200,13 +200,13 @@ const styles = StyleSheet.create({
 
   logoContainer: {
     position: "absolute",
-    top: 60,
+    top: 20,
     alignSelf: "center",
     zIndex: 10,
   },
   logo: {
-    width: 250,
-    height: 250,
+    width: 300,
+    height: 300,
     resizeMode: "contain",
   },
 

@@ -13,6 +13,19 @@ import {
   Platform, // Додано для SafeAeraView
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+// Типи для навігації
+type RootStackParamList = {
+  HomePageScreen: undefined;
+  DiscoveryRestoranScreen: undefined;
+};
+
+type DiscoveryRestoranNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "DiscoveryRestoranScreen"
+>;
 
 // Використовуємо локальні ассети згідно з вашими шляхами
 const MAIN_IMAGE = require("../../assets/dumplings-top.jpg");
@@ -161,13 +174,22 @@ const MenuItemCard: React.FC<{ item: MenuItem }> = ({ item }) => (
 // --- ОСНОВНИЙ КОМПОНЕНТ ---
 
 const RestaurantMenuScreen: React.FC = () => {
+  const navigation = useNavigation<DiscoveryRestoranNavigationProp>();
+
+  const handleBackPress = () => {
+    navigation.navigate("HomePageScreen");
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* 1. Блок Зображення та Хедер */}
         <ImageBackground source={MAIN_IMAGE} style={styles.headerImage}>
           <View style={styles.headerOverlay}>
-            <TouchableOpacity style={styles.backButton}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={handleBackPress}
+            >
               <Ionicons name="chevron-back" size={24} color="#fff" />
             </TouchableOpacity>
           </View>

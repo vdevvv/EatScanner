@@ -42,131 +42,142 @@ export default function CreatePasswordScreen() {
     }
   };
 
+  const handleSignInTabPress = () => {
+    navigation.navigate("SignIn"); // 🔥 перехід на сторінку Sign In при натисканні табу
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      {/* 🔹 Лого */}
-      <View style={styles.logoContainer}>
-        <Image
-          source={require("../../assets/logoScaner.png")}
-          style={styles.logo}
-        />
-      </View>
-
-      {/* Контент */}
-      <View style={styles.content}>
-        {/* Tabs */}
-        <View style={styles.tabs}>
-          <Text style={[styles.tabText, styles.inactiveTab]}>Sign In</Text>
-          <Text style={[styles.tabText, styles.activeTab]}>Sign Up</Text>
-        </View>
-
-        {/* Title */}
-        <Text style={styles.title}>Create your password</Text>
-        <Text style={styles.subtitle}>
-          Your password must be at least 8 characters,{"\n"}including a number
-          and a symbol.
-        </Text>
-
-        {/* Password */}
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={setPassword}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* 🔹 Лого */}
+        <View style={styles.logoContainer}>
+          <Image
+            source={require("../../assets/logoScaner.png")}
+            style={styles.logo}
           />
-          <TouchableOpacity
-            onPress={() => setShowPassword((prev) => !prev)}
-            style={styles.eyeButton}
-          >
-            <Ionicons
-              name={showPassword ? "eye-off-outline" : "eye-outline"}
-              size={22}
-              color="#888"
-            />
-          </TouchableOpacity>
         </View>
 
-        {/* Repeat Password */}
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.input}
-            placeholder="Repeat Password"
-            secureTextEntry={!showRepeatPassword}
-            value={repeatPassword}
-            onChangeText={setRepeatPassword}
-          />
-          <TouchableOpacity
-            onPress={() => setShowRepeatPassword((prev) => !prev)}
-            style={styles.eyeButton}
-          >
-            <Ionicons
-              name={showRepeatPassword ? "eye-off-outline" : "eye-outline"}
-              size={22}
-              color="#888"
-            />
-          </TouchableOpacity>
-        </View>
-
-        {/* Checkbox */}
-        <TouchableOpacity
-          style={styles.checkboxContainer}
-          onPress={() => setAccepted(!accepted)}
-        >
-          <View style={[styles.checkbox, accepted && styles.checkboxChecked]}>
-            {accepted && <View style={styles.checkboxInner} />}
+        <View style={styles.content}>
+          {/* Tabs */}
+          <View style={styles.tabs}>
+            <TouchableOpacity onPress={handleSignInTabPress}>
+              <Text style={[styles.tabText, styles.inactiveTab]}>Sign In</Text>
+            </TouchableOpacity>
+            <Text style={[styles.tabText, styles.activeTab]}>Sign Up</Text>
           </View>
-          <Text style={styles.checkboxLabel}>
-            I accept the terms and privacy policy
-          </Text>
-        </TouchableOpacity>
 
-        {/* Button */}
-        <TouchableOpacity
-          disabled={!isActive}
-          onPress={handleSubmit}
-          style={[styles.createButton, isActive && styles.createButtonActive]}
-        >
-          <Text style={[styles.createText, isActive && { color: "#fff" }]}>
-            Create Password
+          {/* Title */}
+          <Text style={styles.title}>Create your password</Text>
+          <Text style={styles.subtitle}>
+            Your password must be at least 8 characters,{"\n"}including a number
+            and a symbol.
           </Text>
-        </TouchableOpacity>
 
-        {/* Divider */}
-        <View style={styles.dividerContainer}>
-          <View style={styles.dividerLine} />
-          <Text style={styles.dividerText}>Or with</Text>
-          <View style={styles.dividerLine} />
+          {/* Password */}
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Password"
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+            />
+            <TouchableOpacity
+              onPress={() => setShowPassword((prev) => !prev)}
+              style={styles.eyeButton}
+            >
+              <Ionicons
+                name={showPassword ? "eye-off-outline" : "eye-outline"}
+                size={22}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Repeat Password */}
+          <View style={styles.inputWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Repeat Password"
+              secureTextEntry={!showRepeatPassword}
+              value={repeatPassword}
+              onChangeText={setRepeatPassword}
+            />
+            <TouchableOpacity
+              onPress={() => setShowRepeatPassword((prev) => !prev)}
+              style={styles.eyeButton}
+            >
+              <Ionicons
+                name={showRepeatPassword ? "eye-off-outline" : "eye-outline"}
+                size={22}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Checkbox */}
+          <TouchableOpacity
+            style={styles.checkboxContainer}
+            onPress={() => setAccepted(!accepted)}
+          >
+            <View style={[styles.checkbox, accepted && styles.checkboxChecked]}>
+              {accepted && <View style={styles.checkboxInner} />}
+            </View>
+            <Text style={styles.checkboxLabel}>
+              I accept the terms and privacy policy
+            </Text>
+          </TouchableOpacity>
+
+          {/* Button */}
+          <TouchableOpacity
+            disabled={!isActive}
+            onPress={handleSubmit}
+            style={[styles.createButton, isActive && styles.createButtonActive]}
+          >
+            <Text style={[styles.createText, isActive && { color: "#fff" }]}>
+              Create Password
+            </Text>
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View style={styles.dividerContainer}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>Or with</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+          {/* Google */}
+          <TouchableOpacity
+            style={styles.socialButton}
+            onPress={() => navigation.navigate("SignUpConfirmationCode1")}
+          >
+            <Image
+              source={require("../../assets/google.png")}
+              style={styles.socialIcon}
+            />
+            <Text style={styles.socialText}>Continue with Google</Text>
+          </TouchableOpacity>
+
+          {/* Facebook */}
+          <TouchableOpacity
+            style={[styles.socialButton, styles.lastSocialButton]}
+            onPress={() => navigation.navigate("SignUpConfirmationCode1")}
+          >
+            <Image
+              source={require("../../assets/facebook.png")}
+              style={styles.socialIcon}
+            />
+            <Text style={styles.socialText}>Continue with Facebook</Text>
+          </TouchableOpacity>
         </View>
-
-        {/* Google */}
-        <TouchableOpacity
-          style={styles.socialButton}
-          onPress={() => navigation.navigate("SignUpConfirmationCode1")}
-        >
-          <Image
-            source={require("../../assets/google.png")}
-            style={styles.socialIcon}
-          />
-          <Text style={styles.socialText}>Continue with Google</Text>
-        </TouchableOpacity>
-
-        {/* Facebook */}
-        <TouchableOpacity
-          style={[styles.socialButton, styles.lastSocialButton]}
-          onPress={() => navigation.navigate("SignUpConfirmationCode1")}
-        >
-          <Image
-            source={require("../../assets/facebook.png")}
-            style={styles.socialIcon}
-          />
-          <Text style={styles.socialText}>Continue with Facebook</Text>
-        </TouchableOpacity>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -176,19 +187,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
+  scrollContent: {
+    flexGrow: 1,
+    backgroundColor: "#fff",
+    paddingHorizontal: 30,
+    paddingBottom: 40,
+  },
   logoContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
-    marginBottom: 20,
+    position: "absolute",
+    top: 20,
+    alignSelf: "center",
+    zIndex: 10,
   },
   logo: {
-    width: 180,
-    height: 180,
+    width: 300,
+    height: 300,
     resizeMode: "contain",
   },
   content: {
     flex: 1,
+    marginTop: 280,
     alignItems: "center",
     justifyContent: "flex-start",
     paddingHorizontal: 24,
@@ -199,7 +217,7 @@ const styles = StyleSheet.create({
     width: "100%",
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
-    marginBottom: 25,
+    marginBottom: 5,
   },
   tabText: {
     fontSize: 16,
@@ -217,14 +235,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "600",
-    marginTop: 10,
-    marginBottom: 6,
+    marginTop: 2,
+    marginBottom: 2,
     textAlign: "center",
   },
   subtitle: {
     color: "#777",
     textAlign: "center",
-    marginBottom: 25,
+    marginBottom: 10,
     fontSize: 14,
     lineHeight: 20,
   },

@@ -16,10 +16,11 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 // Типи для навігації
 type RootStackParamList = {
   HomePageScreen: undefined;
-  DiscoveryScreen: undefined;
+  Discovery: undefined; // Corrected the name to match the navigation call
   ChatsScreen: undefined;
   FriendsScreen: undefined;
   FriendsProfileFriends: undefined;
+  FriendsProfileScreen: undefined;
   ProfileScreen: undefined;
   MyProfileScreen: undefined;
   DishDetailScreen: undefined;
@@ -113,7 +114,7 @@ export default function FriendsListScreen() {
   };
 
   const handleDiscoveryPress = () => {
-    navigation.navigate("DiscoveryScreen");
+    navigation.navigate("Discovery");
   };
 
   const handleChatsPress = () => {
@@ -129,28 +130,63 @@ export default function FriendsListScreen() {
     navigation.navigate("MyProfileScreen");
   };
 
+  const handleFriendPress = (friendId: string) => {
+    navigation.navigate("FriendsProfileScreen");
+  };
+
+  // Функції для обробки натискань кнопок дій
+  const handleAddFriend = (friendId: string) => {
+    console.log(`Adding friend with ID: ${friendId}`);
+    // Тут можна додати логіку для відправки запиту на додавання в друзі
+    // Наприклад, оновити статус друга в локальному стані або відправити запит на сервер
+  };
+
+  const handleCancelRequest = (friendId: string) => {
+    console.log(`Cancelling request for friend with ID: ${friendId}`);
+    // Тут можна додати логіку для скасування запиту в друзі
+    // Наприклад, оновити статус друга в локальному стані або відправити запит на сервер
+  };
+
+  const handleMessage = (friendId: string) => {
+    console.log(`Messaging friend with ID: ${friendId}`);
+    // Тут можна додати логіку для переходу до чату з другом
+    // Наприклад: navigation.navigate("ChatScreen", { friendId });
+  };
+
   const filtered = FRIENDS.filter((f) =>
     f.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const renderButton = (status: string) => {
+  const renderButton = (status: string, friendId: string) => {
     switch (status) {
       case "add":
         return (
-          <TouchableOpacity style={styles.actionBtn}>
+          <TouchableOpacity 
+            style={styles.actionBtn}
+            onPress={() => handleAddFriend(friendId)}
+            activeOpacity={0.7}
+          >
             <Ionicons name="add-outline" size={18} color={COLORS.primary} />
             <Text style={styles.actionTextAdd}>Add Friend</Text>
           </TouchableOpacity>
         );
       case "cancel":
         return (
-          <TouchableOpacity style={styles.removeBtn}>
-            <Text style={styles.actionTextRemove}>Remove</Text>
+          <TouchableOpacity 
+            style={styles.removeBtn}
+            onPress={() => handleCancelRequest(friendId)}
+            activeOpacity={0.7}
+          >
+            <Text style={styles.actionTextRemove}>Cancel Request</Text>
           </TouchableOpacity>
         );
       case "message":
         return (
-          <TouchableOpacity style={styles.actionBtn}>
+          <TouchableOpacity 
+            style={styles.actionBtn}
+            onPress={() => handleMessage(friendId)}
+            activeOpacity={0.7}
+          >
             <Ionicons
               name="chatbubble-outline"
               size={18}
@@ -192,7 +228,11 @@ export default function FriendsListScreen() {
         data={filtered}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={styles.friendItem}>
+          <TouchableOpacity
+            style={styles.friendItem}
+            onPress={() => handleFriendPress(item.id)}
+            activeOpacity={0.7}
+          >
             <View style={styles.friendInfo}>
               <Image source={item.avatar} style={styles.avatar} />
               <View>
@@ -200,11 +240,11 @@ export default function FriendsListScreen() {
                 <Text style={styles.friendHandle}>{item.handle}</Text>
               </View>
             </View>
-            {renderButton(item.status)}
-          </View>
+            {renderButton(item.status, item.id)}
+          </TouchableOpacity>
         )}
         ItemSeparatorComponent={() => (
-          <View style={{ height: 12, backgroundColor: "transparent" }} />
+          <View style={{ height: 4, backgroundColor: "transparent" }} />
         )}
         contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 10 }}
         showsVerticalScrollIndicator={false}
@@ -291,8 +331,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginHorizontal: 20,
     marginVertical: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    height: 40,
   },
   searchInput: {
     flex: 1,
@@ -304,15 +345,16 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    paddingVertical: 8,
   },
   friendInfo: {
     flexDirection: "row",
     alignItems: "center",
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     marginRight: 12,
   },
   friendName: {
@@ -327,6 +369,12 @@ const styles = StyleSheet.create({
   actionBtn: {
     flexDirection: "row",
     alignItems: "center",
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    borderRadius: 8,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
   },
   removeBtn: {
     flexDirection: "row",

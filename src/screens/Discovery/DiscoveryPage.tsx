@@ -12,6 +12,22 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+// Типи для навігації
+type RootStackParamList = {
+  HomePageScreen: undefined;
+  DiscoveryScreen: undefined;
+  DiscoveryFiltersPage: undefined;
+  ChatsScreen: undefined;
+  FriendsScreen: undefined;
+  FriendsProfileFriends: undefined;
+  ProfileScreen: undefined;
+  MyProfileScreen: undefined;
+  DishDetailScreen: undefined;
+  OrderScreen: undefined;
+};
 
 // --- ІНТЕРФЕЙС ---
 interface MealItem {
@@ -102,29 +118,62 @@ const MealSection: React.FC<{ title: string; data: MealItem[] }> = ({
 };
 
 // --- НИЖНЯ ПАНЕЛЬ ---
-const TabBar: React.FC = () => {
+const TabBar: React.FC<{
+  onHomePress: () => void;
+  onDiscoveryPress: () => void;
+  onChatsPress: () => void;
+  onFriendsPress: () => void;
+  onProfilePress: () => void;
+}> = ({
+  onHomePress,
+  onDiscoveryPress,
+  onChatsPress,
+  onFriendsPress,
+  onProfilePress,
+}) => {
   const tabs = [
-    { name: "Home", icon: "home-outline", active: false },
-    { name: "Discovery", icon: "search", active: true },
-    { name: "Chats", icon: "chatbubbles-outline", active: false },
-    { name: "My Friends", icon: "people-outline", active: false },
-    { name: "Profile", icon: "person-outline", active: false },
+    { name: "Home", icon: "home-outline", active: false, onPress: onHomePress },
+    {
+      name: "Discovery",
+      icon: "search-outline",
+      active: true,
+      onPress: onDiscoveryPress,
+    },
+    {
+      name: "Chats",
+      icon: "chatbubble-outline",
+      active: false,
+      onPress: onChatsPress,
+    },
+    {
+      name: "My Friends",
+      icon: "people-outline",
+      active: false,
+      onPress: onFriendsPress,
+    },
+    {
+      name: "Profile",
+      icon: "person-outline",
+      active: false,
+      onPress: onProfilePress,
+    },
   ];
 
   return (
     <View style={styles.tabBarContainer}>
       {tabs.map((tab) => (
-        <TouchableOpacity key={tab.name} style={styles.tabItem}>
+        <TouchableOpacity
+          key={tab.name}
+          style={styles.tabItem}
+          onPress={tab.onPress}
+        >
           <Ionicons
             name={tab.icon as any}
             size={24}
-            color={tab.active ? "#E57373" : "#a0a0a0"}
+            color={tab.active ? "#E9725C" : "#999"}
           />
           <Text
-            style={[
-              styles.tabText,
-              { color: tab.active ? "#E57373" : "#a0a0a0" },
-            ]}
+            style={[styles.tabText, { color: tab.active ? "#E9725C" : "#999" }]}
           >
             {tab.name}
           </Text>
@@ -134,9 +183,41 @@ const TabBar: React.FC = () => {
   );
 };
 
+type DiscoveryNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "DiscoveryScreen"
+>;
+
 // --- ГОЛОВНИЙ ЕКРАН ---
 const DiscoveryScreen: React.FC = () => {
+  const navigation = useNavigation<DiscoveryNavigationProp>();
   const [searchQuery, setSearchQuery] = useState("");
+
+  // Навігаційні функції для нижнього таб меню
+  const handleHomePress = () => {
+    navigation.navigate("HomePageScreen");
+  };
+
+  const handleDiscoveryPress = () => {
+    // Вже на DiscoveryScreen
+    console.log("Discovery pressed");
+  };
+
+  const handleChatsPress = () => {
+    navigation.navigate("ChatsScreen");
+  };
+
+  const handleFriendsPress = () => {
+    navigation.navigate("FriendsProfileFriends");
+  };
+
+  const handleProfilePress = () => {
+    navigation.navigate("MyProfileScreen");
+  };
+
+  const handleFiltersPress = () => {
+    navigation.navigate("DiscoveryFiltersPage");
+  };
 
   // --- ФІЛЬТРАЦІЯ ---
   const filteredMeals = useMemo(() => {
@@ -175,7 +256,10 @@ const DiscoveryScreen: React.FC = () => {
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
-          <TouchableOpacity style={styles.filterButton}>
+          <TouchableOpacity 
+            style={styles.filterButton}
+            onPress={handleFiltersPress}
+          >
             <Ionicons name="options-outline" size={20} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -189,7 +273,13 @@ const DiscoveryScreen: React.FC = () => {
         <View style={{ height: 100 }} />
       </ScrollView>
 
-      <TabBar />
+      <TabBar
+        onHomePress={handleHomePress}
+        onDiscoveryPress={handleDiscoveryPress}
+        onChatsPress={handleChatsPress}
+        onFriendsPress={handleFriendsPress}
+        onProfilePress={handleProfilePress}
+      />
     </SafeAreaView>
   );
 };
@@ -295,19 +385,18 @@ const styles = StyleSheet.create({
   tabBarContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    alignItems: "center",
-    height: 80,
-    paddingBottom: Platform.OS === "ios" ? 20 : 0,
-    backgroundColor: "#fff",
+    paddingVertical: 10,
     borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
+    height: 80,
+    borderTopColor: "#E0E0E0",
+    backgroundColor: "#fff",
     position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
   },
-  tabItem: { flex: 1, alignItems: "center", justifyContent: "center" },
-  tabText: { fontSize: 12, marginTop: 2, fontWeight: "600" },
+  tabItem: { alignItems: "center", flex: 1 },
+  tabText: { fontSize: 10, marginTop: 2, fontWeight: "500" },
 });
 
 export default DiscoveryScreen;

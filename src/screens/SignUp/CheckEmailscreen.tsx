@@ -26,8 +26,13 @@ const AuthScreen = () => {
     if (activeTab === "signup") {
       navigation.navigate("SignUpConfirmationCode1"); // 🔥 перехід на екран підтвердження
     } else {
-      console.log("Sign In with:", email);
+      navigation.navigate("Splash"); // 🔥 перехід на сторінку Sign In
     }
+  };
+
+  const handleSignInTabPress = () => {
+    setActiveTab("signin");
+    navigation.navigate("Splash"); // 🔥 перехід на сторінку Sign In при натисканні табу
   };
 
   return (
@@ -46,10 +51,7 @@ const AuthScreen = () => {
         <View style={styles.topSection}>
           {/* Tabs */}
           <View style={styles.tabContainer}>
-            <TouchableOpacity
-              onPress={() => setActiveTab("signin")}
-              style={styles.tab}
-            >
+            <TouchableOpacity onPress={handleSignInTabPress} style={styles.tab}>
               <Text
                 style={[
                   styles.tabText,

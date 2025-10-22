@@ -9,48 +9,36 @@ import {
   Dimensions,
 } from "react-native";
 
-// Використовуємо SVG-іконки або Unicode для імітації мобільного середовища,
-// оскільки @expo/vector-icons недоступні у веб-симуляції.
-
-// Типізація для даних користувача
+// Типізація користувача
 interface User {
   username: string;
   name: string;
   avatarUri: string;
 }
 
-// Дані профілю, який заблоковано
+// Дані користувача, якого заблоковано
 const BLOCKED_USER: User = {
   username: "@foodie_iryna",
   name: "Talia Gomez",
-  // Використовуємо placehold.co для placeholder-аватара
   avatarUri: "https://placehold.co/80x80/6E3A2F/ffffff?text=TG",
 };
 
-// Висота екрана для адаптивного стилю (імітуємо мобільний пристрій)
+// Отримуємо висоту екрана для адаптивного розміщення
 const screenHeight = Dimensions.get("window").height;
 
-// --- ІКОНКИ (SVG або Emoji для сумісності) ---
-
-// Замість Entypo dots-three-horizontal використовуємо три крапки (Unicode)
+// --- Іконки у вигляді тексту (імітація iOS стилю) ---
 const MoreIcon = () => <Text style={styles.headerIconText}>...</Text>;
-
-// Замість AntDesign arrowleft використовуємо Emoji або кастомний текст
 const BackIcon = () => <Text style={styles.headerIconText}>{"<"}</Text>;
 
 // --- ОСНОВНИЙ КОМПОНЕНТ ---
-
 const BlockedUserScreen: React.FC = () => {
   const [isBlocked, setIsBlocked] = useState<boolean>(true);
 
-  // Функція для розблокування/блокування
   const handleToggleBlock = () => {
     setIsBlocked((prev) => !prev);
-    if (isBlocked) {
-      console.log(`User ${BLOCKED_USER.username} unblocked!`);
-    } else {
-      console.log(`User ${BLOCKED_USER.username} blocked!`);
-    }
+    console.log(
+      `User ${BLOCKED_USER.username} ${isBlocked ? "unblocked" : "blocked"}!`
+    );
   };
 
   return (
@@ -74,17 +62,20 @@ const BlockedUserScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* BODY CONTENT */}
-      <View style={styles.container}>
-        {/* Аватар */}
-        <Image source={{ uri: BLOCKED_USER.avatarUri }} style={styles.avatar} />
+      {/* BODY */}
+      <View style={styles.body}>
+        {/* Рядок з аватаркою зліва */}
+        <View style={styles.profileRow}>
+          <Image
+            source={{ uri: BLOCKED_USER.avatarUri }}
+            style={styles.avatar}
+          />
+          <Text style={styles.name}>{BLOCKED_USER.name}</Text>
+        </View>
 
-        {/* Ім'я */}
-        <Text style={styles.name}>{BLOCKED_USER.name}</Text>
-
-        {/* Секція статусу (Block/Unblock) */}
-        <View style={styles.statusSection}>
-          {/* Іконка блокування (візуальна імітація) */}
+        {/* Центральний контент */}
+        <View style={styles.centerSection}>
+          {/* Іконка блокування */}
           {isBlocked && (
             <View style={styles.blockIconContainer}>
               <View style={styles.blockIconCircle}>
@@ -93,27 +84,22 @@ const BlockedUserScreen: React.FC = () => {
             </View>
           )}
 
-          {/* Основний заголовок */}
+          {/* Текст */}
           <Text style={styles.mainTitle}>
             {isBlocked ? "You Have Blocked This User." : "You Are Connected."}
           </Text>
 
-          {/* Підзаголовок */}
           <Text style={styles.subtitle}>
             {isBlocked
               ? "You won't see each other's content or be able to connect."
               : "You can see each other's content and connect."}
           </Text>
 
-          {/* Кнопка дії */}
+          {/* Кнопка */}
           <TouchableOpacity
             style={[
               styles.actionButton,
-              {
-                backgroundColor: isBlocked
-                  ? styles.actionButton.backgroundColor
-                  : "#4CAF50",
-              },
+              { backgroundColor: isBlocked ? "#C66B55" : "#4CAF50" },
             ]}
             onPress={handleToggleBlock}
             activeOpacity={0.8}
@@ -130,103 +116,102 @@ const BlockedUserScreen: React.FC = () => {
 
 export default BlockedUserScreen;
 
+// --- СТИЛІ ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 15,
+    paddingHorizontal: 16,
     paddingVertical: 10,
-    height: 60,
+    height: 56,
   },
   headerButton: {
-    padding: 5,
+    padding: 4,
   },
   headerIconText: {
     fontSize: 24,
     color: "#000",
-    fontWeight: "normal",
   },
   username: {
     fontSize: 16,
     fontWeight: "600",
     color: "#000",
   },
-  container: {
+  body: {
     flex: 1,
+    paddingHorizontal: 20,
+  },
+  profileRow: {
+    flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 30,
-    paddingTop: 20,
+    marginBottom: screenHeight * 0.1,
+    marginTop: 10,
   },
   avatar: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    marginBottom: 10,
-    backgroundColor: "#eee",
+    marginRight: 12,
+    backgroundColor: "#EEE",
   },
   name: {
     fontSize: 18,
     fontWeight: "600",
     color: "#000",
-    // Використовуємо відсоток від висоти, щоб розмістити блок по центру
-    marginBottom: screenHeight * 0.1,
   },
-  statusSection: {
+  centerSection: {
     alignItems: "center",
-    width: "100%",
+    justifyContent: "center",
+    paddingHorizontal: 20,
   },
-  // Стилі для іконки блокування
   blockIconContainer: {
     marginBottom: 40,
     marginTop: 20,
   },
   blockIconCircle: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     borderWidth: 5,
-    borderColor: "#b45244",
+    borderColor: "#C66B55",
     alignItems: "center",
     justifyContent: "center",
   },
   blockIconLine: {
-    width: 70,
+    width: 72,
     height: 5,
-    backgroundColor: "#b45244",
+    backgroundColor: "#C66B55",
     transform: [{ rotate: "45deg" }],
-    position: "absolute", // Важливо для правильного позиціонування
+    position: "absolute",
   },
-  // Текстові стилі
   mainTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
+    fontSize: 20,
+    fontWeight: "700",
     color: "#000",
     textAlign: "center",
     marginBottom: 10,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#555",
     textAlign: "center",
-    marginBottom: 50,
-    lineHeight: 24,
+    marginBottom: 40,
+    lineHeight: 20,
   },
-  // Кнопка
   actionButton: {
     width: "100%",
-    paddingVertical: 16,
-    backgroundColor: "#D87A70", // Теракотовий колір для Unblock
+    paddingVertical: 14,
     borderRadius: 10,
     alignItems: "center",
   },
   actionButtonText: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#fff",
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "700",
   },
 });

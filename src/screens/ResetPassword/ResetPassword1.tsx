@@ -8,11 +8,29 @@ import {
   SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+// Типи для навігації
+type RootStackParamList = {
+  ResetPassword1: undefined;
+  ResetPassword2: undefined;
+};
+
+type ResetPasswordNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "ResetPassword1"
+>;
 
 export default function ForgotPasswordScreen() {
+  const navigation = useNavigation<ResetPasswordNavigationProp>();
   const [email, setEmail] = useState("");
 
   const isEmailEntered = email.trim().length > 0;
+
+  const handleResetPassword = () => {
+    navigation.navigate("ResetPassword2");
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -41,6 +59,7 @@ export default function ForgotPasswordScreen() {
           <TouchableOpacity
             style={[styles.button, isEmailEntered && styles.buttonActive]}
             disabled={!isEmailEntered}
+            onPress={handleResetPassword}
           >
             <Text
               style={[

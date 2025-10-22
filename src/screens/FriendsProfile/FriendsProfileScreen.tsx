@@ -1,5 +1,5 @@
 // src/screens/UserProfileScreen.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -19,8 +19,9 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-const { width } = Dimensions.get("window");
+const { width, height } = Dimensions.get("window");
 
 const COLORS = {
   primary: "#E9725C",
@@ -48,6 +49,15 @@ const FRIEND_3_SOURCE =
 const FRIEND_4_SOURCE =
   require("../../assets/friend4.jpg") as ImageSourcePropType;
 
+// Іконки месенджерів
+const MESSENGER_ICON =
+  require("../../assets/MessengerIconFriend.png") as ImageSourcePropType;
+const WHATSAPP_ICON =
+  require("../../assets/WhatsappIconFriend.png") as ImageSourcePropType;
+const MESSAGES_ICON =
+  require("../../assets/MessagesFriend.png") as ImageSourcePropType;
+
+// Demo Data
 const USER_DATA = {
   handle: "@foodie_iryna",
   name: "Talia Gomez",
@@ -77,14 +87,32 @@ const PAST_ORDERS_DATA = [
 ];
 
 const MUTUAL_FRIENDS = [
-  { id: "m1", avatar: FRIEND_1_SOURCE, name: "Max" },
-  { id: "m2", avatar: FRIEND_2_SOURCE, name: "Anna" },
-  { id: "m3", avatar: FRIEND_3_SOURCE, name: "Tom" },
-  { id: "m4", avatar: FRIEND_4_SOURCE, name: "Ira" },
+  {
+    id: "m1",
+    avatar: FRIEND_1_SOURCE,
+    name: "Max",
+    messengerIcon: MESSENGER_ICON,
+  },
+  {
+    id: "m2",
+    avatar: FRIEND_2_SOURCE,
+    name: "Anna",
+    messengerIcon: WHATSAPP_ICON,
+  },
+  {
+    id: "m3",
+    avatar: FRIEND_3_SOURCE,
+    name: "Tom",
+    messengerIcon: MESSAGES_ICON,
+  },
+  {
+    id: "m4",
+    avatar: FRIEND_4_SOURCE,
+    name: "Ira",
+    messengerIcon: MESSAGES_ICON,
+  },
 ];
 
-// --------------------------------------------------
-// 👇 Popup меню опції
 const MENU_OPTIONS = [
   "Share Profile",
   "Add to the Group",
@@ -93,16 +121,45 @@ const MENU_OPTIONS = [
   "Report",
 ];
 
-// --------------------------------------------------
-// Головний компонент
-const UserProfileScreen: React.FC = () => {
-  const navigation = useNavigation();
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [fadeAnim] = useState(new Animated.Value(0));
+const SHARE_OPTIONS = [
+  { id: "1", label: "Message", icon: "chatbubble-outline" },
+  { id: "2", label: "Mail", icon: "mail-outline" },
+  { id: "3", label: "Messenger", icon: "logo-messenger" },
+  { id: "4", label: "Whatsapp", icon: "logo-whatsapp" },
+];
 
-  const handleBack = () => {
-    navigation.goBack();
-  };
+const BOTTOM_ACTIONS = [
+  { id: "1", label: "Copy", icon: "copy-outline" },
+  { id: "2", label: "Add to reading list", icon: "book-outline" },
+];
+
+// Типи для навігації
+type RootStackParamList = {
+  HomePageScreen: undefined;
+  FriendsProfileScreen: undefined;
+  FriendsProfileScreenShare: undefined;
+  ChatsScreen: undefined;
+  MyProfileScreen: undefined;
+  BlockUserScreen: undefined;
+  FriendsReportUser: undefined;
+  RemoveFriend: undefined;
+  FriendAlertBlockUser: undefined;
+};
+
+type UserProfileNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "FriendsProfileScreen"
+>;
+
+// --------------------------------------------------
+const UserProfileScreen: React.FC = () => {
+  const navigation = useNavigation<UserProfileNavigationProp>();
+  const [menuVisible, setMenuVisible] = useState(false);
+  const [shareVisible, setShareVisible] = useState(false);
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const [slideAnim] = useState(new Animated.Value(height));
+
+  const handleBack = () => navigation.goBack();
 
   const toggleMenu = () => {
     if (menuVisible) {
@@ -121,8 +178,58 @@ const UserProfileScreen: React.FC = () => {
     }
   };
 
+  const openShareModal = () => {
+    setShareVisible(true);
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration: 250,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const closeShareModal = () => {
+    Animated.timing(slideAnim, {
+      toValue: height,
+      duration: 200,
+      useNativeDriver: true,
+    }).start(() => setShareVisible(false));
+  };
+
+  const handleMenuOption = (option: string) => {
+    toggleMenu();
+
+    switch (option) {
+      case "Share Profile":
+        setTimeout(() => {
+          navigation.navigate("FriendsProfileScreenShare");
+        }, 300);
+        break;
+      case "Add to the Group":
+        navigation.navigate("ChatsScreen");
+        break;
+      case "Remove Friend":
+        // Логіка видалення друга
+
+        setTimeout(() => {
+          navigation.navigate("RemoveFriend");
+        }, 300);
+        break;
+      case "Block User":
+        setTimeout(() => {
+          navigation.navigate("FriendAlertBlockUser");
+        }, 300); // 2 секунди
+        break;
+      case "Report":
+        setTimeout(() => {
+          navigation.navigate("FriendsReportUser");
+        }, 300);
+        break;
+      default:
+        break;
+    }
+  };
+
   // -----------------------------------
-  // Допоміжні компоненти
   const StatItem = ({ count, label }: { count: number; label: string }) => (
     <View style={styles.statItem}>
       <Text style={styles.statCount}>{count}</Text>
@@ -157,15 +264,12 @@ const UserProfileScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
-
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
           <Ionicons name="chevron-back" size={28} color={COLORS.textDark} />
         </TouchableOpacity>
-
         <Text style={styles.headerTitle}>{USER_DATA.handle}</Text>
-
         <TouchableOpacity onPress={toggleMenu}>
           <Ionicons
             name="ellipsis-horizontal"
@@ -188,8 +292,10 @@ const UserProfileScreen: React.FC = () => {
           </View>
 
           <Text style={styles.userName}>{USER_DATA.name}</Text>
-
-          <TouchableOpacity style={styles.messageButton}>
+          <TouchableOpacity
+            style={styles.messageButton}
+            onPress={() => navigation.navigate("ChatsScreen")}
+          >
             <Text style={styles.messageButtonText}>Send message</Text>
           </TouchableOpacity>
         </View>
@@ -209,7 +315,9 @@ const UserProfileScreen: React.FC = () => {
           >
             {MUTUAL_FRIENDS.map((f) => (
               <View key={f.id} style={styles.friendPill}>
-                <Image source={f.avatar} style={styles.friendAvatar} />
+                <View style={styles.avatarContainer}>
+                  <Image source={f.avatar} style={styles.friendAvatar} />
+                </View>
                 <Text style={styles.friendName}>{f.name}</Text>
               </View>
             ))}
@@ -257,10 +365,7 @@ const UserProfileScreen: React.FC = () => {
                   borderColor: COLORS.divider,
                 },
               ]}
-              onPress={() => {
-                console.log(option);
-                toggleMenu();
-              }}
+              onPress={() => handleMenuOption(option)}
             >
               <Text
                 style={[
@@ -279,6 +384,84 @@ const UserProfileScreen: React.FC = () => {
           ))}
         </Animated.View>
       </Modal>
+
+      {/* Bottom Share Modal */}
+      <Modal visible={shareVisible} transparent animationType="none">
+        <TouchableWithoutFeedback onPress={closeShareModal}>
+          <View style={styles.overlay} />
+        </TouchableWithoutFeedback>
+
+        <Animated.View
+          style={[
+            styles.shareSheet,
+            { transform: [{ translateY: slideAnim }] },
+          ]}
+        >
+          <View style={styles.shareHeader}>
+            <Image source={USER_DATA.avatar} style={styles.shareAvatar} />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.shareName}>{USER_DATA.name}</Text>
+              <Text style={styles.shareHandle}>{USER_DATA.handle}</Text>
+            </View>
+            <TouchableOpacity onPress={closeShareModal}>
+              <Ionicons name="close" size={22} color={COLORS.textDark} />
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.shareFriendsScroll}
+          >
+            {MUTUAL_FRIENDS.map((f) => (
+              <View key={f.id} style={styles.shareFriendItem}>
+                <Image source={f.avatar} style={styles.shareFriendAvatar} />
+                <Text style={styles.shareFriendName}>{f.name}</Text>
+              </View>
+            ))}
+          </ScrollView>
+
+          <View style={styles.shareDivider} />
+
+          <View style={styles.shareIconsRow}>
+            {SHARE_OPTIONS.map((o) => (
+              <TouchableOpacity
+                key={o.id}
+                style={styles.shareIconBlock}
+                onPress={() => {
+                  closeShareModal();
+                  if (o.label === "Message") {
+                    navigation.navigate("ChatsScreen");
+                  }
+                  // Інші опції можна додати пізніше
+                }}
+              >
+                <View style={styles.shareIconCircle}>
+                  <Ionicons
+                    name={o.icon as any}
+                    size={22}
+                    color={COLORS.textDark}
+                  />
+                </View>
+                <Text style={styles.shareIconLabel}>{o.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          <View style={styles.bottomActions}>
+            {BOTTOM_ACTIONS.map((a) => (
+              <TouchableOpacity key={a.id} style={styles.actionRow}>
+                <Text style={styles.actionLabel}>{a.label}</Text>
+                <Ionicons
+                  name={a.icon as any}
+                  size={18}
+                  color={COLORS.textDark}
+                />
+              </TouchableOpacity>
+            ))}
+          </View>
+        </Animated.View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -286,7 +469,7 @@ const UserProfileScreen: React.FC = () => {
 export default UserProfileScreen;
 
 // --------------------------------------------------
-// Стилі
+// СТИЛІ
 const PADDING_HORIZONTAL = 20;
 const AVATAR_SIZE = 80;
 const FRIEND_AVATAR_SIZE = 56;
@@ -353,28 +536,41 @@ const styles = StyleSheet.create({
   mutualLabel: { fontSize: 12, color: COLORS.textGrey },
   friendsAvatarsScroll: { paddingLeft: 10, paddingRight: 20 },
   friendPill: { alignItems: "center", marginRight: 14 },
+  avatarContainer: {
+    position: "relative",
+  },
   friendAvatar: {
     width: FRIEND_AVATAR_SIZE,
     height: FRIEND_AVATAR_SIZE,
     borderRadius: FRIEND_AVATAR_SIZE / 2,
   },
+  messengerIconContainer: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: COLORS.white,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: COLORS.white,
+  },
+  messengerIcon: {
+    width: 16,
+    height: 16,
+  },
   friendName: { fontSize: 11, color: COLORS.textGrey, textAlign: "center" },
 
-  pastOrdersHeader: {
-    paddingVertical: 12,
-    alignItems: "center",
-  },
+  pastOrdersHeader: { paddingVertical: 12, alignItems: "center" },
   pastOrdersTitle: { fontSize: 18, fontWeight: "600", color: COLORS.textDark },
-  orderItemContainer: {
-    width: GRID_ITEM_SIZE,
-    height: GRID_ITEM_SIZE * 1.5,
-  },
+  orderItemContainer: { width: GRID_ITEM_SIZE, height: GRID_ITEM_SIZE * 1.5 },
   orderImage: { flex: 1, justifyContent: "flex-end" },
   orderTextOverlay: { padding: 8, backgroundColor: "rgba(0,0,0,0.35)" },
   orderDishName: { fontSize: 12, fontWeight: "600", color: COLORS.white },
   orderRestaurantName: { fontSize: 10, color: COLORS.white },
 
-  // modal
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: COLORS.overlay,
@@ -386,6 +582,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderRadius: 16,
     paddingVertical: 6,
+    minWidth: 220,
     shadowColor: "#000",
     shadowOpacity: 0.25,
     shadowRadius: 8,
@@ -399,9 +596,67 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 18,
   },
-  menuText: {
-    fontSize: 16,
-    color: COLORS.textDark,
-    fontWeight: "500",
+  menuText: { fontSize: 16, color: COLORS.textDark, fontWeight: "500" },
+
+  // Share Modal
+  shareSheet: {
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+    backgroundColor: COLORS.white,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: -3 },
+    elevation: 10,
   },
+  shareHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  shareAvatar: { width: 50, height: 50, borderRadius: 25, marginRight: 10 },
+  shareName: { fontSize: 16, fontWeight: "600", color: COLORS.textDark },
+  shareHandle: { fontSize: 14, color: COLORS.textGrey },
+  shareFriendsScroll: { paddingVertical: 10 },
+  shareFriendItem: { alignItems: "center", marginRight: 18 },
+  shareFriendAvatar: { width: 54, height: 54, borderRadius: 27 },
+  shareFriendName: { fontSize: 12, color: COLORS.textDark },
+  shareDivider: {
+    height: 1,
+    backgroundColor: COLORS.divider,
+    marginVertical: 8,
+  },
+  shareIconsRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginBottom: 8,
+  },
+  shareIconBlock: { alignItems: "center" },
+  shareIconCircle: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: "#F3F4F6",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 4,
+  },
+  shareIconLabel: { fontSize: 12, color: COLORS.textDark },
+  bottomActions: {
+    borderTopWidth: 1,
+    borderTopColor: COLORS.divider,
+    paddingTop: 6,
+  },
+  actionRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 12,
+  },
+  actionLabel: { fontSize: 15, color: COLORS.textDark },
 });

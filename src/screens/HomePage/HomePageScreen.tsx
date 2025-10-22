@@ -22,14 +22,16 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 // Типи для навігації
 type RootStackParamList = {
   HomePageScreen: undefined;
-  DiscoveryScreen: undefined;
+  Discovery: undefined;
   ChatsScreen: undefined;
   FriendsScreen: undefined;
-  FriendsProfileFriends: undefined; // Add this line
+  FriendsProfileFriends: undefined;
+  FriendsProfileScreen: undefined;
   ProfileScreen: undefined;
   MyProfileScreen: undefined;
   DishDetailScreen: undefined;
-  OrderScreen: undefined;
+  Order: undefined;
+  Notifications: undefined;
 };
 
 const images = [
@@ -39,6 +41,15 @@ const images = [
   require("../../assets/food3.jpg"),
   require("../../assets/food4.jpg"),
   require("../../assets/food5.jpg"),
+  require("../../assets/food6.jpg"),
+  require("../../assets/food7.jpg"),
+  require("../../assets/food8.jpg"),
+  require("../../assets/food9.jpg"),
+  require("../../assets/dumplings-top.jpg"),
+  require("../../assets/pasta.jpg"),
+  require("../../assets/pasta copy.jpg"),
+  require("../../assets/potatoes-square.jpg"),
+  require("../../assets/sushi-dragons.jpg"),
 ];
 
 const shareIcon = require("../../assets/Telegram.png");
@@ -70,34 +81,45 @@ interface DishData {
 
 const DISH_DATA: DishData[] = [
   {
-    title: "Herbed Golden Potatoes",
-    restaurant: "Love Restaurant",
-    location: "Dubai",
-    distance: "3 miles away",
-    rating: 5.0,
-    userRating: 4.8,
-    price: 45,
+  title: "Herbed Golden Potatoes",
+  restaurant: "Love Restaurant",
+  location: "Dubai",
+  distance: "3 miles away",
+  rating: 5.0,
+  userRating: 4.8,
+  price: 45,
     imageSource: images[0],
   },
+
   {
-    title: "Delicious Pasta",
-    restaurant: "Italian Corner",
-    location: "Abu Dhabi",
-    distance: "2 miles away",
+    title: "Beef Steak",
+    restaurant: "Steak House",
+    location: "Marina Walk",
+    distance: "3.5 miles away",
     rating: 4.8,
     userRating: 4.6,
-    price: 35,
-    imageSource: images[1],
+    price: 65,
+    imageSource: images[6],
   },
   {
-    title: "Fresh Sushi",
-    restaurant: "Tokyo Sushi",
-    location: "Dubai Marina",
-    distance: "5 miles away",
-    rating: 4.9,
-    userRating: 4.7,
-    price: 55,
-    imageSource: images[2],
+    title: "Fish & Chips",
+    restaurant: "Ocean View",
+    location: "Beach Road",
+    distance: "6 miles away",
+    rating: 4.4,
+    userRating: 4.2,
+    price: 38,
+    imageSource: images[7],
+  },
+  {
+    title: "Vegetarian Bowl",
+    restaurant: "Healthy Choice",
+    location: "Business Bay",
+    distance: "2 miles away",
+    rating: 4.6,
+    userRating: 4.4,
+    price: 32,
+    imageSource: images[8],
   },
 ];
 
@@ -187,35 +209,39 @@ const HomePageScreen: React.FC = () => {
   };
 
   const handleOrderNowPress = () => {
-    navigation.navigate("OrderScreen");
+    navigation.navigate("Order");
+  };
+
+  const handleNotificationsPress = () => {
+    navigation.navigate("Notifications");
   };
 
   const renderDishCard = (dish: DishData, index: number) => {
     const isSaved = savedDishes.includes(index);
 
-    return (
+  return (
       <View key={index} style={styles.cardContainer}>
         <ImageBackground
           source={dish.imageSource}
           style={styles.imageBackground}
           imageStyle={{ resizeMode: "cover" }}
         >
-          <View style={styles.darkOverlay} />
-          <LinearGradient
-            colors={["transparent", "transparent", COLORS.shadow]}
-            style={styles.bottomGradient}
-          />
+        <View style={styles.darkOverlay} />
+        <LinearGradient
+          colors={["transparent", "transparent", COLORS.shadow]}
+          style={styles.bottomGradient}
+        />
 
-          <View style={styles.contentWrapper}>
+        <View style={styles.contentWrapper}>
             <Text style={styles.dishTitle}>{dish.title}</Text>
 
-            <View style={styles.sideIcons}>
+          <View style={styles.sideIcons}>
               <TouchableOpacity
                 style={styles.sideIconItem}
                 onPress={() => setShareMenuVisible(true)}
               >
-                <Image source={shareIcon} style={styles.sideIconImage} />
-              </TouchableOpacity>
+              <Image source={shareIcon} style={styles.sideIconImage} />
+            </TouchableOpacity>
 
               {/* ❤️ Кнопка Save */}
               <TouchableOpacity
@@ -223,27 +249,27 @@ const HomePageScreen: React.FC = () => {
                 onPress={() => toggleSaveDish(index)}
               >
                 <Image source={isSaved ? saveIconRed : saveIcon} />
-              </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           </View>
+        </View>
 
-          <View style={styles.infoBlock}>
+        <View style={styles.infoBlock}>
             <Text style={styles.restaurantTitle}>{dish.restaurant}</Text>
 
-            <View style={styles.metaRow}>
-              <Ionicons
-                name="location-sharp"
-                size={16}
-                color={COLORS.primary}
-                style={{ marginRight: 5 }}
-              />
+          <View style={styles.metaRow}>
+            <Ionicons
+              name="location-sharp"
+              size={16}
+              color={COLORS.primary}
+              style={{ marginRight: 5 }}
+            />
               <Text style={styles.metaText}>{dish.location}</Text>
-              <Text style={styles.metaTextDivider}>•</Text>
+            <Text style={styles.metaTextDivider}>•</Text>
               <Text style={styles.metaText}>{dish.distance}</Text>
-            </View>
+          </View>
 
             {/* ⭐ Рейтинг */}
-            <View style={styles.ratingRow}>
+          <View style={styles.ratingRow}>
               <View style={styles.ratingBoxTransparent}>
                 <Ionicons name="star" size={14} color="#34A853" />
                 <Text style={styles.ratingTextDark}>{dish.rating} Rating</Text>
@@ -259,31 +285,31 @@ const HomePageScreen: React.FC = () => {
                 <Text style={styles.ratingTextDark}>
                   {dish.userRating} Rating
                 </Text>
-              </View>
             </View>
+          </View>
 
-            <View style={styles.buttonRow}>
-              <TouchableOpacity
-                style={[styles.actionButton, styles.viewDishButton]}
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              style={[styles.actionButton, styles.viewDishButton]}
                 onPress={handleViewDishPress}
-              >
-                <Text style={styles.viewDishText}>View Dish</Text>
-              </TouchableOpacity>
+            >
+              <Text style={styles.viewDishText}>View Dish</Text>
+            </TouchableOpacity>
 
-              <TouchableOpacity
-                style={[styles.actionButton, styles.orderNowButton]}
+            <TouchableOpacity
+              style={[styles.actionButton, styles.orderNowButton]}
                 onPress={handleOrderNowPress}
-              >
+            >
                 <Text style={styles.orderNowText}>
                   Order Now | AED {dish.price}
                 </Text>
-              </TouchableOpacity>
-            </View>
+            </TouchableOpacity>
           </View>
-        </ImageBackground>
-      </View>
-    );
-  };
+        </View>
+      </ImageBackground>
+    </View>
+  );
+};
 
   return (
     <View style={styles.container}>
@@ -307,7 +333,10 @@ const HomePageScreen: React.FC = () => {
             ))}
           </View>
         </View>
-        <TouchableOpacity style={styles.headerIcon}>
+        <TouchableOpacity
+          style={styles.headerIcon}
+          onPress={handleNotificationsPress}
+        >
           <Ionicons
             name="notifications-outline"
             size={30}

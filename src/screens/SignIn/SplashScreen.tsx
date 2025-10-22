@@ -1,7 +1,6 @@
 // screens/WelcomeScreen.tsx
 import React, { useEffect } from "react";
-import { StyleSheet, ImageBackground, StatusBar } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet, ImageBackground, StatusBar, View } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../App";
@@ -19,26 +18,26 @@ const WelcomeScreen: React.FC = () => {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      navigation.navigate("OnBoarding1Screen");
+      navigation.navigate("SignIn");
     }, 2000); // 2 секунди
 
     return () => clearTimeout(timeout);
   }, [navigation]);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <ImageBackground
         source={BACKGROUND_IMAGE}
         style={styles.background}
         resizeMode="cover"
       />
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
   },
   background: {
