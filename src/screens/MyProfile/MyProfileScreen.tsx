@@ -17,7 +17,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-// Типи для навігації
+// --- Типи маршрутів ---
 type RootStackParamList = {
   HomePageScreen: undefined;
   Discovery: undefined;
@@ -26,24 +26,25 @@ type RootStackParamList = {
   FriendsProfileFriends: undefined;
   ProfileScreen: undefined;
   MyProfileScreen: undefined;
+  MyProfileSettings: undefined;
+  MyProfileSaved: undefined;
   DishDetailScreen: undefined;
   OrderScreen: undefined;
+  SavedScreen: undefined;
 };
 
-// --- КОНФІГУРАЦІЯ ТА ДАНІ ---
+// --- Конфігурація ---
 const { width } = Dimensions.get("window");
-
 const COLORS = {
-  primary: "#E9725C", // Червоно-помаранчевий
+  primary: "#E9725C",
   background: "#FFFFFF",
-  textDark: "#1F2937", // Темний текст
-  textGrey: "#6B7280", // Сірий текст
+  textDark: "#1F2937",
+  textGrey: "#6B7280",
   white: "#FFFFFF",
   divider: "#E5E7EB",
 };
 
-// 💡 ЛОКАЛЬНІ ЗОБРАЖЕННЯ
-// Залишаємо ваші шляхи require()
+// --- Локальні зображення ---
 const AVATAR_SOURCE =
   require("../../assets/profile-avatar.jpg") as ImageSourcePropType;
 const DISH_1_SOURCE =
@@ -51,204 +52,136 @@ const DISH_1_SOURCE =
 const DISH_2_SOURCE =
   require("../../assets/potatoes-square.jpg") as ImageSourcePropType;
 
-// Дані профілю (ВЛАСНИЙ ПРОФІЛЬ)
+// --- Дані користувача ---
 const USER_DATA = {
   handle: "@foodie_iryna",
-  name: "Iryna Hvozdetka", // Оновлене ім'я
+  name: "Iryna Hvozdetka",
   stats: [
     { label: "Saved", count: 46 },
     { label: "Friends", count: 212 },
-    // Тут було Shared orders та Shared videos, але на скріншоті їх немає
   ],
   avatar: AVATAR_SOURCE,
 };
 
-// Імітація даних для розділу "Past Orders" (Сітка)
+// --- Дані замовлень ---
 const PAST_ORDERS_DATA = [
-  {
-    id: "1",
-    dishName: "Sushi Dragons",
-    restaurant: "Chefs Hall",
-    image: DISH_1_SOURCE,
-  },
-  {
-    id: "2",
-    dishName: "Herbed Golden Potatoes",
-    restaurant: "A Mano",
-    image: DISH_2_SOURCE,
-  },
-  {
-    id: "3",
-    dishName: "Sushi Dragons",
-    restaurant: "Chefs Hall",
-    image: DISH_1_SOURCE,
-  },
-  {
-    id: "4",
-    dishName: "Herbed Golden Potatoes",
-    restaurant: "A Mano",
-    image: DISH_2_SOURCE,
-  },
-  {
-    id: "5",
-    dishName: "Sushi Dragons",
-    restaurant: "Chefs Hall",
-    image: DISH_1_SOURCE,
-  },
-  {
-    id: "6",
-    dishName: "Herbed Golden Potatoes",
-    restaurant: "A Mano",
-    image: DISH_2_SOURCE,
-  },
+  { id: "1", image: DISH_1_SOURCE },
+  { id: "2", image: DISH_2_SOURCE },
+  { id: "3", image: DISH_1_SOURCE },
+  { id: "4", image: DISH_2_SOURCE },
+  { id: "5", image: DISH_1_SOURCE },
+  { id: "6", image: DISH_2_SOURCE },
 ];
 
-// --- ДОПОМІЖНІ КОМПОНЕНТИ ---
-
-// Статистична картка (46 Saved, 212 Friends)
-interface StatItemProps {
-  count: number;
-  label: string;
-}
-
-const StatItem: React.FC<StatItemProps> = ({ count, label }) => (
-  <View style={styles.statItem}>
-    <Text style={styles.statCount}>{count}</Text>
-    <Text style={styles.statLabel}>{label}</Text>
-  </View>
-);
-
-// Елемент сітки "Past Orders"
-// Розмір елемента сітки розраховується як ширина екрана / 3
-const GRID_ITEM_SIZE = width / 3;
-
-interface OrderItemProps {
-  dishName: string;
-  restaurant: string;
-  image: ImageSourcePropType;
-}
-
-const OrderItem: React.FC<OrderItemProps> = ({
-  dishName,
-  restaurant,
-  image,
-}) => (
-  <TouchableOpacity style={styles.orderItemContainer}>
-    <ImageBackground
-      source={image}
-      style={styles.orderImage}
-      resizeMode="cover"
-    >
-      <View style={styles.orderTextOverlay}>
-        <Text style={styles.orderDishName}>{dishName}</Text>
-        <Text style={styles.orderRestaurantName}>{restaurant}</Text>
-      </View>
-    </ImageBackground>
-  </TouchableOpacity>
-);
-
-// --- ТИП НАВІГАЦІЇ ---
+// --- Тип навігації ---
 type MyProfileNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "MyProfileScreen"
 >;
 
-// --- ОСНОВНИЙ ЕКРАН ПРОФІЛЮ ---
+// --- Компоненти ---
+interface StatItemProps {
+  count: number;
+  label: string;
+  onPress?: () => void;
+}
 
-const ProfileScreen: React.FC = () => {
+const StatItem: React.FC<StatItemProps> = ({ count, label, onPress }) => (
+  <TouchableOpacity style={styles.statItem} onPress={onPress}>
+    <Text style={styles.statCount}>{count}</Text>
+    <Text style={styles.statLabel}>{label}</Text>
+  </TouchableOpacity>
+);
+
+const GRID_ITEM_SIZE = width / 3;
+
+interface OrderItemProps {
+  image: ImageSourcePropType;
+}
+
+const OrderItem: React.FC<OrderItemProps> = ({ image }) => (
+  <TouchableOpacity style={styles.orderItemContainer} activeOpacity={0.8}>
+    <ImageBackground
+      source={image}
+      style={styles.orderImage}
+      resizeMode="cover"
+      imageStyle={{ borderRadius: 8 }}
+    />
+  </TouchableOpacity>
+);
+
+// --- Основний екран ---
+const MyProfileScreen: React.FC = () => {
   const navigation = useNavigation<MyProfileNavigationProp>();
 
-  // Навігаційні функції для нижнього таб меню
-  const handleHomePress = () => {
-    navigation.navigate("HomePageScreen");
-  };
+  // --- Обробники натискань ---
+  const handleHomePress = () => navigation.navigate("HomePageScreen");
+  const handleDiscoveryPress = () => navigation.navigate("Discovery");
+  const handleChatsPress = () => navigation.navigate("ChatsScreen");
+  const handleFriendsPress = () => navigation.navigate("FriendsProfileFriends");
+  const handleProfilePress = () => console.log("Already on profile");
+  const handleSettingsPress = () => navigation.navigate("MyProfileSettings");
+  const handleSavedPress = () => navigation.navigate("MyProfileSaved");
+  const handleFriendsListPress = () => navigation.navigate("FriendsScreen");
 
-  const handleDiscoveryPress = () => {
-    navigation.navigate("Discovery");
-  };
-
-  const handleChatsPress = () => {
-    navigation.navigate("ChatsScreen");
-  };
-
-  const handleFriendsPress = () => {
-    navigation.navigate("FriendsProfileFriends");
-  };
-
-  const handleProfilePress = () => {
-    // Вже на MyProfileScreen
-    console.log("Profile pressed");
-  };
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Хедер */}
+      {/* --- Header --- */}
       <View style={styles.header}>
-        {/* Прибираємо кнопку "назад", залишаємо тільки для FriendProfileScreen */}
         <View style={{ width: 28 }} />
         <Text style={styles.headerTitle}>{USER_DATA.handle}</Text>
-        <TouchableOpacity onPress={() => console.log("Open Settings")}>
-          <Ionicons
-            name="settings-outline" // Значок шестерінки
-            size={24}
-            color={COLORS.textDark}
-          />
+        <TouchableOpacity onPress={handleSettingsPress}>
+          <Ionicons name="settings-outline" size={24} color={COLORS.textDark} />
         </TouchableOpacity>
       </View>
 
+      {/* --- Контент --- */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Блок Профілю */}
+        {/* --- Блок профілю --- */}
         <View style={styles.profileBlock}>
           <View style={styles.topRow}>
-            {/* Аватар */}
             <Image source={USER_DATA.avatar} style={styles.avatar} />
 
-            {/* Статистика */}
             <View style={styles.statsContainer}>
-              {USER_DATA.stats.map((stat, index) => (
-                <StatItem key={index} count={stat.count} label={stat.label} />
-              ))}
-              {/* Додаємо порожні елементи для вирівнювання, якщо потрібно,
-                  але на скріншоті лише два елементи статистики */}
+              <StatItem
+                count={USER_DATA.stats[0].count}
+                label="Saved"
+                onPress={handleSavedPress}
+              />
+              <StatItem
+                count={USER_DATA.stats[1].count}
+                label="Friends"
+                onPress={handleFriendsListPress}
+              />
               <View style={styles.statItemPlaceholder} />
               <View style={styles.statItemPlaceholder} />
             </View>
           </View>
 
-          {/* Ім'я */}
           <Text style={styles.userName}>{USER_DATA.name}</Text>
-
-          {/* !!! Кнопку "Send message" ВИДАЛЕНО !!! */}
         </View>
-        {/* !!! Спільні друзі ВИДАЛЕНО !!! */}
 
-        {/* Розділювач та Заголовок "Past Orders" */}
+        {/* --- Заголовок Past Orders --- */}
         <View style={styles.pastOrdersHeader}>
           <Text style={styles.pastOrdersTitle}>Past Orders</Text>
         </View>
 
-        {/* Сітка замовлень */}
+        {/* --- Сітка замовлень без текстів --- */}
         <FlatList
           data={PAST_ORDERS_DATA}
-          renderItem={({ item }) => (
-            <OrderItem
-              dishName={item.dishName}
-              restaurant={item.restaurant}
-              image={item.image}
-            />
-          )}
+          renderItem={({ item }) => <OrderItem image={item.image} />}
           keyExtractor={(item) => item.id}
           numColumns={3}
           scrollEnabled={false}
           columnWrapperStyle={styles.columnWrapper}
         />
 
-        {/* Додатковий простір для скролінгу */}
         <View style={{ height: 50 }} />
       </ScrollView>
 
-      {/* Навігаційна панель */}
+      {/* --- Нижнє меню --- */}
       <View style={styles.bottomTabBar}>
         <TabBarItem
           iconName="home-outline"
@@ -285,7 +218,7 @@ const ProfileScreen: React.FC = () => {
   );
 };
 
-// --- КОМПОНЕНТ ЕЛЕМЕНТА НИЖНЬОЇ ПАНЕЛІ (TabBar) ---
+// --- Елемент нижньої навігації ---
 interface TabBarItemProps {
   iconName: keyof typeof Ionicons.glyphMap;
   label: string;
@@ -316,20 +249,13 @@ const TabBarItem: React.FC<TabBarItemProps> = ({
   </TouchableOpacity>
 );
 
-// --- СТИЛІЗАЦІЯ ---
-
+// --- Стилі ---
 const PADDING_HORIZONTAL = 20;
 const AVATAR_SIZE = 80;
 
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: COLORS.background,
-  },
-  scrollContent: {
-    paddingBottom: 20,
-  },
-  // --- Хедер (Навігаційна панель) ---
+  safeArea: { flex: 1, backgroundColor: COLORS.background },
+  scrollContent: { paddingBottom: 20 },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -337,24 +263,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: PADDING_HORIZONTAL,
     paddingVertical: 10,
   },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: COLORS.textDark,
-  },
-
-  // --- Блок Профілю ---
+  headerTitle: { fontSize: 18, fontWeight: "600", color: COLORS.textDark },
   profileBlock: {
     paddingHorizontal: PADDING_HORIZONTAL,
     paddingVertical: 10,
-    borderBottomWidth: 1, // Розділювач, який був присутній
+    borderBottomWidth: 1,
     borderBottomColor: COLORS.divider,
   },
-  topRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 15,
-  },
+  topRow: { flexDirection: "row", alignItems: "center", marginBottom: 15 },
   avatar: {
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
@@ -366,38 +282,19 @@ const styles = StyleSheet.create({
   statsContainer: {
     flex: 1,
     flexDirection: "row",
-    // Залишимо простір для 4 елементів, як було раніше,
-    // але заповнимо лише двома, щоб зберегти вирівнювання
     justifyContent: "space-around",
   },
-  statItem: {
-    alignItems: "center",
-    flex: 1,
-    marginHorizontal: 5,
-  },
-  statItemPlaceholder: {
-    flex: 1, // Для симетричного розміщення двох активних елементів
-    marginHorizontal: 5,
-  },
-  statCount: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: COLORS.textDark,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: COLORS.textGrey,
-    textAlign: "center",
-  },
+  statItem: { alignItems: "center", flex: 1, marginHorizontal: 5 },
+  statItemPlaceholder: { flex: 1, marginHorizontal: 5 },
+  statCount: { fontSize: 20, fontWeight: "bold", color: COLORS.textDark },
+  statLabel: { fontSize: 12, color: COLORS.textGrey, textAlign: "center" },
   userName: {
-    fontSize: 20, // Трохи менше, ніж на профілі друга
-    fontWeight: "500", // Менш жирний, ніж на профілі друга
+    fontSize: 20,
+    fontWeight: "500",
     color: COLORS.textDark,
-    marginBottom: 20, // Великий відступ, оскільки немає кнопки "Send message"
-    paddingTop: 5, // Трохи опустити від аватара
+    marginBottom: 20,
+    paddingTop: 5,
   },
-
-  // --- Сітка замовлень ---
   pastOrdersHeader: {
     paddingHorizontal: PADDING_HORIZONTAL,
     paddingVertical: 15,
@@ -406,37 +303,19 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     color: COLORS.textDark,
-    textAlign: "center", // Центрування заголовка
+    textAlign: "center",
   },
-  columnWrapper: {
-    justifyContent: "flex-start", // Початок зліва
-  },
+  columnWrapper: { justifyContent: "flex-start" },
   orderItemContainer: {
     width: GRID_ITEM_SIZE,
     height: GRID_ITEM_SIZE * 1.5,
-    padding: 1,
+    padding: 2,
   },
   orderImage: {
     flex: 1,
-    justifyContent: "flex-end",
-    borderRadius: 0,
+    borderRadius: 8,
+    overflow: "hidden",
   },
-  orderTextOverlay: {
-    padding: 8,
-    // Змінимо фон, щоб він був менш помітним на вашому скріншоті
-    backgroundColor: "rgba(255, 255, 255, 0.7)",
-  },
-  orderDishName: {
-    fontSize: 12,
-    fontWeight: "600",
-    color: COLORS.textDark, // Темний текст на світлому фоні
-  },
-  orderRestaurantName: {
-    fontSize: 10,
-    color: COLORS.textGrey,
-  },
-
-  // --- Нижня навігаційна панель (TabBar) ---
   bottomTabBar: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -450,25 +329,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  bottomNav: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    height: 70,
-    backgroundColor: COLORS.white,
-    borderTopWidth: 1,
-    borderTopColor: "#EEEEEE",
-    marginBottom: 15,
-  },
-  tabBarItem: {
-    alignItems: "center",
-    flex: 1,
-  },
-  tabBarLabel: {
-    fontSize: 10,
-    marginTop: 2,
-    fontWeight: "500",
-  },
+  tabBarItem: { alignItems: "center", flex: 1 },
+  tabBarLabel: { fontSize: 10, marginTop: 2, fontWeight: "500" },
 });
 
-export default ProfileScreen;
+export default MyProfileScreen;

@@ -14,7 +14,7 @@ import { RootStackParamList } from "../../../App"; // Імпорт типів н
 
 type AuthScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "AuthScreen"
+  "CheckEmailscreen"
 >;
 
 const AuthScreen = () => {
@@ -26,13 +26,12 @@ const AuthScreen = () => {
     if (activeTab === "signup") {
       navigation.navigate("SignUpConfirmationCode1"); // 🔥 перехід на екран підтвердження
     } else {
-      navigation.navigate("Splash"); // 🔥 перехід на сторінку Sign In
+      navigation.navigate("SignIn"); // 🔥 перехід на сторінку Sign In
     }
   };
 
   const handleSignInTabPress = () => {
-    setActiveTab("signin");
-    navigation.navigate("Splash"); // 🔥 перехід на сторінку Sign In при натисканні табу
+    navigation.navigate("SignIn"); // 🔥 перехід на сторінку Sign In при натисканні табу
   };
 
   return (

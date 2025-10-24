@@ -81,13 +81,13 @@ interface DishData {
 
 const DISH_DATA: DishData[] = [
   {
-  title: "Herbed Golden Potatoes",
-  restaurant: "Love Restaurant",
-  location: "Dubai",
-  distance: "3 miles away",
-  rating: 5.0,
-  userRating: 4.8,
-  price: 45,
+    title: "Herbed Golden Potatoes",
+    restaurant: "Love Restaurant",
+    location: "Dubai",
+    distance: "3 miles away",
+    rating: 5.0,
+    userRating: 4.8,
+    price: 45,
     imageSource: images[0],
   },
 
@@ -219,29 +219,29 @@ const HomePageScreen: React.FC = () => {
   const renderDishCard = (dish: DishData, index: number) => {
     const isSaved = savedDishes.includes(index);
 
-  return (
+    return (
       <View key={index} style={styles.cardContainer}>
         <ImageBackground
           source={dish.imageSource}
           style={styles.imageBackground}
           imageStyle={{ resizeMode: "cover" }}
         >
-        <View style={styles.darkOverlay} />
-        <LinearGradient
-          colors={["transparent", "transparent", COLORS.shadow]}
-          style={styles.bottomGradient}
-        />
+          <View style={styles.darkOverlay} />
+          <LinearGradient
+            colors={["transparent", "transparent", COLORS.shadow]}
+            style={styles.bottomGradient}
+          />
 
-        <View style={styles.contentWrapper}>
+          <View style={styles.contentWrapper}>
             <Text style={styles.dishTitle}>{dish.title}</Text>
 
-          <View style={styles.sideIcons}>
+            <View style={styles.sideIcons}>
               <TouchableOpacity
                 style={styles.sideIconItem}
                 onPress={() => setShareMenuVisible(true)}
               >
-              <Image source={shareIcon} style={styles.sideIconImage} />
-            </TouchableOpacity>
+                <Image source={shareIcon} style={styles.sideIconImage} />
+              </TouchableOpacity>
 
               {/* ❤️ Кнопка Save */}
               <TouchableOpacity
@@ -249,27 +249,27 @@ const HomePageScreen: React.FC = () => {
                 onPress={() => toggleSaveDish(index)}
               >
                 <Image source={isSaved ? saveIconRed : saveIcon} />
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
 
-        <View style={styles.infoBlock}>
+          <View style={styles.infoBlock}>
             <Text style={styles.restaurantTitle}>{dish.restaurant}</Text>
 
-          <View style={styles.metaRow}>
-            <Ionicons
-              name="location-sharp"
-              size={16}
-              color={COLORS.primary}
-              style={{ marginRight: 5 }}
-            />
+            <View style={styles.metaRow}>
+              <Ionicons
+                name="location-sharp"
+                size={16}
+                color={COLORS.primary}
+                style={{ marginRight: 5 }}
+              />
               <Text style={styles.metaText}>{dish.location}</Text>
-            <Text style={styles.metaTextDivider}>•</Text>
+              <Text style={styles.metaTextDivider}>•</Text>
               <Text style={styles.metaText}>{dish.distance}</Text>
-          </View>
+            </View>
 
             {/* ⭐ Рейтинг */}
-          <View style={styles.ratingRow}>
+            <View style={styles.ratingRow}>
               <View style={styles.ratingBoxTransparent}>
                 <Ionicons name="star" size={14} color="#34A853" />
                 <Text style={styles.ratingTextDark}>{dish.rating} Rating</Text>
@@ -285,31 +285,31 @@ const HomePageScreen: React.FC = () => {
                 <Text style={styles.ratingTextDark}>
                   {dish.userRating} Rating
                 </Text>
+              </View>
             </View>
-          </View>
 
-          <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={[styles.actionButton, styles.viewDishButton]}
+            <View style={styles.buttonRow}>
+              <TouchableOpacity
+                style={[styles.actionButton, styles.viewDishButton]}
                 onPress={handleViewDishPress}
-            >
-              <Text style={styles.viewDishText}>View Dish</Text>
-            </TouchableOpacity>
+              >
+                <Text style={styles.viewDishText}>View Dish</Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[styles.actionButton, styles.orderNowButton]}
+              <TouchableOpacity
+                style={[styles.actionButton, styles.orderNowButton]}
                 onPress={handleOrderNowPress}
-            >
+              >
                 <Text style={styles.orderNowText}>
                   Order Now | AED {dish.price}
                 </Text>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-      </ImageBackground>
-    </View>
-  );
-};
+        </ImageBackground>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>

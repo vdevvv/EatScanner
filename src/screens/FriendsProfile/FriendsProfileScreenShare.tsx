@@ -94,7 +94,6 @@ const MUTUAL_FRIENDS = [
 ];
 
 const SHARE_APPS = [
-  { id: "1", label: "Message", icon: "chatbubble-outline", isLocalIcon: false },
   { id: "2", label: "Mail", icon: MAIL_ICON, isLocalIcon: true },
   { id: "3", label: "Messenger", icon: MESSENGER_ICON, isLocalIcon: true },
   { id: "4", label: "Whatsapp", icon: WHATSAPP_ICON, isLocalIcon: true },
@@ -244,7 +243,10 @@ const FriendsProfileScreenShare: React.FC = () => {
                 <View style={styles.shareAvatarContainer}>
                   <Image source={f.avatar} style={styles.shareFriendAvatar} />
                   <View style={styles.shareMessengerIconContainer}>
-                    <Image source={f.messengerIcon} style={styles.shareMessengerIcon} />
+                    <Image
+                      source={f.messengerIcon}
+                      style={styles.shareMessengerIcon}
+                    />
                   </View>
                 </View>
                 <Text style={styles.shareFriendName}>{f.name}</Text>

@@ -10,25 +10,21 @@ import {
   Image,
   Dimensions,
   Platform,
-  // Type definition for require in React Native/Expo environment
   ImageSourcePropType,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
-// --- 1. ІМІТАЦІЯ ДАНИХ ТА АСЕТІВ ---
-
-// Важливо: у реальному проекті шляхи '../assets/' повинні бути коректними.
-// Для цього прикладу я використовую універсальний плейсхолдер.
+// --- ІМІТАЦІЯ ДАНИХ ---
 const IMAGE_ASSETS = {
-  profile1: 1, // Placeholder number for ImageSourcePropType
+  profile1: 1,
   profile2: 2,
   profile3: 3,
   profile4: 4,
 } as const;
 
-// Тип для аватара
 type AvatarKey = keyof typeof IMAGE_ASSETS;
 
 interface Friend {
@@ -70,7 +66,6 @@ const INITIAL_FRIEND_LIST: Friend[] = [
   },
 ];
 
-// Корекція: Об'єднуємо список друзів та дублікати в одну константу
 const FRIEND_LIST: Friend[] = [
   ...INITIAL_FRIEND_LIST,
   ...INITIAL_FRIEND_LIST.map((f, i) => ({
@@ -87,7 +82,7 @@ const SEARCH_RESULTS: Friend[] = [
     name: "Talia Gomez",
     username: "@foodie_iryna",
     avatar: "profile1",
-    isFriend: false, // Новий користувач, показуємо кнопку "Add"
+    isFriend: false,
   },
   {
     id: "s2",
@@ -105,15 +100,8 @@ const SEARCH_RESULTS: Friend[] = [
   },
 ];
 
-// --- 2. КОМПОНЕНТ ЕЛЕМЕНТА СПИСКУ ---
-
-// Оскільки ми не можемо використовувати `require()` в цьому середовищі,
-// ми імітуємо завантаження зображення через placeholder URL або заглушку.
+// --- Аватар ---
 const getAvatarSource = (key: AvatarKey): ImageSourcePropType => {
-  // У реальному проекті тут було б щось на зразок:
-  // return IMAGE_ASSETS[key];
-
-  // Використовуємо placeholder URL для імітації (важливо для веб-превью)
   switch (key) {
     case "profile1":
       return { uri: "https://placehold.co/50x50/E57373/FFFFFF?text=P1" };
@@ -121,24 +109,28 @@ const getAvatarSource = (key: AvatarKey): ImageSourcePropType => {
       return { uri: "https://placehold.co/50x50/3498DB/FFFFFF?text=P2" };
     case "profile3":
       return { uri: "https://placehold.co/50x50/2ECC71/FFFFFF?text=P3" };
-    case "profile4":
     default:
       return { uri: "https://placehold.co/50x50/9B59B6/FFFFFF?text=P4" };
   }
 };
 
-const FriendListItemFixed: React.FC<{ friend: Friend }> = ({ friend }) => {
+// --- Елемент списку ---
+const FriendListItemFixed: React.FC<{ 
+  friend: Friend; 
+  onRemoveFriend?: (friendId: string) => void;
+}> = ({ friend, onRemoveFriend }) => {
   const buttonText = friend.isFriend ? "Remove" : "Add";
-  // Стиль кнопки залежить від стану
   const buttonStyle = friend.isFriend
     ? styles.removeButtonContainer
     : styles.addButtonContainer;
-  // Стиль тексту залежить від стану
   const textStyle = friend.isFriend ? styles.removeText : styles.addText;
 
   const handleAction = () => {
-    console.log(`${buttonText} ${friend.name}`);
-    // Логіка оновлення стану друзів
+    if (friend.isFriend && onRemoveFriend) {
+      onRemoveFriend(friend.id);
+    } else {
+      console.log(`Add ${friend.name}`);
+    }
   };
 
   return (
@@ -146,12 +138,10 @@ const FriendListItemFixed: React.FC<{ friend: Friend }> = ({ friend }) => {
       <Image
         source={getAvatarSource(friend.avatar)}
         style={styles.avatar}
-        // Додаємо fallback, якщо placeholder не завантажиться
         defaultSource={{
           uri: "https://placehold.co/50x50/CCCCCC/333333?text=User",
         }}
       />
-
       <View style={styles.userInfo}>
         <Text style={styles.nameText}>{friend.name}</Text>
         <Text style={styles.usernameText}>{friend.username}</Text>
@@ -164,28 +154,37 @@ const FriendListItemFixed: React.FC<{ friend: Friend }> = ({ friend }) => {
   );
 };
 
-// --- 3. ОСНОВНИЙ КОМПОНЕНТ ЕКРАНУ ---
-
+// --- Основний екран ---
 const FriendsScreenFinal: React.FC = () => {
+  const navigation = useNavigation();
   const [searchText, setSearchText] = useState("");
+  const [friendsList, setFriendsList] = useState<Friend[]>(FRIEND_LIST);
   const isSearching = searchText.length > 0;
+  const displayList = isSearching ? SEARCH_RESULTS : friendsList;
 
-  // Логіка: Якщо є текст у полі пошуку, показуємо фіксовані SEARCH_RESULTS.
-  // В іншому випадку, показуємо FRIEND_LIST.
-  const displayList = isSearching ? SEARCH_RESULTS : FRIEND_LIST;
+  const handleBack = () => {
+    navigation.goBack();
+  };
+
+  const handleRemoveFriend = (friendId: string) => {
+    setFriendsList(prevList => 
+      prevList.filter(friend => friend.id !== friendId)
+    );
+    console.log(`Friend with ID ${friendId} removed from list`);
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       {/* Шапка */}
       <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <Ionicons name="chevron-back" size={28} color="#333" />
         </TouchableOpacity>
         <Text style={styles.screenTitle}>Friends</Text>
         <View style={{ width: 48 }} />
       </View>
 
-      {/* Поле Пошуку */}
+      {/* Пошук */}
       <View style={styles.searchBarContainer}>
         <Ionicons
           name="search-outline"
@@ -195,7 +194,7 @@ const FriendsScreenFinal: React.FC = () => {
         />
         <TextInput
           style={styles.searchInput}
-          placeholder={"Search anyone..."}
+          placeholder="Search anyone..."
           placeholderTextColor="#999"
           value={searchText}
           onChangeText={setSearchText}
@@ -210,16 +209,19 @@ const FriendsScreenFinal: React.FC = () => {
         )}
       </View>
 
-      {/* Список Друзів / Результатів Пошуку */}
+      {/* Список друзів */}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {displayList.map((friend) => (
-          <FriendListItemFixed key={friend.id} friend={friend} />
+          <FriendListItemFixed 
+            key={friend.id} 
+            friend={friend} 
+            onRemoveFriend={handleRemoveFriend}
+          />
         ))}
 
-        {/* Імітація випадку, коли пошук нічого не знайшов (для демонстрації) */}
         {isSearching && displayList.length === 0 && (
           <View style={styles.noResultsContainer}>
             <Text style={styles.noResultsText}>
@@ -232,14 +234,12 @@ const FriendsScreenFinal: React.FC = () => {
   );
 };
 
-// --- 4. СТИЛІ ---
-
+// --- СТИЛІ ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#fff",
   },
-  // --- Стилі Шапки ---
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -265,8 +265,6 @@ const styles = StyleSheet.create({
     color: "#333",
     paddingVertical: 10,
   },
-
-  // --- Стилі Пошукової Панелі ---
   searchBarContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -285,16 +283,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     ...Platform.select({
-      android: {
-        paddingVertical: 0,
-      },
+      android: { paddingVertical: 0 },
     }),
   },
   clearButton: {
     padding: 5,
   },
-
-  // --- Стилі Списку ---
   scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 8,
@@ -312,7 +306,7 @@ const styles = StyleSheet.create({
     height: 50,
     borderRadius: 25,
     marginRight: 12,
-    backgroundColor: "#ccc", // fallback background color
+    backgroundColor: "#ccc",
   },
   userInfo: {
     flex: 1,
@@ -327,9 +321,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#999",
   },
-
-  // --- Стилі Кнопок ---
-  // Стиль для кнопки "Add" (сіра рамка)
   addButtonContainer: {
     paddingHorizontal: 20,
     paddingVertical: 8,
@@ -338,25 +329,23 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e5e5e5",
   },
-  // Стиль для кнопки "Remove" (прозорий червоний фон з червоними контурами)
   removeButtonContainer: {
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: "rgba(229, 115, 115, 0.1)", // Прозорий червоний фон
+    backgroundColor: "rgba(229, 115, 115, 0.1)",
     borderWidth: 1,
-    borderColor: "#E57373", // Червона рамка
+    borderColor: "#E57373",
   },
-  // Стилі для тексту всередині кнопки
   addText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#333", // Чорний текст для "Add"
+    color: "#333",
   },
   removeText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#E57373", // Червоний текст для "Remove"
+    color: "#E57373",
   },
   noResultsContainer: {
     alignItems: "center",

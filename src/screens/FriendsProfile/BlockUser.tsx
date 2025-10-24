@@ -8,6 +8,9 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../App";
 
 // Типізація користувача
 interface User {
@@ -26,12 +29,19 @@ const BLOCKED_USER: User = {
 // Отримуємо висоту екрана для адаптивного розміщення
 const screenHeight = Dimensions.get("window").height;
 
+// Тип навігації
+type BlockUserNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "BlockUser"
+>;
+
 // --- Іконки у вигляді тексту (імітація iOS стилю) ---
 const MoreIcon = () => <Text style={styles.headerIconText}>...</Text>;
 const BackIcon = () => <Text style={styles.headerIconText}>{"<"}</Text>;
 
 // --- ОСНОВНИЙ КОМПОНЕНТ ---
 const BlockedUserScreen: React.FC = () => {
+  const navigation = useNavigation<BlockUserNavigationProp>();
   const [isBlocked, setIsBlocked] = useState<boolean>(true);
 
   const handleToggleBlock = () => {
@@ -47,7 +57,7 @@ const BlockedUserScreen: React.FC = () => {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.headerButton}
-          onPress={() => console.log("Go back")}
+          onPress={() => navigation.navigate("FriendsProfileFriends")}
         >
           <BackIcon />
         </TouchableOpacity>

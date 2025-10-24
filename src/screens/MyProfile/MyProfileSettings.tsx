@@ -8,10 +8,27 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-// --- ІНТЕРФЕЙСИ ТА ТИПИ ---
+// --- Типи навігації ---
+type RootStackParamList = {
+  MyProfile: undefined;
+  MyProfileSettings: undefined;
+  MyProfileEdit: undefined;
+  MyProfileChangePassword: undefined;
+  MyProfilePolicyScreen: undefined;
+  MyProfileTermsConditions: undefined;
+  MyProfileHelpSuport: undefined;
+  SignIn: undefined;
+};
 
-// Визначаємо структуру елемента налаштувань
+type MyProfileSettingsNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "MyProfileSettings"
+>;
+
+// --- Тип елемента налаштування ---
 interface SettingItem {
   id: string;
   title: string;
@@ -19,123 +36,92 @@ interface SettingItem {
     | keyof typeof Ionicons.glyphMap
     | keyof typeof MaterialCommunityIcons.glyphMap;
   iconLibrary: "Ionicons" | "MaterialCommunityIcons";
-  action: () => void; // Функція, що виконується при натисканні
-  isDestructive?: boolean; // Для опції "Log Out"
+  action: () => void;
+  isDestructive?: boolean;
 }
 
-// --- ІМІТАЦІЯ ДАНИХ ---
-
-// Функція-заглушка для імітації навігації
-const handleAction = (itemTitle: string) => {
-  console.log(`Навігація до: ${itemTitle}`);
-  // У реальному додатку тут була б навігація: navigation.navigate(item.id);
-};
-
-const SETTINGS_OPTIONS: SettingItem[] = [
-  {
-    id: "EditProfile",
-    title: "Edit Profile",
-    iconName: "pencil-outline",
-    iconLibrary: "Ionicons",
-    action: () => handleAction("Edit Profile"),
-  },
-  {
-    id: "ChangePassword",
-    title: "Change Password",
-    iconName: "pencil-outline",
-    iconLibrary: "Ionicons",
-    action: () => handleAction("Change Password"),
-  },
-  {
-    id: "PrivacyPolicy",
-    title: "Privacy Policy",
-    iconName: "lock-closed-outline",
-    iconLibrary: "Ionicons",
-    action: () => handleAction("Privacy Policy"),
-  },
-  {
-    id: "TermsAndConditions",
-    title: "Terms & Conditions",
-    iconName: "folder-outline",
-    iconLibrary: "Ionicons",
-    action: () => handleAction("Terms & Conditions"),
-  },
-  {
-    id: "HelpAndSupport",
-    title: "Help & Support",
-    iconName: "help-circle-outline",
-    iconLibrary: "Ionicons",
-    action: () => handleAction("Help & Support"),
-  },
-  {
-    id: "LogOut",
-    title: "Log Out",
-    iconName: "exit-outline",
-    iconLibrary: "Ionicons",
-    action: () => handleAction("Log Out"),
-    isDestructive: true,
-  },
-];
-
-// --- ДОПОМІЖНИЙ КОМПОНЕНТ: ЕЛЕМЕНТ НАЛАШТУВАННЯ ---
-
-const SettingRow: React.FC<{ item: SettingItem }> = ({ item }) => {
-  const IconComponent =
-    item.iconLibrary === "Ionicons" ? Ionicons : MaterialCommunityIcons;
-  const iconSize = 24;
-
-  // Колір тексту: червоний для Log Out, чорний для інших
-  const textColor = item.isDestructive ? styles.logOutText : styles.defaultText;
-
-  // Колір іконки: трохи світліший сірий
-  const iconColor = item.isDestructive ? "#e57373" : "#333";
-
-  return (
-    <TouchableOpacity
-      style={styles.rowContainer}
-      onPress={item.action}
-      activeOpacity={0.7}
-    >
-      <View style={styles.iconContainer}>
-        {/* Іконка */}
-        <IconComponent
-          // @ts-ignore: safe due to interface definition
-          name={item.iconName}
-          size={iconSize}
-          color={iconColor}
-        />
-      </View>
-
-      {/* Текст налаштування */}
-      <Text style={[styles.rowTitle, textColor]}>{item.title}</Text>
-
-      {/* Стрілка-індикатор */}
-      <Ionicons name="chevron-forward" size={20} color="#ccc" />
-    </TouchableOpacity>
-  );
-};
-
-// --- ОСНОВНИЙ КОМПОНЕНТ: ЕКРАН НАЛАШТУВАНЬ ---
-
+// --- Основний компонент ---
 const MyProfileSettings: React.FC = () => {
+  const navigation = useNavigation<MyProfileSettingsNavigationProp>();
+
+  // --- Обробники натискань ---
   const handleBack = () => {
-    console.log("Натиснуто Назад");
-    // Тут була б логіка навігації: navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate("MyProfile"); // резервне повернення
+    }
   };
+
+  const handleEditProfile = () => navigation.navigate("MyProfileEdit");
+  const handleChangePassword = () =>
+    navigation.navigate("MyProfileChangePassword");
+  const handlePrivacyPolicy = () =>
+    navigation.navigate("MyProfilePolicyScreen");
+  const handleTermsAndConditions = () =>
+    navigation.navigate("MyProfileTermsConditions");
+  const handleHelpAndSupport = () => navigation.navigate("MyProfileHelpSuport");
+  const handleLogOut = () => navigation.navigate("SignIn");
+
+  // --- Масив опцій ---
+  const SETTINGS_OPTIONS: SettingItem[] = [
+    {
+      id: "EditProfile",
+      title: "Edit Profile",
+      iconName: "person-circle-outline",
+      iconLibrary: "Ionicons",
+      action: handleEditProfile,
+    },
+    {
+      id: "ChangePassword",
+      title: "Change Password",
+      iconName: "key-outline",
+      iconLibrary: "Ionicons",
+      action: handleChangePassword,
+    },
+    {
+      id: "PrivacyPolicy",
+      title: "Privacy Policy",
+      iconName: "lock-closed-outline",
+      iconLibrary: "Ionicons",
+      action: handlePrivacyPolicy,
+    },
+    {
+      id: "TermsAndConditions",
+      title: "Terms & Conditions",
+      iconName: "document-text-outline",
+      iconLibrary: "Ionicons",
+      action: handleTermsAndConditions,
+    },
+    {
+      id: "HelpAndSupport",
+      title: "Help & Support",
+      iconName: "help-circle-outline",
+      iconLibrary: "Ionicons",
+      action: handleHelpAndSupport,
+    },
+    {
+      id: "LogOut",
+      title: "Log Out",
+      iconName: "exit-outline",
+      iconLibrary: "Ionicons",
+      action: handleLogOut,
+      isDestructive: true,
+    },
+  ];
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Шапка */}
+      {/* --- Header --- */}
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-          <Ionicons name="chevron-back" size={28} color="#333" />
+          <Ionicons name="chevron-back" size={26} color="#333" />
         </TouchableOpacity>
         <Text style={styles.screenTitle}>Settings</Text>
-        {/* Пустий елемент для центрування (якщо потрібно) */}
-        <View style={{ width: 48 }} />
+        <View style={{ width: 40 }} />
       </View>
 
-      {/* Список налаштувань */}
+      {/* --- Список опцій --- */}
       <View style={styles.listContainer}>
         {SETTINGS_OPTIONS.map((item) => (
           <SettingRow key={item.id} item={item} />
@@ -145,67 +131,84 @@ const MyProfileSettings: React.FC = () => {
   );
 };
 
-// --- СТИЛІ ---
+// --- Компонент одного рядка ---
+const SettingRow: React.FC<{ item: SettingItem }> = ({ item }) => {
+  const IconComponent =
+    item.iconLibrary === "Ionicons" ? Ionicons : MaterialCommunityIcons;
 
+  return (
+    <TouchableOpacity
+      style={styles.rowContainer}
+      activeOpacity={0.7}
+      onPress={item.action}
+    >
+      <View style={styles.iconContainer}>
+        <IconComponent
+          // @ts-ignore
+          name={item.iconName}
+          size={24}
+          color={item.isDestructive ? "#E53935" : "#333"}
+        />
+      </View>
+
+      <Text
+        style={[
+          styles.rowTitle,
+          { color: item.isDestructive ? "#E53935" : "#333" },
+        ]}
+      >
+        {item.title}
+      </Text>
+
+      <Ionicons name="chevron-forward" size={18} color="#bbb" />
+    </TouchableOpacity>
+  );
+};
+
+// --- Стилі ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#fff",
   },
-  // --- Стилі Шапки ---
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 10,
-    paddingVertical: Platform.OS === "ios" ? 10 : 20, // Збільшуємо padding для Android
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
+    paddingVertical: Platform.OS === "ios" ? 12 : 16,
+    paddingHorizontal: 16,
   },
   backButton: {
-    padding: 10,
+    padding: 6,
   },
   screenTitle: {
-    // Стилізація для центрування заголовка
-    position: "absolute",
-    left: 0,
-    right: 0,
-    textAlign: "center",
     fontSize: 18,
     fontWeight: "600",
     color: "#333",
-    paddingVertical: 10,
+    textAlign: "center",
   },
-
-  // --- Стилі Списку та Рядка ---
   listContainer: {
     paddingHorizontal: 16,
-    paddingTop: 10,
+    paddingTop: 12,
   },
   rowContainer: {
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#f5f5f5", // Дуже світла лінія-роздільник
+    borderBottomColor: "#f6f6f6",
   },
   iconContainer: {
-    width: 32, // Фіксована ширина для вирівнювання іконок
+    width: 32,
     alignItems: "center",
-    marginRight: 10,
+    marginRight: 12,
   },
   rowTitle: {
-    flex: 1, // Займає весь доступний простір
+    flex: 1,
     fontSize: 16,
     fontWeight: "500",
-  },
-
-  // --- Стилі Тексту ---
-  defaultText: {
-    color: "#333",
-  },
-  logOutText: {
-    color: "#e57373", // Червоний колір для "Log Out"
   },
 });
 

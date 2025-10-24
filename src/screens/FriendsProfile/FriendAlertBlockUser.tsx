@@ -15,6 +15,9 @@ import {
   Modal,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { RootStackParamList } from "../../../App";
 
 const { width } = Dimensions.get("window");
 
@@ -85,7 +88,14 @@ const PAST_ORDERS_DATA = [
 
 const GRID_ITEM_SIZE = width / 3;
 
+// Тип навігації
+type BlockUserNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "FriendAlertBlockUser"
+>;
+
 const BlockUserModalScreen: React.FC = () => {
+  const navigation = useNavigation<BlockUserNavigationProp>();
   const [visible, setVisible] = useState(true);
 
   const StatItem = ({ count, label }: { count: number; label: string }) => (
@@ -190,8 +200,8 @@ const BlockUserModalScreen: React.FC = () => {
             <TouchableOpacity
               style={styles.blockButton}
               onPress={() => {
-                alert("User blocked");
                 setVisible(false);
+                navigation.navigate("BlockUser");
               }}
             >
               <Text style={styles.blockButtonText}>Block</Text>

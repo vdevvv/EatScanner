@@ -1,5 +1,5 @@
-// src/screens/FriendsProfile/FriendsProfileSaved.tsx
-import React, { useState } from "react";
+// src/screens/MyProfile/MyProfileSaved.tsx
+import React from "react";
 import {
   StyleSheet,
   Text,
@@ -9,15 +9,12 @@ import {
   TouchableOpacity,
   Dimensions,
   StatusBar,
-  Image,
+  ImageBackground,
   FlatList,
   ImageSourcePropType,
-  ImageBackground,
-  Modal,
-  Animated,
-  TouchableWithoutFeedback,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
@@ -28,7 +25,6 @@ const COLORS = {
   textGrey: "#6B7280",
   white: "#FFFFFF",
   divider: "#E5E7EB",
-  overlay: "rgba(0,0,0,0.4)",
 };
 
 // --- Локальні зображення ---
@@ -76,17 +72,11 @@ const SAVED_VIDEOS_DATA = [
   },
 ];
 
-interface SavedVideoScreenProps {
-  onBack?: () => void;
-}
+const MyProfileSaved: React.FC = () => {
+  const navigation = useNavigation();
 
-const SavedVideoScreen: React.FC<SavedVideoScreenProps> = ({ onBack }) => {
   const handleBack = () => {
-    if (onBack) {
-      onBack();
-    } else {
-      console.log("Back button pressed");
-    }
+    navigation.goBack(); // ✅ повертає на попередній екран
   };
 
   const VideoItem = ({
@@ -105,8 +95,9 @@ const SavedVideoScreen: React.FC<SavedVideoScreenProps> = ({ onBack }) => {
         resizeMode="cover"
       >
         <View style={styles.bookmarkContainer}>
-          <Ionicons name="bookmark" size={40} color="#E9725C" />
+          <Ionicons name="bookmark" size={40} color={COLORS.primary} />
         </View>
+
         <View style={styles.videoTextOverlay}>
           <Text style={styles.videoDishName}>{dishName}</Text>
           <View style={styles.restaurantContainer}>
@@ -124,15 +115,15 @@ const SavedVideoScreen: React.FC<SavedVideoScreenProps> = ({ onBack }) => {
 
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
+        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
           <Ionicons name="chevron-back" size={28} color={COLORS.textDark} />
         </TouchableOpacity>
 
         <Text style={styles.headerTitle}>Saved Video</Text>
-
         <Text style={styles.videoCount}>48 videos</Text>
       </View>
 
+      {/* Content */}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -159,29 +150,52 @@ const SavedVideoScreen: React.FC<SavedVideoScreenProps> = ({ onBack }) => {
   );
 };
 
-export default SavedVideoScreen;
+export default MyProfileSaved;
 
-// --------------------------------------------------
+// --- СТИЛІ ---
 const PADDING_HORIZONTAL = 20;
-const GRID_ITEM_SIZE = (width - 60) / 2; // 2 columns with padding
+const GRID_ITEM_SIZE = (width - 60) / 2;
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.background },
-  scrollContent: { paddingBottom: 20 },
+  safeArea: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  scrollContent: {
+    paddingBottom: 20,
+  },
 
+  // --- HEADER ---
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: PADDING_HORIZONTAL,
     paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.divider,
   },
-  headerTitle: { fontSize: 18, fontWeight: "600", color: COLORS.textDark },
-  videoCount: { fontSize: 16, color: COLORS.textGrey, fontWeight: "500" },
+  backButton: {
+    padding: 6,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: COLORS.textDark,
+  },
+  videoCount: {
+    fontSize: 16,
+    color: COLORS.textGrey,
+    fontWeight: "500",
+  },
 
-  gridContainer: { paddingHorizontal: 10 },
-  row: { justifyContent: "space-between" },
-
+  // --- GRID ---
+  gridContainer: {
+    paddingHorizontal: 10,
+  },
+  row: {
+    justifyContent: "space-between",
+  },
   videoItemContainer: {
     width: GRID_ITEM_SIZE,
     height: GRID_ITEM_SIZE * 1.2,
@@ -189,7 +203,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: "hidden",
   },
-  videoImage: { flex: 1, justifyContent: "flex-end" },
+  videoImage: {
+    flex: 1,
+    justifyContent: "flex-end",
+  },
   bookmarkContainer: {
     position: "absolute",
     top: 8,

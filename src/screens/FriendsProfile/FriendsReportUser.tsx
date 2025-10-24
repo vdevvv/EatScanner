@@ -73,6 +73,17 @@ const MY_FRIENDS: { id: string; avatar: ImageSourcePropType; name: string }[] =
 type RootStackParamList = {
   SignUp: undefined;
   FriendsReportUser: undefined;
+  FriendsProfileFriends: undefined;
+  HomePageScreen: undefined;
+  Discovery: undefined;
+  ChatsScreen: undefined;
+  FriendsScreen: undefined;
+  FriendsProfileScreen: undefined;
+  ProfileScreen: undefined;
+  MyProfileScreen: undefined;
+  DishDetailScreen: undefined;
+  OrderScreen: undefined;
+  SavedScreen: undefined;
 };
 
 type FriendsReportNavigationProp = NativeStackNavigationProp<
@@ -98,7 +109,9 @@ const FriendsReportUser: React.FC = () => {
 
       {/* HEADER */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("FriendsProfileFriends")}
+        >
           <Ionicons name="chevron-back" size={28} color={COLORS.textDark} />
         </TouchableOpacity>
 

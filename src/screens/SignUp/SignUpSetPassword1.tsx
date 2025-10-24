@@ -213,11 +213,12 @@ const styles = StyleSheet.create({
   },
   tabs: {
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     width: "100%",
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
     marginBottom: 5,
+    paddingLeft: 40,
   },
   tabText: {
     fontSize: 16,

@@ -10,8 +10,8 @@ import {
   Alert,
   Platform,
 } from "react-native";
-// Припускаємо, що ці пакети встановлені у вашому RN-проекті:
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native"; // ✅ додано
 
 // --- ІНТЕРФЕЙСИ ---
 interface PasswordInputProps {
@@ -40,7 +40,7 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
           style={styles.textInput}
           value={value}
           onChangeText={onChangeText}
-          secureTextEntry={!isVisible} // Управління приховуванням тексту
+          secureTextEntry={!isVisible}
           autoCapitalize="none"
           autoCorrect={false}
           placeholder="••••••••••"
@@ -51,7 +51,6 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
           style={styles.toggleButton}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
-          {/* Використовуємо MaterialCommunityIcons */}
           <MaterialCommunityIcons
             name={isVisible ? "eye-off-outline" : "eye-outline"}
             size={24}
@@ -63,15 +62,15 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
   );
 };
 
-// --- ОСНОВНИЙ ЕКРАН ЗМІНИ ПАРОЛЯ ---
+// --- ОСНОВНИЙ ЕКРАН ---
 const ChangePasswordScreen: React.FC = () => {
+  const navigation = useNavigation(); // ✅ додано
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleBack = () => {
-    // Тут буде логіка навігації: navigation.goBack();
-    console.log("Натиснуто Назад");
+    navigation.goBack(); // ✅ повернення назад
   };
 
   const handleSaveChanges = () => {
@@ -91,6 +90,7 @@ const ChangePasswordScreen: React.FC = () => {
     setOldPassword("");
     setNewPassword("");
     setConfirmPassword("");
+    navigation.goBack(); // ✅ повернення після збереження
   };
 
   return (
@@ -104,10 +104,8 @@ const ChangePasswordScreen: React.FC = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Заголовок секції */}
         <Text style={styles.sectionTitle}>Change Password</Text>
 
-        {/* Форма */}
         <View style={styles.formContainer}>
           <PasswordInput
             label="Old password"
@@ -127,7 +125,7 @@ const ChangePasswordScreen: React.FC = () => {
         </View>
       </ScrollView>
 
-      {/* Кнопка Збереження (фіксована внизу) */}
+      {/* Кнопка збереження */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.saveButton}
@@ -142,7 +140,6 @@ const ChangePasswordScreen: React.FC = () => {
 };
 
 // --- СТИЛІ ---
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -151,17 +148,16 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 20,
     paddingTop: 10,
-    paddingBottom: 100, // Відступ для фіксованої кнопки
+    paddingBottom: 100,
   },
-
-  // --- Стилі Шапки ---
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
     paddingVertical: 10,
-    borderBottomWidth: 1, // Додамо межу, щоб імітувати UI
+    borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
+    backgroundColor: "#fff",
   },
   backButton: {
     padding: 10,
@@ -172,8 +168,6 @@ const styles = StyleSheet.create({
     color: "#000",
     marginLeft: 5,
   },
-
-  // --- Заголовки секцій ---
   sectionTitle: {
     fontSize: 20,
     fontWeight: "700",
@@ -181,11 +175,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     marginBottom: 10,
   },
-
-  // --- Стилі Форми ---
-  formContainer: {
-    // Контейнер форми
-  },
+  formContainer: {},
   inputGroup: {
     marginBottom: 25,
   },
@@ -214,8 +204,6 @@ const styles = StyleSheet.create({
   toggleButton: {
     padding: 5,
   },
-
-  // --- Стилі Футера та Кнопки ---
   footer: {
     position: "absolute",
     bottom: 0,

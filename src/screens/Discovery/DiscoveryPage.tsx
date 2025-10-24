@@ -9,24 +9,26 @@ import {
   ScrollView,
   FlatList,
   Image,
-  Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-// Типи для навігації
+// --- Типи для навігації ---
 type RootStackParamList = {
   HomePageScreen: undefined;
-  DiscoveryScreen: undefined;
+  Discovery: undefined;
   DiscoveryFiltersPage: undefined;
   ChatsScreen: undefined;
   FriendsScreen: undefined;
   FriendsProfileFriends: undefined;
   ProfileScreen: undefined;
   MyProfileScreen: undefined;
+  MyProfileSettings: undefined;
+  MyProfileSaved: undefined;
   DishDetailScreen: undefined;
   OrderScreen: undefined;
+  SavedScreen: undefined;
 };
 
 // --- ІНТЕРФЕЙС ---
@@ -146,7 +148,7 @@ const TabBar: React.FC<{
       onPress: onChatsPress,
     },
     {
-      name: "My Friends",
+      name: "Friends",
       icon: "people-outline",
       active: false,
       onPress: onFriendsPress,
@@ -183,43 +185,25 @@ const TabBar: React.FC<{
   );
 };
 
+// --- ГОЛОВНИЙ ЕКРАН ---
 type DiscoveryNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
-  "DiscoveryScreen"
+  "Discovery"
 >;
 
-// --- ГОЛОВНИЙ ЕКРАН ---
 const DiscoveryScreen: React.FC = () => {
   const navigation = useNavigation<DiscoveryNavigationProp>();
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Навігаційні функції для нижнього таб меню
-  const handleHomePress = () => {
-    navigation.navigate("HomePageScreen");
-  };
+  // --- Навігація табів ---
+  const handleHomePress = () => navigation.navigate("HomePageScreen");
+  const handleDiscoveryPress = () => {}; // вже на цьому екрані
+  const handleChatsPress = () => navigation.navigate("ChatsScreen");
+  const handleFriendsPress = () => navigation.navigate("FriendsProfileFriends");
+  const handleProfilePress = () => navigation.navigate("MyProfileScreen");
+  const handleFiltersPress = () => navigation.navigate("DiscoveryFiltersPage");
 
-  const handleDiscoveryPress = () => {
-    // Вже на DiscoveryScreen
-    console.log("Discovery pressed");
-  };
-
-  const handleChatsPress = () => {
-    navigation.navigate("ChatsScreen");
-  };
-
-  const handleFriendsPress = () => {
-    navigation.navigate("FriendsProfileFriends");
-  };
-
-  const handleProfilePress = () => {
-    navigation.navigate("MyProfileScreen");
-  };
-
-  const handleFiltersPress = () => {
-    navigation.navigate("DiscoveryFiltersPage");
-  };
-
-  // --- ФІЛЬТРАЦІЯ ---
+  // --- Фільтрація ---
   const filteredMeals = useMemo(() => {
     if (!searchQuery.trim()) return mockMeals;
     return mockMeals.filter(
@@ -256,7 +240,7 @@ const DiscoveryScreen: React.FC = () => {
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.filterButton}
             onPress={handleFiltersPress}
           >

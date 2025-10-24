@@ -8,6 +8,19 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+// --- Типізація навігації ---
+type RootStackParamList = {
+  PrivacyPolicyScreen: undefined;
+  MyProfileScreen: undefined;
+};
+
+type NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "PrivacyPolicyScreen"
+>;
 
 const privacyPolicyContent = {
   introduction:
@@ -172,8 +185,10 @@ const PolicySection: React.FC<PolicySectionProps> = ({ section }) => (
 
 // --- ГОЛОВНИЙ КОМПОНЕНТ ---
 const PrivacyPolicyScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp>();
+
   const handleBack = () => {
-    console.log("Back pressed");
+    navigation.goBack(); // ✅ повернення на попередній екран
   };
 
   return (

@@ -9,58 +9,58 @@ import {
   Image,
   ScrollView,
   Platform,
-  // Додамо ImageSourcePropType для коректного типу локального ресурсу
   ImageSourcePropType,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-// --- ІМІТАЦІЯ ДАНИХ ТА СТАНУ ---
+// --- Типізація навігації ---
+type RootStackParamList = {
+  MyProfileScreen: undefined;
+  EditProfileScreen: undefined;
+};
 
-// !!! ВИПРАВЛЕНО: Для використання локального файлу (як-от ../../src/assets/friend3.jpg)
-// потрібно використовувати require().
-// Оскільки в середовищі Canvas фізичного файлу friend3.jpg немає,
-// ми використовуємо require для заглушки (dummy), щоб продемонструвати
-// правильний синтаксис для локального ресурсу.
-// У ВАШОМУ РЕАЛЬНОМУ ПРОЄКТІ ВИКОРИСТОВУЙТЕ:
-// const LOCAL_AVATAR = require('../../src/assets/friend3.jpg');
-// Якщо ви запустите цей код у своєму емуляторі, він шукатиме цей шлях.
+type NavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "EditProfileScreen"
+>;
+
+// --- ІМІТАЦІЯ АВАТАРА ---
 const LOCAL_AVATAR =
-  require("../../src/assets/friend3.jpg") as ImageSourcePropType;
+  require("../../assets/profile-avatar.jpg") as ImageSourcePropType;
 
 const EditProfileScreen: React.FC = () => {
-  // Стан для зберігання даних профілю
+  const navigation = useNavigation<NavigationProp>();
+
+  // Стан для полів профілю
   const [fullName, setFullName] = useState("Iryna Hvozdetska");
   const [userName, setUserName] = useState("@foodie_iryna");
   const [email, setEmail] = useState("example@gmail.com");
   const [phoneNumber, setPhoneNumber] = useState("+91 6895312");
 
-  // Джерело зображення
   const avatarSource = LOCAL_AVATAR;
 
-  // --- ФУНКЦІЇ ОБРОБНИКИ ---
-
+  // --- Навігація ---
   const handleBack = () => {
-    console.log("Натиснуто Назад");
-    // Тут була б логіка навігації: navigation.goBack();
+    navigation.goBack(); // ✅ Повернення на попередній екран
   };
 
   const handleSave = () => {
-    console.log("Збереження змін:", {
+    console.log("✅ Збережено зміни:", {
       fullName,
       userName,
       email,
       phoneNumber,
     });
-    // Тут була б логіка виклику API для оновлення профілю
+    navigation.goBack(); // ✅ Після збереження — назад до профілю
   };
 
   const handleEditAvatar = () => {
-    console.log("Редагування аватара");
-    // Тут була б логіка вибору/завантаження нового зображення
+    console.log("Редагування аватара...");
   };
 
-  // --- ДОПОМІЖНИЙ КОМПОНЕНТ: ПОЛЕ ВВЕДЕННЯ ---
-
+  // --- Підкомпонент для Input ---
   interface InputFieldProps {
     label: string;
     value: string;
@@ -92,36 +92,30 @@ const EditProfileScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Шапка */}
+      {/* 🔹 Header */}
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <Ionicons name="chevron-back" size={28} color="#333" />
         </TouchableOpacity>
         <Text style={styles.screenTitle}>Edit Profile</Text>
-        {/* Пустий елемент для вирівнювання (якщо потрібно) */}
         <View style={{ width: 48 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Секція Аватара */}
+        {/* 🔹 Avatar Section */}
         <View style={styles.avatarSection}>
           <View style={styles.avatarContainer}>
-            <Image
-              source={avatarSource} // Використовуємо коректне джерело (require)
-              style={styles.avatar}
-            />
-            {/* Кнопка Редагування Аватара */}
+            <Image source={avatarSource} style={styles.avatar} />
             <TouchableOpacity
               style={styles.editIconContainer}
               onPress={handleEditAvatar}
-              activeOpacity={0.8}
             >
               <MaterialCommunityIcons name="pencil" size={18} color="#333" />
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Форма Введення Даних */}
+        {/* 🔹 Input Fields */}
         <View style={styles.formContainer}>
           <InputField
             label="Full name"
@@ -152,7 +146,7 @@ const EditProfileScreen: React.FC = () => {
         </View>
       </ScrollView>
 
-      {/* Кнопка Збереження (фіксована внизу) */}
+      {/* 🔹 Save Button (fixed bottom) */}
       <View style={styles.footer}>
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Save changes</Text>
@@ -163,7 +157,6 @@ const EditProfileScreen: React.FC = () => {
 };
 
 // --- СТИЛІ ---
-
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -171,10 +164,8 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 16,
-    paddingBottom: 100, // Додаємо відступ, щоб кнопка внизу не перекривала контент
+    paddingBottom: 100,
   },
-
-  // --- Стилі Шапки ---
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -188,7 +179,6 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   screenTitle: {
-    // Стилізація для центрування заголовка
     position: "absolute",
     left: 0,
     right: 0,
@@ -196,10 +186,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     color: "#333",
-    paddingVertical: 10,
   },
-
-  // --- Секція Аватара ---
   avatarSection: {
     alignItems: "center",
     marginVertical: 30,
@@ -229,8 +216,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#eee",
   },
-
-  // --- Стилі Форми ---
   formContainer: {
     marginBottom: 20,
   },
@@ -252,8 +237,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
-
-  // --- Стилі Футера та Кнопки ---
   footer: {
     position: "absolute",
     bottom: 0,
@@ -266,7 +249,7 @@ const styles = StyleSheet.create({
     borderTopColor: "#f5f5f5",
   },
   saveButton: {
-    backgroundColor: "#cd6155", // Колір з вашого скріншота (теракотовий/іржавий)
+    backgroundColor: "#cd6155",
     paddingVertical: 15,
     borderRadius: 10,
     alignItems: "center",

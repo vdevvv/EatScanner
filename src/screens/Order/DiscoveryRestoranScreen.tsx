@@ -6,20 +6,22 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
-  SafeAreaView,
   ImageSourcePropType,
   Dimensions,
   ImageBackground,
-  Platform, // Додано для SafeAeraView
+  Platform,
+  StatusBar,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Типи для навігації
 type RootStackParamList = {
   HomePageScreen: undefined;
   DiscoveryRestoranScreen: undefined;
+  DiscoveryRestoranOrderScreen: undefined;
 };
 
 type DiscoveryRestoranNavigationProp = NativeStackNavigationProp<
@@ -160,8 +162,11 @@ const MenuFilterButton: React.FC<{
   </TouchableOpacity>
 );
 
-const MenuItemCard: React.FC<{ item: MenuItem }> = ({ item }) => (
-  <TouchableOpacity style={styles.menuItemCard}>
+const MenuItemCard: React.FC<{
+  item: MenuItem;
+  onPress: (item: MenuItem) => void;
+}> = ({ item, onPress }) => (
+  <TouchableOpacity style={styles.menuItemCard} onPress={() => onPress(item)}>
     <Image source={item.image} style={styles.menuItemImage} />
     <View style={styles.menuItemTextContainer}>
       <Text style={styles.menuItemTitle}>{item.name}</Text>
@@ -175,26 +180,38 @@ const MenuItemCard: React.FC<{ item: MenuItem }> = ({ item }) => (
 
 const RestaurantMenuScreen: React.FC = () => {
   const navigation = useNavigation<DiscoveryRestoranNavigationProp>();
+  const insets = useSafeAreaInsets();
 
   const handleBackPress = () => {
     navigation.navigate("HomePageScreen");
   };
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* 1. Блок Зображення та Хедер */}
-        <ImageBackground source={MAIN_IMAGE} style={styles.headerImage}>
-          <View style={styles.headerOverlay}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={handleBackPress}
-            >
-              <Ionicons name="chevron-back" size={24} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        </ImageBackground>
+  const handleMenuItemPress = (item: MenuItem) => {
+    navigation.navigate("DiscoveryRestoranOrderScreen");
+  };
 
+  return (
+    <View style={styles.container}>
+      <StatusBar
+        barStyle="light-content"
+        backgroundColor="transparent"
+        translucent
+      />
+
+      {/* ImageBackground що розтягується на весь екран */}
+      <ImageBackground source={MAIN_IMAGE} style={styles.headerImageBackground}>
+        <View style={[styles.headerContentOverlay, { paddingTop: insets.top }]}>
+          <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
+            <Ionicons name="chevron-back" size={24} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </ImageBackground>
+
+      {/* ScrollView з контентом */}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollViewContentContainer}
+      >
         {/* 2. Інформаційний Блок Ресторану */}
         <View style={styles.infoBlock}>
           <Text style={styles.restaurantTitle}>La Pasta House</Text>
@@ -258,46 +275,50 @@ const RestaurantMenuScreen: React.FC = () => {
           {/* Список страв */}
           <View style={styles.menuList}>
             {MENU_ITEMS.map((item) => (
-              <MenuItemCard key={item.id} item={item} />
+              <MenuItemCard
+                key={item.id}
+                item={item}
+                onPress={handleMenuItemPress}
+              />
             ))}
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 // --- СТИЛІ ---
 
 const styles = StyleSheet.create({
-  safeArea: {
+  container: {
     flex: 1,
     backgroundColor: "#fff",
   },
-
-  // 1. Хедер та Навігація
-  headerImage: {
+  headerImageBackground: {
     width: "100%",
     height: 250,
-    justifyContent: "flex-start",
-  },
-  headerOverlay: {
-    // Використовуємо абсолютне позиціонування для кращого контролю
     position: "absolute",
     top: 0,
     left: 0,
     right: 0,
-    paddingTop: Platform.OS === "android" ? 30 : 50, // Зсув для iOS Safe Area
+  },
+  headerContentOverlay: {
     paddingHorizontal: 20,
-    flexDirection: "row", // Щоб розмістити елементи в ряд, якщо вони будуть додані
+    flexDirection: "row",
     justifyContent: "flex-start",
-    zIndex: 10, // Гарантуємо, що кнопка поверх ImageBackground
+    alignItems: "center",
+    zIndex: 10,
+    minHeight: 50,
   },
   backButton: {
     backgroundColor: "rgba(0,0,0,0.4)",
     borderRadius: 20,
     padding: 5,
-    alignSelf: "flex-start", // Вирівнюємо лише кнопку
+    alignSelf: "flex-start",
+  },
+  scrollViewContentContainer: {
+    paddingTop: 250,
   },
 
   // 2. Інформаційний Блок

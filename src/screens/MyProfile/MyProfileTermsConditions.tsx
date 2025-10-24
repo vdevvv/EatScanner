@@ -8,6 +8,7 @@ import {
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native"; // ✅ додано
 
 // --- УМОВИ ТА ПОЛОЖЕННЯ ---
 const termsAndConditionsContent = {
@@ -125,15 +126,20 @@ const TermsSection: React.FC<TermsSectionProps> = ({ section }) => (
       </View>
     )}
 
-    {section.footer && <Text style={styles.sectionText}>{section.footer}</Text>}
+    {section.footer && (
+      <Text style={[styles.sectionText, styles.footerText]}>
+        {section.footer}
+      </Text>
+    )}
   </View>
 );
 
 // --- Головний екран ---
 const TermsAndConditionsScreen: React.FC = () => {
+  const navigation = useNavigation(); // ✅ ініціалізація навігації
+
   const handleBack = () => {
-    // navigation.goBack();
-    console.log("Back pressed");
+    navigation.goBack(); // ✅ повернення назад
   };
 
   return (
@@ -146,7 +152,7 @@ const TermsAndConditionsScreen: React.FC = () => {
         <Text style={styles.screenTitle}>Terms & Conditions</Text>
       </View>
 
-      {/* Content */}
+      {/* Контент */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.introductionText}>
           {termsAndConditionsContent.introduction}
@@ -229,6 +235,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#444",
     lineHeight: 24,
+  },
+  footerText: {
+    fontSize: 14,
+    color: "#666",
+    marginTop: 5,
   },
 });
 

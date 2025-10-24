@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   resetPasswordText: {
-    color: "#D06B5C",
+    color: "#000",
     fontWeight: "600",
   },
 });

@@ -33,9 +33,22 @@ import ResetPassword2 from "./src/screens/ResetPassword/ResetPassword2";
 import ResetPassword3 from "./src/screens/ResetPassword/ResetPassword3";
 import ResetPassword4 from "./src/screens/ResetPassword/ResetPassword4";
 import DiscoveryFiltersPage from "./src/screens/Discovery/DiscoveryFiltersPage";
+import MyProfileSettings from "./src/screens/MyProfile/MyProfileSettings";
+import MyProfilePolicyScreen from "./src/screens/MyProfile/MyProfilePolicyScreen";
+import MyProfileTermsConditions from "./src/screens/MyProfile/MyProfileTermsConditions";
+import MyProfileHelpSuport from "./src/screens/MyProfile/MyProfileHelpSuport";
+import MyProfileEdit from "./src/screens/MyProfile/MyProfileEdit";
+import MyProfileChangePassword from "./src/screens/MyProfile/MyProfileChangePassword";
+import MyProfileSaved from "./src/screens/MyProfile/MyProfileSaved";
+import FriendsScreen from "./src/screens/MyProfile/MyProfileFriends";
+import DiscoverRestoranWhere from "./src/screens/Order/DiscoverRestoranWhere";
 export type RootStackParamList = {
   Welcome: undefined;
+  FriendsScreen: undefined;
+  MyProfileChangePassword: undefined;
+  MyProfileSaved: undefined;
   FriendLockedInfo: undefined;
+  MyProfileEdit: undefined;
   DiscoveryFiltersPage: undefined;
   FriendsReportUser: undefined;
   BlockUser: undefined;
@@ -53,6 +66,7 @@ export type RootStackParamList = {
   SignUpSetPassword1: undefined;
   SignUp: undefined;
   MyProfileScreen: undefined;
+  MyProfileSettings: undefined;
   AuthScreen: undefined;
   HomePageScreen: undefined;
   FriendsProfileScreen: undefined;
@@ -66,6 +80,15 @@ export type RootStackParamList = {
   ResetPassword2: undefined;
   ResetPassword3: undefined;
   ResetPassword4: undefined;
+  MyProfilePolicyScreen: undefined;
+  MyProfileTermsConditions: undefined;
+  MyProfileHelpSuport: undefined;
+  // Додаткові маршрути для навігації
+  ChatsScreen: undefined;
+  ProfileScreen: undefined;
+  DishDetailScreen: undefined;
+  OrderScreen: undefined;
+  SavedScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -75,6 +98,25 @@ const App: React.FC = () => {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="FriendsScreen" component={FriendsScreen} />
+        <Stack.Screen name="MyProfileSaved" component={MyProfileSaved} />
+        <Stack.Screen name="MyProfileEdit" component={MyProfileEdit} />
+        <Stack.Screen
+          name="MyProfileChangePassword"
+          component={MyProfileChangePassword}
+        />
+        <Stack.Screen
+          name="MyProfileHelpSuport"
+          component={MyProfileHelpSuport}
+        />
+        <Stack.Screen
+          name="MyProfileTermsConditions"
+          component={MyProfileTermsConditions}
+        />
+        <Stack.Screen
+          name="MyProfilePolicyScreen"
+          component={MyProfilePolicyScreen}
+        />
         <Stack.Screen name="ResetPassword2" component={ResetPassword2} />
         <Stack.Screen name="ResetPassword3" component={ResetPassword3} />
         <Stack.Screen name="RemoveFriend" component={RemoveFriend} />
@@ -124,6 +166,7 @@ const App: React.FC = () => {
           component={SignUpConfirmationCode1}
         />
         <Stack.Screen name="MyProfileScreen" component={MyProfileScreen} />
+        <Stack.Screen name="MyProfileSettings" component={MyProfileSettings} />
         <Stack.Screen name="ResetPassword1" component={ResetPassword1} />
         <Stack.Screen name="ResetPassword4" component={ResetPassword4} />
       </Stack.Navigator>

@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -20,6 +21,8 @@ type RootStackParamList = {
   CheckEmailscreen: undefined;
   SignIn: undefined;
   ResetPassword1: undefined;
+  SignUp: undefined;
+  HomePageScreen: undefined;
 };
 
 type SignInNavigationProp = NativeStackNavigationProp<
@@ -34,17 +37,23 @@ export default function AuthScreen() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleSignIn = () => console.log("Sign In:", email, password);
+  const handleSignIn = () => {
+    if (!email.trim() || !password.trim()) {
+      Alert.alert("Error", "Please enter both email and password");
+      return;
+    }
+
+    console.log("Sign In:", email, password);
+    navigation.navigate("HomePageScreen"); // тимчасово, до інтеграції бекенду
+  };
+
   const handleSignUp = () => {
-    navigation.navigate("CheckEmailscreen");
+    navigation.navigate("SignUp");
   };
 
   const handleButtonPress = () => {
-    if (activeTab === "signin") {
-      handleSignIn();
-    } else {
-      handleSignUp();
-    }
+    if (activeTab === "signin") handleSignIn();
+    else handleSignUp();
   };
 
   return (
@@ -56,7 +65,7 @@ export default function AuthScreen() {
         <ScrollView
           style={styles.container}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+          contentContainerStyle={{ flexGrow: 1 }}
         >
           {/* Logo */}
           <View style={styles.logoContainer}>
@@ -67,7 +76,7 @@ export default function AuthScreen() {
             />
           </View>
 
-          {/* Wrapper для всього контенту нижче логотипа */}
+          {/* Контент під логотипом */}
           <View style={styles.contentWrapper}>
             {/* Tabs */}
             <View style={styles.tabContainer}>
@@ -87,7 +96,10 @@ export default function AuthScreen() {
 
               <TouchableOpacity
                 style={[styles.tab, activeTab === "signup" && styles.activeTab]}
-                onPress={() => setActiveTab("signup")}
+                onPress={() => {
+                  setActiveTab("signup");
+                  navigation.navigate("SignUp");
+                }}
               >
                 <Text
                   style={[
@@ -152,6 +164,7 @@ export default function AuthScreen() {
                   : styles.signUpButton,
               ]}
               onPress={handleButtonPress}
+              activeOpacity={0.8}
             >
               <Text style={styles.buttonText}>
                 {activeTab === "signin" ? "Sign In" : "Sign Up"}
@@ -169,16 +182,15 @@ export default function AuthScreen() {
                 </TouchableOpacity>
               </View>
             )}
+          </View>
 
-            {/* Terms and Privacy */}
-            <View style={styles.termsContainer}>
-              <Text style={styles.termsText}>
-                By logging in, you confirm you agree to{" "}
-                <Text style={styles.link}>Terms and conditions</Text> and that
-                you have read our{" "}
-                <Text style={styles.link}>Privacy Policy</Text>.
-              </Text>
-            </View>
+          {/* Terms & Privacy */}
+          <View style={styles.termsContainer}>
+            <Text style={styles.termsText}>
+              By logging in, you confirm you agree to{" "}
+              <Text style={styles.link}>Terms and Conditions</Text> and that you
+              have read our <Text style={styles.link}>Privacy Policy</Text>.
+            </Text>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -197,23 +209,22 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 20,
   },
   logo: {
-    top: -60, // логотип залишається піднятим
-    width: 280,
-    height: 280,
+    width: 220,
+    height: 220,
   },
   contentWrapper: {
-    marginTop: -100, // контент ближче до логотипа
+    marginTop: -40,
   },
   tabContainer: {
     flexDirection: "row",
     justifyContent: "center",
     borderBottomWidth: 1,
     borderColor: "#ddd",
-    marginTop: -5,
-    marginBottom: 30, // 🟢 додано великий відступ між табом і Welcome
+    marginTop: 10,
+    marginBottom: 25,
   },
   tab: {
     paddingVertical: 6,
@@ -234,14 +245,13 @@ const styles = StyleSheet.create({
   },
   welcomeContainer: {
     alignItems: "center",
-    marginTop: 0,
-    marginBottom: 10,
+    marginBottom: 15,
   },
   welcomeTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "700",
     color: "#000",
-    marginBottom: 2,
+    marginBottom: 4,
   },
   welcomeSubtitle: {
     textAlign: "center",
@@ -255,8 +265,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderRadius: 10,
     height: 48,
-    marginTop: 5,
-    marginBottom: 5,
+    marginVertical: 6,
     justifyContent: "center",
     paddingHorizontal: 14,
   },
@@ -273,8 +282,7 @@ const styles = StyleSheet.create({
     height: 48,
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 10,
-    marginBottom: 10,
+    marginTop: 12,
   },
   signInButton: {
     backgroundColor: "#C8644D",
@@ -290,30 +298,29 @@ const styles = StyleSheet.create({
   resetContainer: {
     flexDirection: "row",
     justifyContent: "center",
-    marginTop: 5,
-    marginBottom: 5,
+    marginTop: 6,
   },
   resetText: {
     color: "#555",
     marginRight: 4,
   },
   resetLink: {
-    color: "#C8644D",
+    color: "#000",
     fontWeight: "600",
   },
   termsContainer: {
     paddingHorizontal: 20,
-    marginTop: 5,
+    marginTop: "auto",
     marginBottom: 20,
   },
   termsText: {
-    textAlign: "left",
+    textAlign: "center",
     fontSize: 12,
-    color: "#888",
+    color: "#666",
     lineHeight: 18,
   },
   link: {
-    color: "#C8644D",
+    color: "#000",
     textDecorationLine: "underline",
   },
 });

@@ -7,8 +7,22 @@ import {
   StyleSheet,
   SafeAreaView,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-// Компонент одного "чіпа" (кнопочки)
+// --- Типи маршрутів ---
+type RootStackParamList = {
+  MyProfileSaved: undefined;
+  FiltersScreen: undefined;
+};
+
+// --- Тип навігації ---
+type FiltersNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  "FiltersScreen"
+>;
+
+// --- Компонент одного "чіпа" ---
 const Chip = ({ label, active, onPress }: any) => (
   <TouchableOpacity
     style={[styles.chip, active && styles.chipActive]}
@@ -20,7 +34,7 @@ const Chip = ({ label, active, onPress }: any) => (
   </TouchableOpacity>
 );
 
-// Компонент секції (заголовок + чіпи)
+// --- Компонент секції (заголовок + чіпи) ---
 const Section = ({ title, children }: any) => (
   <View style={styles.section}>
     <Text style={styles.sectionTitle}>{title}</Text>
@@ -29,6 +43,8 @@ const Section = ({ title, children }: any) => (
 );
 
 export default function FiltersScreen() {
+  const navigation = useNavigation<FiltersNavigationProp>();
+
   const [selectedCuisine, setSelectedCuisine] = useState<string[]>([]);
   const [selectedMeal, setSelectedMeal] = useState<string[]>([]);
   const [selectedDiet, setSelectedDiet] = useState<string[]>([]);
@@ -47,13 +63,21 @@ export default function FiltersScreen() {
     }
   };
 
+  // --- Обробники ---
+  const handleBack = () => navigation.goBack();
+  const handleApply = () => navigation.goBack(); // або navigate("MyProfileSaved")
+
   return (
     <SafeAreaView style={styles.container}>
+      {/* --- Header --- */}
       <View style={styles.header}>
-        <Text style={styles.backArrow}>‹</Text>
+        <TouchableOpacity onPress={handleBack}>
+          <Text style={styles.backArrow}>‹</Text>
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>Filters</Text>
       </View>
 
+      {/* --- Основний контент --- */}
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{ paddingBottom: 100 }}
@@ -167,14 +191,15 @@ export default function FiltersScreen() {
         </Section>
       </ScrollView>
 
-      {/* Apply Filters Button */}
-      <TouchableOpacity style={styles.applyButton}>
+      {/* --- Кнопка застосування --- */}
+      <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
         <Text style={styles.applyButtonText}>Apply filters</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
 }
 
+// --- Стилі ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,

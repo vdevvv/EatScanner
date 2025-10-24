@@ -15,6 +15,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 type RootStackParamList = {
   ResetPassword1: undefined;
   ResetPassword2: undefined;
+  SignUp: undefined;
 };
 
 type ResetPasswordNavigationProp = NativeStackNavigationProp<
@@ -32,10 +33,14 @@ export default function ForgotPasswordScreen() {
     navigation.navigate("ResetPassword2");
   };
 
+  const handleBack = () => {
+    navigation.navigate("SignUp");
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Назад */}
-      <TouchableOpacity style={styles.backButton}>
+      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
         <Ionicons name="chevron-back" size={22} color="black" />
       </TouchableOpacity>
 

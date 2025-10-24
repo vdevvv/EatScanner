@@ -103,6 +103,7 @@ type FriendsListNavigationProp = NativeStackNavigationProp<
 export default function FriendsListScreen() {
   const navigation = useNavigation<FriendsListNavigationProp>();
   const [search, setSearch] = useState("");
+  const [friendsList, setFriendsList] = useState(FRIENDS);
 
   const handleBack = () => {
     navigation.goBack();
@@ -137,14 +138,18 @@ export default function FriendsListScreen() {
   // Функції для обробки натискань кнопок дій
   const handleAddFriend = (friendId: string) => {
     console.log(`Adding friend with ID: ${friendId}`);
-    // Тут можна додати логіку для відправки запиту на додавання в друзі
-    // Наприклад, оновити статус друга в локальному стані або відправити запит на сервер
+    // Видаляємо друга зі списку після додавання
+    setFriendsList((prevList) =>
+      prevList.filter((friend) => friend.id !== friendId)
+    );
   };
 
   const handleCancelRequest = (friendId: string) => {
     console.log(`Cancelling request for friend with ID: ${friendId}`);
-    // Тут можна додати логіку для скасування запиту в друзі
-    // Наприклад, оновити статус друга в локальному стані або відправити запит на сервер
+    // Видаляємо друга зі списку після скасування запиту
+    setFriendsList((prevList) =>
+      prevList.filter((friend) => friend.id !== friendId)
+    );
   };
 
   const handleMessage = (friendId: string) => {
@@ -153,7 +158,7 @@ export default function FriendsListScreen() {
     // Наприклад: navigation.navigate("ChatScreen", { friendId });
   };
 
-  const filtered = FRIENDS.filter((f) =>
+  const filtered = friendsList.filter((f) =>
     f.name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -161,7 +166,7 @@ export default function FriendsListScreen() {
     switch (status) {
       case "add":
         return (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.actionBtn}
             onPress={() => handleAddFriend(friendId)}
             activeOpacity={0.7}
@@ -172,7 +177,7 @@ export default function FriendsListScreen() {
         );
       case "cancel":
         return (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.removeBtn}
             onPress={() => handleCancelRequest(friendId)}
             activeOpacity={0.7}
@@ -182,7 +187,7 @@ export default function FriendsListScreen() {
         );
       case "message":
         return (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.actionBtn}
             onPress={() => handleMessage(friendId)}
             activeOpacity={0.7}
@@ -207,7 +212,9 @@ export default function FriendsListScreen() {
         <TouchableOpacity onPress={handleBack}>
           <Ionicons name="chevron-back" size={26} color={COLORS.textDark} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Talia`s Friends (212)</Text>
+        <Text style={styles.headerTitle}>
+          Talia`s Friends ({friendsList.length})
+        </Text>
         <View style={{ width: 26 }} />
       </View>
 

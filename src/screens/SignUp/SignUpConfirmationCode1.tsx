@@ -8,8 +8,9 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
-  TextInput as RNTextInput,
   ScrollView,
+  SafeAreaView,
+  TextInput as RNTextInput,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -67,99 +68,113 @@ export default function SignUpConfirmationCode1() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={styles.container}
-    >
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
       >
-        {/* 🔹 ЛОГО — абсолютно позиціоноване, не зсуває layout */}
-        <View style={styles.logoContainer}>
-          <Image
-            source={require("../../assets/logoScaner.png")}
-            style={styles.logo}
-          />
-        </View>
-
-        {/* 🔹 Основний контент */}
-        <View style={styles.content}>
-          {/* Верхня частина */}
-          <View style={styles.topSection}>
-            {/* Tabs */}
-            <View style={styles.tabs}>
-              <Text style={[styles.tabText, styles.inactiveTab]}>Sign In</Text>
-              <Text style={[styles.tabText, styles.activeTab]}>Sign Up</Text>
-            </View>
-
-            <Text style={styles.title}>Enter confirmation code</Text>
-            <Text style={styles.subtitle}>
-              We've sent an SMS with an activation code to your{"\n"}email
-              example@gmail.com
-            </Text>
-
-            {/* 🔹 Поля для коду */}
-            <View style={styles.codeContainer}>
-              {code.map((value, index) => (
-                <TextInput
-                  key={index}
-                  ref={(ref) => {
-                    inputs.current[index] = ref;
-                  }}
-                  value={value}
-                  onChangeText={(text) =>
-                    handleChange(text.replace(/\D/g, ""), index)
-                  }
-                  onKeyPress={(e) => handleKeyPress(e, index)}
-                  keyboardType="number-pad"
-                  maxLength={1}
-                  style={styles.codeInput}
-                  returnKeyType="done"
-                  textContentType="oneTimeCode"
-                />
-              ))}
-            </View>
-
-            {/* 🔹 Кнопка підтвердження */}
-            <TouchableOpacity
-              style={[
-                styles.confirmButton,
-                isFilled && styles.confirmButtonActive,
-              ]}
-              disabled={!isFilled}
-              onPress={handleConfirm}
-            >
-              <Text style={[styles.confirmText, isFilled && { color: "#fff" }]}>
-                Confirm
-              </Text>
-            </TouchableOpacity>
-
-            {/* 🔹 Таймер */}
-            <TouchableOpacity onPress={resendCode}>
-              <Text style={styles.resendText}>
-                Send code again{" "}
-                {timer > 0 && (
-                  <Text style={{ color: "#999" }}>
-                    {timer < 10 ? `00:0${timer}` : `00:${timer}`}
-                  </Text>
-                )}
-              </Text>
-            </TouchableOpacity>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* 🔹 ЛОГО */}
+          <View style={styles.logoContainer}>
+            <Image
+              source={require("../../assets/logoScaner.png")}
+              style={styles.logo}
+              resizeMode="contain"
+            />
           </View>
 
-          {/* Нижня частина - соціальні кнопки */}
-          <View style={styles.bottomSection}>
-            {/* 🔹 Divider */}
-            <View style={styles.dividerContainer}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>Or with</Text>
-              <View style={styles.dividerLine} />
+          {/* 🔹 Основний контент */}
+          <View style={styles.content}>
+            {/* Верхня частина */}
+            <View style={styles.topSection}>
+              {/* Tabs */}
+              <View style={styles.tabContainer}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("SignIn")}
+                  style={styles.tab}
+                >
+                  <Text style={[styles.tabText, styles.inactiveTab]}>
+                    Sign In
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity disabled style={styles.tab}>
+                  <Text style={[styles.tabText, styles.activeTab]}>
+                    Sign Up
+                  </Text>
+                </TouchableOpacity>
+              </View>
+
+              <Text style={styles.title}>Enter confirmation code</Text>
+              <Text style={styles.subtitle}>
+                We’ve sent an SMS with an activation code to your{"\n"}email
+                example@gmail.com
+              </Text>
+
+              {/* Поля коду */}
+              <View style={styles.codeContainer}>
+                {code.map((value, index) => (
+                  <TextInput
+                    key={index}
+                    ref={(ref) => {
+                      if (ref) {
+                        inputs.current[index] = ref;
+                      }
+                    }}
+                    value={value}
+                    onChangeText={(text) =>
+                      handleChange(text.replace(/\D/g, ""), index)
+                    }
+                    onKeyPress={(e) => handleKeyPress(e, index)}
+                    keyboardType="number-pad"
+                    maxLength={1}
+                    style={styles.codeInput}
+                    returnKeyType="done"
+                    textContentType="oneTimeCode"
+                  />
+                ))}
+              </View>
+
+              {/* Кнопка підтвердження */}
+              <TouchableOpacity
+                style={[
+                  styles.confirmButton,
+                  isFilled && styles.confirmButtonActive,
+                ]}
+                disabled={!isFilled}
+                onPress={handleConfirm}
+              >
+                <Text
+                  style={[styles.confirmText, isFilled && { color: "#fff" }]}
+                >
+                  Confirm
+                </Text>
+              </TouchableOpacity>
+
+              {/* Таймер */}
+              <TouchableOpacity onPress={resendCode}>
+                <Text style={styles.resendText}>
+                  Send code again{" "}
+                  {timer > 0 && (
+                    <Text style={{ color: "#999" }}>
+                      {timer < 10 ? `00:0${timer}` : `00:${timer}`}
+                    </Text>
+                  )}
+                </Text>
+              </TouchableOpacity>
             </View>
 
-            {/* 🔹 Соцмережі */}
-            <View style={styles.socialButtons}>
+            {/* Нижня частина */}
+            <View style={styles.bottomSection}>
+              <View style={styles.dividerContainer}>
+                <View style={styles.line} />
+                <Text style={styles.orText}>Or with</Text>
+                <View style={styles.line} />
+              </View>
+
               <TouchableOpacity style={styles.socialButton}>
                 <Image
                   source={require("../../assets/google.png")}
@@ -179,142 +194,135 @@ export default function SignUpConfirmationCode1() {
               </TouchableOpacity>
             </View>
           </View>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
     backgroundColor: "#fff",
   },
-
-  scrollContent: {
+  scrollContainer: {
     flexGrow: 1,
-    backgroundColor: "#fff",
-    paddingHorizontal: 30,
+    justifyContent: "space-between",
     paddingBottom: 40,
   },
-
   logoContainer: {
-    position: "absolute",
-    top: 20,
-    alignSelf: "center",
-    zIndex: 10,
+    alignItems: "center",
+    marginTop: 10,
   },
   logo: {
-    width: 300,
-    height: 300,
-    resizeMode: "contain",
+    top: -60,
+    width: 280,
+    height: 280,
   },
-
   content: {
     flex: 1,
-    marginTop: 280,
-    alignItems: "center",
+    marginTop: -80,
+    paddingHorizontal: 25,
     justifyContent: "space-between",
   },
   topSection: {
     alignItems: "center",
-    width: "100%",
   },
   bottomSection: {
     alignItems: "center",
     width: "100%",
   },
-
-  tabs: {
+  tabContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
-    width: "100%",
+    justifyContent: "center",
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-    marginBottom: 24,
+    borderColor: "#ddd",
+    marginBottom: 30,
+  },
+  tab: {
+    paddingVertical: 6,
+    width: "45%",
+    alignItems: "center",
   },
   tabText: {
     fontSize: 16,
-    paddingVertical: 8,
+    fontWeight: "600",
   },
   inactiveTab: {
-    color: "#999",
+    color: "#888",
   },
   activeTab: {
     color: "#000",
     borderBottomWidth: 2,
-    borderBottomColor: "#000",
+    borderColor: "#000",
   },
   title: {
-    fontSize: 18,
-    fontWeight: "600",
-    marginTop: 12,
-    marginBottom: 6,
+    fontSize: 20,
+    fontWeight: "700",
     color: "#000",
+    marginBottom: 4,
   },
   subtitle: {
-    color: "#777",
     textAlign: "center",
-    marginBottom: 18,
     fontSize: 14,
+    color: "#555",
     lineHeight: 20,
+    marginBottom: 20,
   },
   codeContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    width: "90%",
-    marginBottom: 18,
+    marginBottom: 20,
   },
   codeInput: {
     width: 50,
     height: 50,
-    borderWidth: 1,
+    borderWidth: 1.3,
     borderColor: "#ccc",
     borderRadius: 10,
     textAlign: "center",
-    fontSize: 20,
+    fontSize: 18,
     color: "#000",
     backgroundColor: "#fff",
   },
   confirmButton: {
-    width: "100%",
-    backgroundColor: "#f2f2f2",
-    paddingVertical: 14,
-    borderRadius: 8,
+    borderRadius: 10,
+    height: 48,
     alignItems: "center",
-    marginBottom: 0,
+    justifyContent: "center",
+    backgroundColor: "#f2f2f2",
+    marginBottom: 10,
+    width: "100%",
   },
   confirmButtonActive: {
-    backgroundColor: "#D06B5C",
+    backgroundColor: "#C8644D",
   },
   confirmText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#999",
+    color: "#aaa",
   },
   resendText: {
     color: "#000",
-    marginBottom: 0,
+    textAlign: "center",
+    marginBottom: 20,
   },
   dividerContainer: {
     flexDirection: "row",
     alignItems: "center",
     width: "100%",
     marginBottom: 14,
-    marginTop: 20,
+    marginTop: 10,
   },
-  dividerLine: {
+  line: {
     flex: 1,
     height: 1,
     backgroundColor: "#ccc",
   },
-  dividerText: {
-    marginHorizontal: 8,
-    color: "#999",
-  },
-  socialButtons: {
-    width: "100%",
-    gap: 12,
+  orText: {
+    color: "#888",
+    marginHorizontal: 10,
+    fontSize: 13,
   },
   socialButton: {
     width: "100%",
@@ -326,6 +334,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: "#fff",
+    marginBottom: 12,
   },
   socialIcon: {
     width: 20,
