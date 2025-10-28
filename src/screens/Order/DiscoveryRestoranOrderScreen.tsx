@@ -6,31 +6,31 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
-  SafeAreaView,
   Dimensions,
   Platform,
+  StatusBar,
+  SafeAreaView,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
-const IMAGE_HEIGHT = width * 0.8; // Висота зображення займає 80% ширини
+const IMAGE_HEIGHT = width * 0.85;
 
-// Локальний ассет, який використовувався у ваших зображеннях
-const DISH_IMAGE = require("../components/pasta.jpg");
+// Локальний ассет
+const DISH_IMAGE = require("../../assets/pasta.jpg");
 
-// --- ДАНІ СТРАВИ (Імітація) ---
+// Імітація даних
 const dishData = {
-  restaurantName: "La Pasta House",
   dishName: "Amatriciana pasta",
   description:
     "Tomato sauce, smoked pork neck, red onions, pecorino cheese, chilli. (All meat is slow-cooked in an aromatic blend of spices and chilies)",
   trustpilotRating: 4.3,
   googleRating: 4.0,
-  price: 45, // AED
+  price: 45,
 };
 
-// --- КОМПОНЕНТ РЕЙТИНГУ ---
-
+// Компонент Рейтингу
 interface RatingPillProps {
   platform: "Trustpilot" | "Google";
   rating: number;
@@ -45,7 +45,6 @@ const RatingPill: React.FC<RatingPillProps> = ({
   iconName,
 }) => (
   <View style={[styles.ratingPill, { backgroundColor: color }]}>
-    {/* ЗМІНА: Встановлюємо колір іконки на білий (#fff) */}
     <MaterialCommunityIcons name={iconName as any} size={14} color="#fff" />
     <Text style={styles.ratingText}>
       {platform} {rating}
@@ -53,93 +52,95 @@ const RatingPill: React.FC<RatingPillProps> = ({
   </View>
 );
 
-// --- ОСНОВНИЙ КОМПОНЕНТ ---
+// Основний екран
+const DishDetailScreen: React.FC = () => {
+  const navigation = useNavigation();
 
-const DishDetailScreen: React.FC<{ onOrderPress: () => void }> = ({
-  onOrderPress,
-}) => {
-  // Функція-заглушка для навігації "Назад"
   const handleBack = () => {
-    console.log("Navigation back not implemented.");
+    navigation.goBack(); // ← Активна навігація назад
+  };
+
+  const handleOrderPress = () => {
+    console.log("Order Now pressed");
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={styles.scrollView}
-      >
-        {/* Блок 1: Зображення та Кнопка Назад */}
-        <View style={styles.imageContainer}>
-          <Image source={DISH_IMAGE} style={styles.dishImage} />
-          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-            <Ionicons name="chevron-back" size={30} color="#333" />
-          </TouchableOpacity>
-        </View>
+    <View style={styles.root}>
+      {/* Прозора статус-бар */}
+      <StatusBar
+        translucent
+        backgroundColor="transparent"
+        barStyle="dark-content"
+      />
 
-        {/* Блок 2: Деталі Страви */}
-        <View style={styles.detailsCard}>
-          <View style={styles.restaurantInfo}>
-            <MaterialCommunityIcons
-              name="home-outline"
-              size={20}
-              color="#333"
-            />
-            <Text style={styles.restaurantName}>{dishData.restaurantName}</Text>
+      {/* Зображення на фоні */}
+      <View style={styles.imageContainer}>
+        <Image source={DISH_IMAGE} style={styles.dishImage} />
+        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+          <Ionicons name="chevron-back" size={30} color="#333" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Контент нижче */}
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.detailsCard}>
+            <View style={styles.restaurantInfo}>
+              <MaterialCommunityIcons
+                name="home-outline"
+                size={20}
+                color="#333"
+              />
+              <Text style={styles.restaurantName}>Pasta House</Text>
+            </View>
+
+            <Text style={styles.dishName}>{dishData.dishName}</Text>
+            <Text style={styles.dishDescription}>{dishData.description}</Text>
+
+            {/* Рейтинги */}
+            <View style={styles.ratingsContainer}>
+              <RatingPill
+                platform="Trustpilot"
+                rating={dishData.trustpilotRating}
+                color="#4CAF50"
+                iconName="star"
+              />
+              <RatingPill
+                platform="Google"
+                rating={dishData.googleRating}
+                color="#3f84f8"
+                iconName="google"
+              />
+            </View>
           </View>
+        </ScrollView>
+      </SafeAreaView>
 
-          <Text style={styles.dishName}>{dishData.dishName}</Text>
-          <Text style={styles.dishDescription}>{dishData.description}</Text>
-
-          {/* Рейтинги */}
-          <View style={styles.ratingsContainer}>
-            <RatingPill
-              platform="Trustpilot"
-              rating={dishData.trustpilotRating}
-              color="#4CAF50" // Зелений
-              iconName="star"
-            />
-            <RatingPill
-              platform="Google"
-              rating={dishData.googleRating}
-              color="#3f84f8" // Синій
-              // УВАГА: Для Google ми використовуємо значок 'google' з MaterialCommunityIcons.
-              // Якщо ви хочете використовувати іконку Google в одному кольорі (як на фото),
-              // вона має бути монохромною. MaterialCommunityIcons має значок 'google',
-              // який можна використовувати в одному кольорі.
-              iconName="google"
-            />
-          </View>
-
-          {/* Тут може бути більше контенту (інгредієнти, відгуки тощо) */}
-        </View>
-      </ScrollView>
-
-      {/* Блок 3: Фіксована Кнопка Замовлення */}
+      {/* Кнопка замовлення */}
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.orderButton} onPress={onOrderPress}>
+        <TouchableOpacity style={styles.orderButton} onPress={handleOrderPress}>
           <Text style={styles.orderButtonText}>
             Order Now | AED {dishData.price}
           </Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
 // --- СТИЛІ ---
-
 const styles = StyleSheet.create({
-  safeArea: {
+  root: {
     flex: 1,
     backgroundColor: "#fff",
   },
-  scrollView: {
-    flex: 1,
-  },
   imageContainer: {
-    width: width,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
     height: IMAGE_HEIGHT,
+    zIndex: 1,
   },
   dishImage: {
     width: "100%",
@@ -148,19 +149,23 @@ const styles = StyleSheet.create({
   },
   backButton: {
     position: "absolute",
-    top: Platform.OS === "android" ? 40 : 10,
-    left: 10,
-    padding: 10,
-    borderRadius: 50,
-    // Можна додати легкий фон або тінь для кращої видимості на зображенні
+    top: Platform.OS === "ios" ? 60 : 40,
+    left: 15,
+    padding: 8,
+    backgroundColor: "rgba(255,255,255,0.7)",
+    borderRadius: 30,
+  },
+  safeArea: {
+    flex: 1,
+    marginTop: IMAGE_HEIGHT - 40,
   },
   detailsCard: {
     backgroundColor: "#fff",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
-    marginTop: -30, // Перекриває нижню частину зображення
     padding: 25,
-    paddingBottom: 100, // Забезпечення прокрутки над футером
+    paddingBottom: 100,
+    zIndex: 2,
   },
   restaurantInfo: {
     flexDirection: "row",
@@ -174,7 +179,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   dishName: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "700",
     color: "#333",
     marginBottom: 10,
@@ -203,8 +208,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginLeft: 6,
   },
-
-  // Фіксований Футер
   footer: {
     position: "absolute",
     bottom: 0,
@@ -216,7 +219,7 @@ const styles = StyleSheet.create({
     borderTopColor: "#f0f0f0",
   },
   orderButton: {
-    backgroundColor: "#E57373", // Основний акцентний колір
+    backgroundColor: "#E57373",
     padding: 18,
     borderRadius: 12,
     alignItems: "center",

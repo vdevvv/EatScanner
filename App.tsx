@@ -42,9 +42,15 @@ import MyProfileChangePassword from "./src/screens/MyProfile/MyProfileChangePass
 import MyProfileSaved from "./src/screens/MyProfile/MyProfileSaved";
 import FriendsScreen from "./src/screens/MyProfile/MyProfileFriends";
 import DiscoverRestoranWhere from "./src/screens/Order/DiscoverRestoranWhere";
+import DishDetailScreen from "./src/screens/Order/DiscoveryRestoranScreen";
+import DiscoveryRestoranOrderScreen from "./src/screens/Order/DiscoveryRestoranOrderScreen";
+
 export type RootStackParamList = {
   Welcome: undefined;
+  DiscoverRestoranWhere: undefined;
   FriendsScreen: undefined;
+  DiscoveryRestoranOrderScreen: undefined;
+  DishDetailScreen: undefined;
   MyProfileChangePassword: undefined;
   MyProfileSaved: undefined;
   FriendLockedInfo: undefined;
@@ -83,10 +89,7 @@ export type RootStackParamList = {
   MyProfilePolicyScreen: undefined;
   MyProfileTermsConditions: undefined;
   MyProfileHelpSuport: undefined;
-  // Додаткові маршрути для навігації
-  ChatsScreen: undefined;
   ProfileScreen: undefined;
-  DishDetailScreen: undefined;
   OrderScreen: undefined;
   SavedScreen: undefined;
 };
@@ -98,6 +101,15 @@ const App: React.FC = () => {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen
+          name="DiscoveryRestoranOrderScreen"
+          component={DiscoveryRestoranOrderScreen}
+        />
+        <Stack.Screen name="DishDetailScreen" component={DishDetailScreen} />
+        <Stack.Screen
+          name="DiscoverRestoranWhere"
+          component={DiscoverRestoranWhere}
+        />
         <Stack.Screen name="FriendsScreen" component={FriendsScreen} />
         <Stack.Screen name="MyProfileSaved" component={MyProfileSaved} />
         <Stack.Screen name="MyProfileEdit" component={MyProfileEdit} />
@@ -169,6 +181,7 @@ const App: React.FC = () => {
         <Stack.Screen name="MyProfileSettings" component={MyProfileSettings} />
         <Stack.Screen name="ResetPassword1" component={ResetPassword1} />
         <Stack.Screen name="ResetPassword4" component={ResetPassword4} />
+
       </Stack.Navigator>
     </NavigationContainer>
   );

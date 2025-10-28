@@ -17,11 +17,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-// --- Типи маршрутів ---
 type RootStackParamList = {
   HomePageScreen: undefined;
   Discovery: undefined;
-  ChatsScreen: undefined;
   FriendsScreen: undefined;
   FriendsProfileFriends: undefined;
   ProfileScreen: undefined;
@@ -63,14 +61,44 @@ const USER_DATA = {
   avatar: AVATAR_SOURCE,
 };
 
-// --- Дані замовлень ---
+// --- Дані замовлень (усі з підписами) ---
 const PAST_ORDERS_DATA = [
-  { id: "1", image: DISH_1_SOURCE },
-  { id: "2", image: DISH_2_SOURCE },
-  { id: "3", image: DISH_1_SOURCE },
-  { id: "4", image: DISH_2_SOURCE },
-  { id: "5", image: DISH_1_SOURCE },
-  { id: "6", image: DISH_2_SOURCE },
+  {
+    id: "1",
+    image: DISH_1_SOURCE,
+    title: "Sushi Dragons",
+    restaurant: "Yoshi House",
+  },
+  {
+    id: "2",
+    image: DISH_2_SOURCE,
+    title: "Herbed Golden Potatoes",
+    restaurant: "A Mano",
+  },
+  {
+    id: "3",
+    image: DISH_1_SOURCE,
+    title: "Sushi Dragons",
+    restaurant: "Yoshi House",
+  },
+  {
+    id: "4",
+    image: DISH_2_SOURCE,
+    title: "Herbed Golden Potatoes",
+    restaurant: "A Mano",
+  },
+  {
+    id: "5",
+    image: DISH_1_SOURCE,
+    title: "Sushi Dragons",
+    restaurant: "Yoshi House",
+  },
+  {
+    id: "6",
+    image: DISH_2_SOURCE,
+    title: "Herbed Golden Potatoes",
+    restaurant: "A Mano",
+  },
 ];
 
 // --- Тип навігації ---
@@ -79,7 +107,7 @@ type MyProfileNavigationProp = NativeStackNavigationProp<
   "MyProfileScreen"
 >;
 
-// --- Компоненти ---
+// --- Компонент для статистики ---
 interface StatItemProps {
   count: number;
   label: string;
@@ -93,20 +121,41 @@ const StatItem: React.FC<StatItemProps> = ({ count, label, onPress }) => (
   </TouchableOpacity>
 );
 
-const GRID_ITEM_SIZE = width / 3;
-
+// --- Компонент для замовлення ---
 interface OrderItemProps {
   image: ImageSourcePropType;
+  title: string;
+  restaurant: string;
 }
 
-const OrderItem: React.FC<OrderItemProps> = ({ image }) => (
+const GRID_ITEM_SIZE = width / 3;
+
+const OrderItem: React.FC<OrderItemProps> = ({ image, title, restaurant }) => (
   <TouchableOpacity style={styles.orderItemContainer} activeOpacity={0.8}>
     <ImageBackground
       source={image}
       style={styles.orderImage}
       resizeMode="cover"
       imageStyle={{ borderRadius: 8 }}
-    />
+    >
+      <View style={styles.overlay} />
+      <View style={styles.orderTextContainer}>
+        <Text style={styles.orderTitle} numberOfLines={1}>
+          {title}
+        </Text>
+        <View style={styles.restaurantRow}>
+          <Ionicons
+            name="home-outline"
+            size={12}
+            color={COLORS.white}
+            style={{ marginRight: 3 }}
+          />
+          <Text style={styles.orderRestaurant} numberOfLines={1}>
+            {restaurant}
+          </Text>
+        </View>
+      </View>
+    </ImageBackground>
   </TouchableOpacity>
 );
 
@@ -114,10 +163,9 @@ const OrderItem: React.FC<OrderItemProps> = ({ image }) => (
 const MyProfileScreen: React.FC = () => {
   const navigation = useNavigation<MyProfileNavigationProp>();
 
-  // --- Обробники натискань ---
+  // --- Обробники навігації ---
   const handleHomePress = () => navigation.navigate("HomePageScreen");
   const handleDiscoveryPress = () => navigation.navigate("Discovery");
-  const handleChatsPress = () => navigation.navigate("ChatsScreen");
   const handleFriendsPress = () => navigation.navigate("FriendsProfileFriends");
   const handleProfilePress = () => console.log("Already on profile");
   const handleSettingsPress = () => navigation.navigate("MyProfileSettings");
@@ -163,22 +211,27 @@ const MyProfileScreen: React.FC = () => {
           <Text style={styles.userName}>{USER_DATA.name}</Text>
         </View>
 
-        {/* --- Заголовок Past Orders --- */}
+        {/* --- Past Orders --- */}
         <View style={styles.pastOrdersHeader}>
           <Text style={styles.pastOrdersTitle}>Past Orders</Text>
         </View>
 
-        {/* --- Сітка замовлень без текстів --- */}
         <FlatList
           data={PAST_ORDERS_DATA}
-          renderItem={({ item }) => <OrderItem image={item.image} />}
+          renderItem={({ item }) => (
+            <OrderItem
+              image={item.image}
+              title={item.title}
+              restaurant={item.restaurant}
+            />
+          )}
           keyExtractor={(item) => item.id}
           numColumns={3}
           scrollEnabled={false}
           columnWrapperStyle={styles.columnWrapper}
         />
 
-        <View style={{ height: 50 }} />
+        <View style={{ height: 80 }} />
       </ScrollView>
 
       {/* --- Нижнє меню --- */}
@@ -194,12 +247,6 @@ const MyProfileScreen: React.FC = () => {
           label="Discovery"
           active={false}
           onPress={handleDiscoveryPress}
-        />
-        <TabBarItem
-          iconName="chatbubble-outline"
-          label="Chats"
-          active={false}
-          onPress={handleChatsPress}
         />
         <TabBarItem
           iconName="people-outline"
@@ -315,6 +362,29 @@ const styles = StyleSheet.create({
     flex: 1,
     borderRadius: 8,
     overflow: "hidden",
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.15)",
+    borderRadius: 8,
+  },
+  orderTextContainer: {
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingVertical: 6,
+    paddingHorizontal: 6,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+  },
+  orderTitle: { color: COLORS.white, fontSize: 12, fontWeight: "600" },
+  restaurantRow: { flexDirection: "row", alignItems: "center", marginTop: 2 },
+  orderRestaurant: {
+    color: COLORS.white,
+    fontSize: 10,
+    opacity: 0.9,
   },
   bottomTabBar: {
     flexDirection: "row",

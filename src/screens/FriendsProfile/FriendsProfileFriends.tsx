@@ -13,11 +13,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-// Типи для навігації
 type RootStackParamList = {
   HomePageScreen: undefined;
-  Discovery: undefined; // Corrected the name to match the navigation call
-  ChatsScreen: undefined;
+  Discovery: undefined;
   FriendsScreen: undefined;
   FriendsProfileFriends: undefined;
   FriendsProfileScreen: undefined;
@@ -109,7 +107,6 @@ export default function FriendsListScreen() {
     navigation.goBack();
   };
 
-  // Навігаційні функції для нижнього таб меню
   const handleHomePress = () => {
     navigation.navigate("HomePageScreen");
   };
@@ -118,12 +115,7 @@ export default function FriendsListScreen() {
     navigation.navigate("Discovery");
   };
 
-  const handleChatsPress = () => {
-    navigation.navigate("ChatsScreen");
-  };
-
   const handleFriendsPress = () => {
-    // Вже на FriendsProfileFriends
     console.log("Friends pressed");
   };
 
@@ -154,8 +146,6 @@ export default function FriendsListScreen() {
 
   const handleMessage = (friendId: string) => {
     console.log(`Messaging friend with ID: ${friendId}`);
-    // Тут можна додати логіку для переходу до чату з другом
-    // Наприклад: navigation.navigate("ChatScreen", { friendId });
   };
 
   const filtered = friendsList.filter((f) =>
@@ -270,12 +260,6 @@ export default function FriendsListScreen() {
           label="Discovery"
           active={false}
           onPress={handleDiscoveryPress}
-        />
-        <TabBarItem
-          iconName="chatbubble-outline"
-          label="Chats"
-          active={false}
-          onPress={handleChatsPress}
         />
         <TabBarItem
           iconName="people-outline"

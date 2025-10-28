@@ -9,12 +9,14 @@ import {
   SafeAreaView,
   Dimensions,
   Platform,
+  Alert,
 } from "react-native";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
-const DISH_IMAGE = require("../components/pasta.jpg");
+const DISH_IMAGE = require("../../assets/pasta.jpg");
 
 interface DeliveryOption {
   id: string;
@@ -55,6 +57,7 @@ const DELIVERY_OPTIONS: DeliveryOption[] = [
   },
 ];
 
+/* ---------------- Компонент шапки ресторану ---------------- */
 const RestaurantHeader: React.FC<{
   restaurantName: string;
   restaurantSubtitle: string;
@@ -68,6 +71,7 @@ const RestaurantHeader: React.FC<{
       <Text style={styles.restaurantHeaderSubtitle}>
         {restaurantSubtitle || "Chefs Hall"}
       </Text>
+
       <View style={styles.ratingsContainer}>
         <View
           style={[styles.ratingPillContainer, { backgroundColor: "#4CAF50" }]}
@@ -75,6 +79,7 @@ const RestaurantHeader: React.FC<{
           <MaterialIcons name="star" size={14} color="#fff" />
           <Text style={styles.ratingPillText}>4.3</Text>
         </View>
+
         <View
           style={[styles.ratingPillContainer, { backgroundColor: "#3f84f8" }]}
         >
@@ -86,13 +91,13 @@ const RestaurantHeader: React.FC<{
   </View>
 );
 
+/* ---------------- Карточка опції доставки ---------------- */
 const DeliveryOptionCard: React.FC<{
   option: DeliveryOption;
   isSelected: boolean;
   onSelect: () => void;
 }> = ({ option, isSelected, onSelect }) => {
   const isWebsite = option.id === "website";
-
   return (
     <TouchableOpacity
       style={[styles.deliveryCard, isSelected && styles.deliveryCardSelected]}
@@ -115,6 +120,7 @@ const DeliveryOptionCard: React.FC<{
           >
             {option.name}
           </Text>
+
           <View style={styles.deliveryDetails}>
             <Text style={styles.deliveryDescription}>{option.description}</Text>
             {!isWebsite && (
@@ -133,7 +139,9 @@ const DeliveryOptionCard: React.FC<{
   );
 };
 
-const OrderScreen: React.FC = () => {
+/* ---------------- Головний екран ---------------- */
+const DiscoverRestoranWhere: React.FC = () => {
+  const navigation = useNavigation();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
 
   const restaurantName = "Grandma's Kettle";
@@ -146,19 +154,35 @@ const OrderScreen: React.FC = () => {
 
   const handleMakeOrder = () => {
     if (!isButtonActive) return;
-    console.log(`Making an order via: ${selectedOption}`);
+
+    Alert.alert(
+      "Order Placed ✅",
+      `Your order via ${selectedOption} has been placed successfully!`,
+      [
+        {
+          text: "OK",
+          onPress: () => navigation.navigate("HomePageScreen" as never),
+        },
+      ]
+    );
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      {/* ---------- Header ---------- */}
       <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.backButton}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
           <Ionicons name="chevron-back" size={28} color="#333" />
         </TouchableOpacity>
+
         <Text style={styles.screenTitle}>Where to Order</Text>
         <View style={{ width: 28 }} />
       </View>
 
+      {/* ---------- Content ---------- */}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.infoBlock}>
           <RestaurantHeader
@@ -169,6 +193,7 @@ const OrderScreen: React.FC = () => {
 
         <View style={styles.optionsSection}>
           <Text style={styles.availableOnTitle}>Available on:</Text>
+
           <View style={styles.deliveryList}>
             {DELIVERY_OPTIONS.map((option) => (
               <DeliveryOptionCard
@@ -179,12 +204,14 @@ const OrderScreen: React.FC = () => {
               />
             ))}
           </View>
+
           <Text style={styles.footerNote}>
             Prices and availability may vary by platform.
           </Text>
         </View>
       </ScrollView>
 
+      {/* ---------- Footer ---------- */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={[
@@ -203,11 +230,9 @@ const OrderScreen: React.FC = () => {
   );
 };
 
+/* ---------------- Стилі ---------------- */
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
+  safeArea: { flex: 1, backgroundColor: "#fff" },
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -219,10 +244,7 @@ const styles = StyleSheet.create({
     width: width,
     position: "relative",
   },
-  backButton: {
-    padding: 10,
-    zIndex: 10,
-  },
+  backButton: { padding: 10, zIndex: 10 },
   screenTitle: {
     position: "absolute",
     left: 0,
@@ -234,7 +256,6 @@ const styles = StyleSheet.create({
     top: Platform.OS === "android" ? 10 : 0,
     paddingVertical: 10,
   },
-
   infoBlock: {
     paddingHorizontal: 20,
     paddingVertical: 15,
@@ -252,9 +273,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
     resizeMode: "cover",
   },
-  restaurantHeaderText: {
-    flex: 1,
-  },
+  restaurantHeaderText: { flex: 1 },
   restaurantHeaderTitle: {
     fontSize: 16,
     fontWeight: "700",
@@ -283,7 +302,6 @@ const styles = StyleSheet.create({
     marginLeft: 4,
     color: "#fff",
   },
-
   optionsSection: {
     paddingHorizontal: 20,
     paddingVertical: 15,
@@ -294,7 +312,6 @@ const styles = StyleSheet.create({
     color: "#333",
     marginBottom: 15,
   },
-  deliveryList: {},
   deliveryCard: {
     padding: 15,
     borderRadius: 10,
@@ -305,9 +322,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  deliveryCardSelected: {
-    borderColor: "#333",
-  },
+  deliveryCardSelected: { borderColor: "#333" },
   deliveryCardContent: {
     flexDirection: "row",
     alignItems: "center",
@@ -322,46 +337,25 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 15,
   },
-  radioButtonSelected: {
-    borderColor: "#333",
-  },
+  radioButtonSelected: { borderColor: "#333" },
   radioDot: {
     height: 10,
     width: 10,
     borderRadius: 5,
     backgroundColor: "#333",
   },
-  deliveryTextWrapper: {
-    flex: 1,
-  },
-  deliveryName: {
-    fontSize: 15,
-    fontWeight: "500",
-    color: "#333",
-  },
-  deliveryNameSelected: {
-    fontWeight: "600",
-  },
-  deliveryDetails: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginTop: 2,
-  },
-  deliveryDescription: {
-    fontSize: 13,
-    color: "#888",
-  },
+  deliveryTextWrapper: { flex: 1 },
+  deliveryName: { fontSize: 15, fontWeight: "500", color: "#333" },
+  deliveryNameSelected: { fontWeight: "600" },
+  deliveryDetails: { flexDirection: "row", flexWrap: "wrap", marginTop: 2 },
+  deliveryDescription: { fontSize: 13, color: "#888" },
   deliveryTime: {
     fontSize: 13,
     color: "#333",
     fontWeight: "500",
     marginLeft: 5,
   },
-  deliveryPrice: {
-    fontSize: 13,
-    color: "#333",
-    fontWeight: "500",
-  },
+  deliveryPrice: { fontSize: 13, color: "#333", fontWeight: "500" },
   footerNote: {
     fontSize: 12,
     color: "#888",
@@ -382,12 +376,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     height: 55,
   },
-  makeOrderButtonInactive: {
-    backgroundColor: "#ccc",
-  },
-  makeOrderButtonActive: {
-    backgroundColor: "#E57373",
-  },
+  makeOrderButtonInactive: { backgroundColor: "#ccc" },
+  makeOrderButtonActive: { backgroundColor: "#E57373" },
   makeOrderButtonText: {
     color: "#fff",
     fontSize: 18,
@@ -395,4 +385,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OrderScreen;
+export default DiscoverRestoranWhere;

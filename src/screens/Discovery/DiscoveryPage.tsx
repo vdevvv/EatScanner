@@ -19,7 +19,6 @@ type RootStackParamList = {
   HomePageScreen: undefined;
   Discovery: undefined;
   DiscoveryFiltersPage: undefined;
-  ChatsScreen: undefined;
   FriendsScreen: undefined;
   FriendsProfileFriends: undefined;
   ProfileScreen: undefined;
@@ -123,13 +122,11 @@ const MealSection: React.FC<{ title: string; data: MealItem[] }> = ({
 const TabBar: React.FC<{
   onHomePress: () => void;
   onDiscoveryPress: () => void;
-  onChatsPress: () => void;
   onFriendsPress: () => void;
   onProfilePress: () => void;
 }> = ({
   onHomePress,
   onDiscoveryPress,
-  onChatsPress,
   onFriendsPress,
   onProfilePress,
 }) => {
@@ -140,12 +137,6 @@ const TabBar: React.FC<{
       icon: "search-outline",
       active: true,
       onPress: onDiscoveryPress,
-    },
-    {
-      name: "Chats",
-      icon: "chatbubble-outline",
-      active: false,
-      onPress: onChatsPress,
     },
     {
       name: "Friends",
@@ -198,7 +189,6 @@ const DiscoveryScreen: React.FC = () => {
   // --- Навігація табів ---
   const handleHomePress = () => navigation.navigate("HomePageScreen");
   const handleDiscoveryPress = () => {}; // вже на цьому екрані
-  const handleChatsPress = () => navigation.navigate("ChatsScreen");
   const handleFriendsPress = () => navigation.navigate("FriendsProfileFriends");
   const handleProfilePress = () => navigation.navigate("MyProfileScreen");
   const handleFiltersPress = () => navigation.navigate("DiscoveryFiltersPage");
@@ -260,7 +250,6 @@ const DiscoveryScreen: React.FC = () => {
       <TabBar
         onHomePress={handleHomePress}
         onDiscoveryPress={handleDiscoveryPress}
-        onChatsPress={handleChatsPress}
         onFriendsPress={handleFriendsPress}
         onProfilePress={handleProfilePress}
       />

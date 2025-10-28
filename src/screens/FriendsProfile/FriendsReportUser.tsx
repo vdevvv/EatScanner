@@ -69,14 +69,12 @@ const MY_FRIENDS: { id: string; avatar: ImageSourcePropType; name: string }[] =
     { id: "f4", avatar: FRIEND_4_SOURCE, name: "Ira" },
   ];
 
-// Типи для навігації
 type RootStackParamList = {
   SignUp: undefined;
   FriendsReportUser: undefined;
   FriendsProfileFriends: undefined;
   HomePageScreen: undefined;
   Discovery: undefined;
-  ChatsScreen: undefined;
   FriendsScreen: undefined;
   FriendsProfileScreen: undefined;
   ProfileScreen: undefined;
