@@ -95,7 +95,6 @@ export type RootStackParamList = {
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
-
 const App: React.FC = () => {
   return (
     <NavigationContainer>
