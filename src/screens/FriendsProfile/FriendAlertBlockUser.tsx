@@ -1,10 +1,8 @@
-// src/screens/BlockUserModalScreen.tsx
 import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   Dimensions,
@@ -18,6 +16,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../App";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
 
@@ -88,7 +87,6 @@ const PAST_ORDERS_DATA = [
 
 const GRID_ITEM_SIZE = width / 3;
 
-// Тип навігації
 type BlockUserNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "FriendAlertBlockUser"
@@ -131,8 +129,6 @@ const BlockUserModalScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
-
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => console.log("Back")}>
           <Ionicons name="chevron-back" size={28} color={COLORS.textDark} />
@@ -164,7 +160,6 @@ const BlockUserModalScreen: React.FC = () => {
           <Text style={styles.userName}>{USER_DATA.name}</Text>
         </View>
 
-        {/* Past Orders */}
         <FlatList
           data={PAST_ORDERS_DATA}
           renderItem={({ item }) => (
@@ -181,7 +176,6 @@ const BlockUserModalScreen: React.FC = () => {
         />
       </ScrollView>
 
-      {/* Block User Modal */}
       <Modal visible={visible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>

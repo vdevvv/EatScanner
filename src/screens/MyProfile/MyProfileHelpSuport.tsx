@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   ScrollView,
   LayoutAnimation,
@@ -11,9 +10,9 @@ import {
   UIManager,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native"; // ✅ додано
+import { useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-// Увімкнення LayoutAnimation для плавних переходів акордеону на Android
 if (
   Platform.OS === "android" &&
   UIManager.setLayoutAnimationEnabledExperimental
@@ -21,7 +20,6 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-// --- ДАНІ ПОШИРЕНИХ ЗАПИТАНЬ (FAQ) ---
 interface FAQItem {
   question: string;
   answer: string;
@@ -95,7 +93,6 @@ const faqData: FAQCategory[] = [
   },
 ];
 
-// --- Компонент акордеону ---
 const AccordionItem: React.FC<{ item: FAQItem }> = ({ item }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -124,17 +121,15 @@ const AccordionItem: React.FC<{ item: FAQItem }> = ({ item }) => {
   );
 };
 
-// --- ГОЛОВНИЙ КОМПОНЕНТ ---
 const HelpAndSupportScreen: React.FC = () => {
-  const navigation = useNavigation(); // ✅ хук для навігації
+  const navigation = useNavigation();
 
   const handleBack = () => {
-    navigation.goBack(); // ✅ повернення назад
+    navigation.goBack();
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Header */}
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <Ionicons name="chevron-back" size={28} color="#000" />
@@ -142,7 +137,6 @@ const HelpAndSupportScreen: React.FC = () => {
         <Text style={styles.screenTitle}>Help & Support</Text>
       </View>
 
-      {/* Content */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.sectionHeading}>FAQs</Text>
 
@@ -170,13 +164,13 @@ const HelpAndSupportScreen: React.FC = () => {
   );
 };
 
-// --- СТИЛІ ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
     backgroundColor: "#fff",
   },
   scrollContent: {
+
     paddingHorizontal: 20,
     paddingVertical: 15,
   },
@@ -184,7 +178,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
-    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#f2f2f2",
     backgroundColor: "#fff",

@@ -9,9 +9,8 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../App"; // 👈 імпортуємо тип стеку
+import { RootStackParamList } from "../../../App";
 
-// ---- тип навігації ----
 type AllergiesScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
 
@@ -23,7 +22,7 @@ interface Category {
 
 const categories: Category[] = [
   { id: "1", label: "Vegetarian", emoji: "🥗" },
-  { id: "2", label: "Vegan", emoji: "🌿" },
+  { id: "2", label: "Vegan", emoji: "🌱" },
   { id: "3", label: "Gluten-Free", emoji: "🌾" },
   { id: "4", label: "No Tree Nuts", emoji: "🌰" },
   { id: "5", label: "Lactose-Free", emoji: "🥛" },
@@ -52,22 +51,19 @@ const AllergiesScreen = () => {
 
   const handleContinue = () => {
     if (!isContinueDisabled) {
-      navigation.navigate("OnBoarding5Screen"); // 👈 перехід на наступний екран
+      navigation.navigate("OnBoarding5Screen");
     }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Заголовок */}
         <View style={styles.headerContainer}>
           <Text style={styles.title}>
             Do you have any{"\n"}allergies or restrictions?
           </Text>
           <Text style={styles.subtitle}>Choose up to 8 categories</Text>
         </View>
-
-        {/* Категорії */}
         <FlatList
           data={categories}
           keyExtractor={(item) => item.id}
@@ -95,16 +91,12 @@ const AllergiesScreen = () => {
             );
           }}
         />
-
-        {/* Прогрес-індикатор */}
         <View style={styles.progressContainer}>
           <View style={styles.progressDot} />
           <View style={styles.progressDot} />
           <View style={[styles.progressDot, styles.activeDot]} />
           <View style={styles.progressDot} />
         </View>
-
-        {/* Кнопка Continue */}
         <TouchableOpacity
           style={[
             styles.continueButton,

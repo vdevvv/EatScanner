@@ -1,10 +1,8 @@
-// src/screens/MyProfile/MyProfileSaved.tsx
 import React from "react";
 import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   Dimensions,
@@ -15,6 +13,7 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
 
@@ -27,7 +26,6 @@ const COLORS = {
   divider: "#E5E7EB",
 };
 
-// --- Локальні зображення ---
 const DISH_1_SOURCE =
   require("../../assets/sushi-dragons.jpg") as ImageSourcePropType;
 const DISH_2_SOURCE =
@@ -76,7 +74,7 @@ const MyProfileSaved: React.FC = () => {
   const navigation = useNavigation();
 
   const handleBack = () => {
-    navigation.goBack(); // ✅ повертає на попередній екран
+    navigation.goBack();
   };
 
   const VideoItem = ({
@@ -112,8 +110,6 @@ const MyProfileSaved: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
-
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
           <Ionicons name="chevron-back" size={28} color={COLORS.textDark} />
@@ -123,7 +119,6 @@ const MyProfileSaved: React.FC = () => {
         <Text style={styles.videoCount}>48 videos</Text>
       </View>
 
-      {/* Content */}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
@@ -152,7 +147,6 @@ const MyProfileSaved: React.FC = () => {
 
 export default MyProfileSaved;
 
-// --- СТИЛІ ---
 const PADDING_HORIZONTAL = 20;
 const GRID_ITEM_SIZE = (width - 60) / 2;
 
@@ -164,8 +158,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 20,
   },
-
-  // --- HEADER ---
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -188,8 +180,6 @@ const styles = StyleSheet.create({
     color: COLORS.textGrey,
     fontWeight: "500",
   },
-
-  // --- GRID ---
   gridContainer: {
     paddingHorizontal: 10,
   },

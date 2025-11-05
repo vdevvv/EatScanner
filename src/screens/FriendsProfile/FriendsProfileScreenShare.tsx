@@ -1,26 +1,23 @@
-// src/screens/FriendsProfileScreenShare.tsx
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   Dimensions,
   StatusBar,
   Image,
-  FlatList,
   ImageSourcePropType,
-  ImageBackground,
   Modal,
   Animated,
   TouchableWithoutFeedback,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import {Ionicons} from "@expo/vector-icons";
+import {useNavigation} from "@react-navigation/native";
+import {SafeAreaView} from "react-native-safe-area-context";
 
-const { width, height } = Dimensions.get("window");
+const {height} = Dimensions.get("window");
 
 const COLORS = {
   primary: "#E9725C",
@@ -32,7 +29,6 @@ const COLORS = {
   overlay: "rgba(0,0,0,0.4)",
 };
 
-// Демо-зображення
 const AVATAR_SOURCE =
   require("../../assets/profile-avatar.jpg") as ImageSourcePropType;
 const FRIEND_1_SOURCE =
@@ -44,7 +40,6 @@ const FRIEND_3_SOURCE =
 const FRIEND_4_SOURCE =
   require("../../assets/friend4.jpg") as ImageSourcePropType;
 
-// Локальні іконки месенджерів
 const TELEGRAM_ICON =
   require("../../assets/MessagesFriend.png") as ImageSourcePropType;
 const WHATSAPP_ICON =
@@ -57,10 +52,10 @@ const USER_DATA = {
   handle: "@foodie_iryna",
   name: "Talia Gomez",
   stats: [
-    { label: "Saved", count: 46 },
-    { label: "Friends", count: 212 },
-    { label: "Shared orders", count: 212 },
-    { label: "Shared videos", count: 212 },
+    {label: "Saved", count: 46},
+    {label: "Friends", count: 212},
+    {label: "Shared orders", count: 212},
+    {label: "Shared videos", count: 212},
   ],
   mutualFriendsCount: 40,
   avatar: AVATAR_SOURCE,
@@ -94,15 +89,15 @@ const MUTUAL_FRIENDS = [
 ];
 
 const SHARE_APPS = [
-  { id: "2", label: "Mail", icon: MAIL_ICON, isLocalIcon: true },
-  { id: "3", label: "Messenger", icon: MESSENGER_ICON, isLocalIcon: true },
-  { id: "4", label: "Whatsapp", icon: WHATSAPP_ICON, isLocalIcon: true },
-  { id: "5", label: "Telegram", icon: TELEGRAM_ICON, isLocalIcon: true },
+  {id: "2", label: "Mail", icon: MAIL_ICON, isLocalIcon: true},
+  {id: "3", label: "Messenger", icon: MESSENGER_ICON, isLocalIcon: true},
+  {id: "4", label: "Whatsapp", icon: WHATSAPP_ICON, isLocalIcon: true},
+  {id: "5", label: "Telegram", icon: TELEGRAM_ICON, isLocalIcon: true},
 ];
 
 const EXTRA_ACTIONS = [
-  { id: "1", label: "Copy", icon: "copy-outline" },
-  { id: "2", label: "Add to readinglist", icon: "book-outline" },
+  {id: "1", label: "Copy", icon: "copy-outline"},
+  {id: "2", label: "Add to readinglist", icon: "book-outline"},
 ];
 
 const FriendsProfileScreenShare: React.FC = () => {
@@ -129,13 +124,11 @@ const FriendsProfileScreenShare: React.FC = () => {
     }).start(() => setShareVisible(false));
   };
 
-  // Open share modal on mount
   useEffect(() => {
     openShareModal();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const StatItem = ({ count, label }: { count: number; label: string }) => (
+  const StatItem = ({count, label}: { count: number; label: string }) => (
     <View style={styles.statItem}>
       <Text style={styles.statCount}>{count}</Text>
       <Text style={styles.statLabel}>{label}</Text>
@@ -153,19 +146,17 @@ const FriendsProfileScreenShare: React.FC = () => {
       );
     } else {
       return (
-        <Ionicons name={app.icon as any} size={40} color={COLORS.textDark} />
+        <Ionicons name={app.icon as any} size={40} color={COLORS.textDark}/>
       );
     }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" />
-
-      {/* Header */}
+      <StatusBar barStyle="dark-content"/>
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="chevron-back" size={28} color={COLORS.textDark} />
+          <Ionicons name="chevron-back" size={28} color={COLORS.textDark}/>
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{USER_DATA.handle}</Text>
         <TouchableOpacity onPress={openShareModal}>
@@ -178,13 +169,12 @@ const FriendsProfileScreenShare: React.FC = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Profile */}
         <View style={styles.profileBlock}>
           <View style={styles.topRow}>
-            <Image source={USER_DATA.avatar} style={styles.avatar} />
+            <Image source={USER_DATA.avatar} style={styles.avatar}/>
             <View style={styles.statsContainer}>
               {USER_DATA.stats.map((s, i) => (
-                <StatItem key={i} count={s.count} label={s.label} />
+                <StatItem key={i} count={s.count} label={s.label}/>
               ))}
             </View>
           </View>
@@ -195,14 +185,13 @@ const FriendsProfileScreenShare: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Friends section */}
         <View style={styles.mutualSection}>
           <Text style={styles.mutualCount}>{USER_DATA.mutualFriendsCount}</Text>
           <Text style={styles.mutualLabel}>Mutual Friends</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             {MUTUAL_FRIENDS.map((f) => (
               <View key={f.id} style={styles.friendItem}>
-                <Image source={f.avatar} style={styles.friendAvatar} />
+                <Image source={f.avatar} style={styles.friendAvatar}/>
                 <Text style={styles.friendName}>{f.name}</Text>
               </View>
             ))}
@@ -210,26 +199,25 @@ const FriendsProfileScreenShare: React.FC = () => {
         </View>
       </ScrollView>
 
-      {/* Bottom Share Modal */}
       <Modal visible={shareVisible} transparent animationType="none">
         <TouchableWithoutFeedback onPress={closeShareModal}>
-          <View style={styles.overlay} />
+          <View style={styles.overlay}/>
         </TouchableWithoutFeedback>
 
         <Animated.View
           style={[
             styles.shareModal,
-            { transform: [{ translateY: slideAnim }] },
+            {transform: [{translateY: slideAnim}]},
           ]}
         >
           <View style={styles.shareHeader}>
-            <Image source={USER_DATA.avatar} style={styles.shareAvatar} />
-            <View style={{ flex: 1 }}>
+            <Image source={USER_DATA.avatar} style={styles.shareAvatar}/>
+            <View style={{flex: 1}}>
               <Text style={styles.shareName}>{USER_DATA.name}</Text>
               <Text style={styles.shareHandle}>{USER_DATA.handle}</Text>
             </View>
             <TouchableOpacity onPress={closeShareModal}>
-              <Ionicons name="close" size={22} color={COLORS.textDark} />
+              <Ionicons name="close" size={22} color={COLORS.textDark}/>
             </TouchableOpacity>
           </View>
 
@@ -241,7 +229,7 @@ const FriendsProfileScreenShare: React.FC = () => {
             {MUTUAL_FRIENDS.map((f) => (
               <View key={f.id} style={styles.shareFriend}>
                 <View style={styles.shareAvatarContainer}>
-                  <Image source={f.avatar} style={styles.shareFriendAvatar} />
+                  <Image source={f.avatar} style={styles.shareFriendAvatar}/>
                   <View style={styles.shareMessengerIconContainer}>
                     <Image
                       source={f.messengerIcon}
@@ -254,7 +242,7 @@ const FriendsProfileScreenShare: React.FC = () => {
             ))}
           </ScrollView>
 
-          <View style={styles.divider} />
+          <View style={styles.divider}/>
 
           <View style={styles.shareAppsRow}>
             {SHARE_APPS.map((a) => (
@@ -285,15 +273,13 @@ const FriendsProfileScreenShare: React.FC = () => {
 
 export default FriendsProfileScreenShare;
 
-// --------------------------------------------------
-// STYLES
 const PADDING_HORIZONTAL = 20;
 const AVATAR_SIZE = 80;
 const FRIEND_SIZE = 58;
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.background },
-  scrollContent: { paddingBottom: 20 },
+  safeArea: {flex: 1, backgroundColor: COLORS.background},
+  scrollContent: {paddingBottom: 20},
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -301,7 +287,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: PADDING_HORIZONTAL,
     paddingVertical: 10,
   },
-  headerTitle: { fontSize: 18, fontWeight: "600", color: COLORS.textDark },
+  headerTitle: {fontSize: 18, fontWeight: "600", color: COLORS.textDark},
 
   profileBlock: {
     paddingHorizontal: PADDING_HORIZONTAL,
@@ -309,7 +295,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.divider,
   },
-  topRow: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
+  topRow: {flexDirection: "row", alignItems: "center", marginBottom: 12},
   avatar: {
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
@@ -321,9 +307,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  statItem: { alignItems: "center", flex: 1 },
-  statCount: { fontSize: 20, fontWeight: "700", color: COLORS.textDark },
-  statLabel: { fontSize: 12, color: COLORS.textGrey },
+  statItem: {alignItems: "center", flex: 1},
+  statCount: {fontSize: 20, fontWeight: "700", color: COLORS.textDark},
+  statLabel: {fontSize: 12, color: COLORS.textGrey},
   userName: {
     fontSize: 22,
     fontWeight: "700",
@@ -336,15 +322,15 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
   },
-  messageButtonText: { fontSize: 16, fontWeight: "700", color: COLORS.white },
+  messageButtonText: {fontSize: 16, fontWeight: "700", color: COLORS.white},
 
   mutualSection: {
     paddingHorizontal: PADDING_HORIZONTAL,
     paddingTop: 16,
   },
-  mutualCount: { fontSize: 20, fontWeight: "700", color: COLORS.textDark },
-  mutualLabel: { fontSize: 12, color: COLORS.textGrey, marginBottom: 10 },
-  friendItem: { alignItems: "center", marginRight: 14 },
+  mutualCount: {fontSize: 20, fontWeight: "700", color: COLORS.textDark},
+  mutualLabel: {fontSize: 12, color: COLORS.textGrey, marginBottom: 10},
+  friendItem: {alignItems: "center", marginRight: 14},
   avatarContainer: {
     position: "relative",
   },
@@ -371,9 +357,7 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
   },
-  friendName: { fontSize: 11, color: COLORS.textGrey },
-
-  // Bottom modal
+  friendName: {fontSize: 11, color: COLORS.textGrey},
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: COLORS.overlay,
@@ -394,12 +378,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 8,
   },
-  shareAvatar: { width: 50, height: 50, borderRadius: 25, marginRight: 10 },
-  shareName: { fontSize: 16, fontWeight: "600", color: COLORS.textDark },
-  shareHandle: { fontSize: 14, color: COLORS.textGrey },
+  shareAvatar: {width: 50, height: 50, borderRadius: 25, marginRight: 10},
+  shareName: {fontSize: 16, fontWeight: "600", color: COLORS.textDark},
+  shareHandle: {fontSize: 14, color: COLORS.textGrey},
 
-  shareFriendsRow: { paddingVertical: 10 },
-  shareFriend: { alignItems: "center", marginRight: 16 },
+  shareFriendsRow: {paddingVertical: 10},
+  shareFriend: {alignItems: "center", marginRight: 16},
   shareAvatarContainer: {
     position: "relative",
   },
@@ -426,9 +410,9 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
   },
-  shareFriendName: { fontSize: 12, color: COLORS.textDark },
+  shareFriendName: {fontSize: 12, color: COLORS.textDark},
 
-  divider: { height: 1, backgroundColor: COLORS.divider, marginVertical: 8 },
+  divider: {height: 1, backgroundColor: COLORS.divider, marginVertical: 8},
 
   shareAppsRow: {
     flexDirection: "row",
@@ -443,7 +427,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
   },
-  appLabel: { fontSize: 12, color: COLORS.textDark },
+  appLabel: {fontSize: 12, color: COLORS.textDark},
 
   extraActions: {
     borderTopWidth: 1,
@@ -456,5 +440,5 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
   },
-  extraActionText: { fontSize: 15, color: COLORS.textDark },
+  extraActionText: {fontSize: 15, color: COLORS.textDark},
 });

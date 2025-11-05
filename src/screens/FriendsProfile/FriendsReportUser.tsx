@@ -1,4 +1,3 @@
-// screens/FriendsReportUser.tsx
 import React, { useState } from "react";
 import {
   View,
@@ -6,10 +5,8 @@ import {
   StyleSheet,
   Modal,
   TouchableOpacity,
-  SafeAreaView,
   FlatList,
   Image,
-  Dimensions,
   StatusBar,
   ScrollView,
   ImageSourcePropType,
@@ -17,8 +14,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
-const { width } = Dimensions.get("window");
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const COLORS = {
   background: "#FFFFFF",
@@ -45,7 +41,6 @@ const USER = {
   avatar: require("../../assets/profile-avatar.jpg"),
 };
 
-// Demo data for stats and friends (align with other screens)
 const USER_STATS = [
   { label: "Posts", count: 24 },
   { label: "Friends", count: 212 },
@@ -104,8 +99,6 @@ const FriendsReportUser: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
-
-      {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.navigate("FriendsProfileFriends")}
@@ -130,12 +123,10 @@ const FriendsReportUser: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* PROFILE CONTENT */}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Top profile card */}
         <View style={styles.profileCard}>
           <View style={styles.profileTopRow}>
             <Image source={USER.avatar} style={styles.avatar} />
@@ -151,8 +142,6 @@ const FriendsReportUser: React.FC = () => {
           <Text style={styles.name}>{USER.name}</Text>
           <Text style={styles.handle}>{USER.username}</Text>
         </View>
-
-        {/* My Friends strip */}
         <View style={styles.friendsSection}>
           <Text style={styles.sectionTitle}>My Friends</Text>
           <ScrollView
@@ -168,34 +157,25 @@ const FriendsReportUser: React.FC = () => {
             ))}
           </ScrollView>
         </View>
-
-        {/* Note text */}
         <View style={styles.noteBlock}>
           <Text style={styles.statusText}>
             You are viewing this user’s profile.
           </Text>
         </View>
       </ScrollView>
-
-      {/* REPORT MODAL */}
       <Modal visible={reportVisible} transparent animationType="fade">
         <View style={styles.overlay}>
           <View style={styles.modalCard}>
-            {/* Close icon */}
             <TouchableOpacity
               style={styles.closeButton}
               onPress={() => setReportVisible(false)}
             >
               <Ionicons name="close" size={22} color="#374151" />
             </TouchableOpacity>
-
-            {/* Title */}
             <Text style={styles.title}>Report This User?</Text>
             <Text style={styles.subtitle}>
               Choose a reason below. This won’t notify the user.
             </Text>
-
-            {/* Dropdown */}
             <TouchableOpacity
               style={styles.dropdown}
               activeOpacity={0.8}
@@ -215,8 +195,6 @@ const FriendsReportUser: React.FC = () => {
                 color="#6B7280"
               />
             </TouchableOpacity>
-
-            {/* Dropdown List */}
             {dropdownOpen && (
               <View style={styles.dropdownList}>
                 <FlatList
@@ -236,8 +214,6 @@ const FriendsReportUser: React.FC = () => {
                 />
               </View>
             )}
-
-            {/* Submit Button */}
             <TouchableOpacity
               style={[
                 styles.submitButton,
@@ -253,8 +229,6 @@ const FriendsReportUser: React.FC = () => {
             >
               <Text style={styles.submitText}>Submit Report</Text>
             </TouchableOpacity>
-
-            {/* Cancel */}
             <TouchableOpacity
               style={styles.cancelButton}
               onPress={() => setReportVisible(false)}
@@ -363,8 +337,6 @@ const styles = StyleSheet.create({
   friendAvatar: { width: 56, height: 56, borderRadius: 28, marginBottom: 6 },
   friendName: { fontSize: 11, color: COLORS.textGrey },
   noteBlock: { paddingHorizontal: 18, paddingVertical: 16 },
-
-  // --- MODAL ---
   overlay: {
     flex: 1,
     backgroundColor: COLORS.overlay,

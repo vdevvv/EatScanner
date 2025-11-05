@@ -1,10 +1,8 @@
-// RemoveFriend.tsx
 import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   Dimensions,
@@ -17,6 +15,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width } = Dimensions.get("window");
 
@@ -30,7 +29,6 @@ const COLORS = {
   overlay: "rgba(0,0,0,0.4)",
 };
 
-// Типи для навігації
 type RootStackParamList = {
   FriendsProfileScreen: undefined;
   RemoveFriend: undefined;
@@ -98,10 +96,9 @@ const PAST_ORDERS_DATA = [
 
 const GRID_ITEM_SIZE = width / 3;
 
-// --------------------------------------------------
 const RemoveFriendScreen: React.FC = () => {
   const navigation = useNavigation<RemoveFriendNavigationProp>();
-  const [removeVisible, setRemoveVisible] = useState(true); // Модалка з'являється одразу при завантаженні
+  const [removeVisible, setRemoveVisible] = useState(true);
 
   const handleBack = () => {
     navigation.goBack();
@@ -140,8 +137,6 @@ const RemoveFriendScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
-
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
           <Ionicons name="chevron-back" size={28} color={COLORS.textDark} />
@@ -159,7 +154,6 @@ const RemoveFriendScreen: React.FC = () => {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Profile */}
         <View style={styles.profileBlock}>
           <View style={styles.topRow}>
             <Image source={USER_DATA.avatar} style={styles.avatar} />
@@ -169,13 +163,8 @@ const RemoveFriendScreen: React.FC = () => {
               ))}
             </View>
           </View>
-
           <Text style={styles.userName}>{USER_DATA.name}</Text>
-
-          
         </View>
-
-        {/* Past Orders */}
         <FlatList
           data={PAST_ORDERS_DATA}
           renderItem={({ item }) => (
@@ -192,7 +181,6 @@ const RemoveFriendScreen: React.FC = () => {
         />
       </ScrollView>
 
-      {/* REMOVE FRIEND MODAL - З'являється одразу при завантаженні сторінки */}
       <Modal visible={removeVisible} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
@@ -240,7 +228,6 @@ const RemoveFriendScreen: React.FC = () => {
 
 export default RemoveFriendScreen;
 
-// --------------------------------------------------
 const AVATAR_SIZE = 80;
 
 const styles = StyleSheet.create({
@@ -294,7 +281,6 @@ const styles = StyleSheet.create({
   orderDishName: { fontSize: 12, fontWeight: "600", color: COLORS.white },
   orderRestaurantName: { fontSize: 10, color: COLORS.white },
 
-  // MODAL
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0,0,0,0.4)",

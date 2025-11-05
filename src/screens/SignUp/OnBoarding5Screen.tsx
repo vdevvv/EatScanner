@@ -8,9 +8,9 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../App"; // 👈 Імпорт типів навігації з App.tsx
+import {AuthStackParamList} from "../../navigations/AuthNavigator";
 
-type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
+type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
 const ShareContactsScreen = () => {
   const [selected, setSelected] = useState<string | null>(null);
@@ -22,7 +22,7 @@ const ShareContactsScreen = () => {
 
   const handleContinue = () => {
     if (!selected) return;
-    navigation.navigate("CheckEmailscreen"); // 👈 зміни назву на потрібну цільову сторінку
+    navigation.navigate("Auth", {initialTab: 'signUp'});
   };
 
   const isContinueDisabled = !selected;
@@ -30,9 +30,7 @@ const ShareContactsScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
-        {/* Верхня частина */}
         <View>
-          {/* Заголовок */}
           <View style={styles.headerContainer}>
             <Text style={styles.title}>
               How would you like{"\n"}to share contacts?
@@ -42,8 +40,6 @@ const ShareContactsScreen = () => {
               us. You can share more anytime.
             </Text>
           </View>
-
-          {/* Опції */}
           <View style={styles.optionsContainer}>
             <TouchableOpacity
               style={[
@@ -73,7 +69,6 @@ const ShareContactsScreen = () => {
           </View>
         </View>
 
-        {/* Нижня частина — прогрес і кнопка */}
         <View style={styles.footerContainer}>
           <View style={styles.progressContainer}>
             <View style={styles.progressDot} />

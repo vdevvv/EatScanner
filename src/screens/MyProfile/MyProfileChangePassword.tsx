@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   TextInput,
   ScrollView,
@@ -11,16 +10,15 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native"; // ✅ додано
+import { useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-// --- ІНТЕРФЕЙСИ ---
 interface PasswordInputProps {
   label: string;
   value: string;
   onChangeText: (text: string) => void;
 }
 
-// --- КОМПОНЕНТ: ПОЛЕ ВВЕДЕННЯ ПАРОЛЯ ---
 const PasswordInput: React.FC<PasswordInputProps> = ({
   label,
   value,
@@ -62,7 +60,6 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
   );
 };
 
-// --- ОСНОВНИЙ ЕКРАН ---
 const ChangePasswordScreen: React.FC = () => {
   const navigation = useNavigation(); // ✅ додано
   const [oldPassword, setOldPassword] = useState("");
@@ -70,7 +67,7 @@ const ChangePasswordScreen: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleBack = () => {
-    navigation.goBack(); // ✅ повернення назад
+    navigation.goBack();
   };
 
   const handleSaveChanges = () => {
@@ -90,12 +87,11 @@ const ChangePasswordScreen: React.FC = () => {
     setOldPassword("");
     setNewPassword("");
     setConfirmPassword("");
-    navigation.goBack(); // ✅ повернення після збереження
+    navigation.goBack();
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Шапка */}
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <Ionicons name="chevron-back" size={28} color="#000" />
@@ -125,7 +121,6 @@ const ChangePasswordScreen: React.FC = () => {
         </View>
       </ScrollView>
 
-      {/* Кнопка збереження */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={styles.saveButton}
@@ -139,7 +134,6 @@ const ChangePasswordScreen: React.FC = () => {
   );
 };
 
-// --- СТИЛІ ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -154,7 +148,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
-    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
     backgroundColor: "#fff",

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   Image,
   TouchableOpacity,
   Dimensions,
@@ -11,35 +10,30 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../App";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-// Типізація користувача
 interface User {
   username: string;
   name: string;
   avatarUri: string;
 }
 
-// Дані користувача, якого заблоковано
 const BLOCKED_USER: User = {
   username: "@foodie_iryna",
   name: "Talia Gomez",
   avatarUri: "https://placehold.co/80x80/6E3A2F/ffffff?text=TG",
 };
 
-// Отримуємо висоту екрана для адаптивного розміщення
 const screenHeight = Dimensions.get("window").height;
 
-// Тип навігації
 type BlockUserNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "BlockUser"
 >;
 
-// --- Іконки у вигляді тексту (імітація iOS стилю) ---
 const MoreIcon = () => <Text style={styles.headerIconText}>...</Text>;
 const BackIcon = () => <Text style={styles.headerIconText}>{"<"}</Text>;
 
-// --- ОСНОВНИЙ КОМПОНЕНТ ---
 const BlockedUserScreen: React.FC = () => {
   const navigation = useNavigation<BlockUserNavigationProp>();
   const [isBlocked, setIsBlocked] = useState<boolean>(true);
@@ -53,7 +47,6 @@ const BlockedUserScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* HEADER */}
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.headerButton}
@@ -72,9 +65,7 @@ const BlockedUserScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* BODY */}
       <View style={styles.body}>
-        {/* Рядок з аватаркою зліва */}
         <View style={styles.profileRow}>
           <Image
             source={{ uri: BLOCKED_USER.avatarUri }}
@@ -83,9 +74,7 @@ const BlockedUserScreen: React.FC = () => {
           <Text style={styles.name}>{BLOCKED_USER.name}</Text>
         </View>
 
-        {/* Центральний контент */}
         <View style={styles.centerSection}>
-          {/* Іконка блокування */}
           {isBlocked && (
             <View style={styles.blockIconContainer}>
               <View style={styles.blockIconCircle}>
@@ -94,7 +83,6 @@ const BlockedUserScreen: React.FC = () => {
             </View>
           )}
 
-          {/* Текст */}
           <Text style={styles.mainTitle}>
             {isBlocked ? "You Have Blocked This User." : "You Are Connected."}
           </Text>
@@ -105,7 +93,6 @@ const BlockedUserScreen: React.FC = () => {
               : "You can see each other's content and connect."}
           </Text>
 
-          {/* Кнопка */}
           <TouchableOpacity
             style={[
               styles.actionButton,
@@ -126,7 +113,6 @@ const BlockedUserScreen: React.FC = () => {
 
 export default BlockedUserScreen;
 
-// --- СТИЛІ ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,

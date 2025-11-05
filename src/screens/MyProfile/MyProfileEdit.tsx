@@ -3,19 +3,17 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   TextInput,
   Image,
   ScrollView,
-  Platform,
   ImageSourcePropType,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-// --- Типізація навігації ---
 type RootStackParamList = {
   MyProfileScreen: undefined;
   EditProfileScreen: undefined;
@@ -26,14 +24,12 @@ type NavigationProp = NativeStackNavigationProp<
   "EditProfileScreen"
 >;
 
-// --- ІМІТАЦІЯ АВАТАРА ---
 const LOCAL_AVATAR =
   require("../../assets/profile-avatar.jpg") as ImageSourcePropType;
 
 const EditProfileScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
 
-  // Стан для полів профілю
   const [fullName, setFullName] = useState("Iryna Hvozdetska");
   const [userName, setUserName] = useState("@foodie_iryna");
   const [email, setEmail] = useState("example@gmail.com");
@@ -41,9 +37,8 @@ const EditProfileScreen: React.FC = () => {
 
   const avatarSource = LOCAL_AVATAR;
 
-  // --- Навігація ---
   const handleBack = () => {
-    navigation.goBack(); // ✅ Повернення на попередній екран
+    navigation.goBack();
   };
 
   const handleSave = () => {
@@ -53,14 +48,13 @@ const EditProfileScreen: React.FC = () => {
       email,
       phoneNumber,
     });
-    navigation.goBack(); // ✅ Після збереження — назад до профілю
+    navigation.goBack();
   };
 
   const handleEditAvatar = () => {
     console.log("Редагування аватара...");
   };
 
-  // --- Підкомпонент для Input ---
   interface InputFieldProps {
     label: string;
     value: string;
@@ -92,7 +86,6 @@ const EditProfileScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* 🔹 Header */}
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <Ionicons name="chevron-back" size={28} color="#333" />
@@ -102,7 +95,6 @@ const EditProfileScreen: React.FC = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* 🔹 Avatar Section */}
         <View style={styles.avatarSection}>
           <View style={styles.avatarContainer}>
             <Image source={avatarSource} style={styles.avatar} />
@@ -115,7 +107,6 @@ const EditProfileScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* 🔹 Input Fields */}
         <View style={styles.formContainer}>
           <InputField
             label="Full name"
@@ -130,7 +121,7 @@ const EditProfileScreen: React.FC = () => {
             autoCapitalize="none"
           />
           <InputField
-            label="Email address"
+            label="EnterEmail address"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -146,7 +137,6 @@ const EditProfileScreen: React.FC = () => {
         </View>
       </ScrollView>
 
-      {/* 🔹 Save Button (fixed bottom) */}
       <View style={styles.footer}>
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveButtonText}>Save changes</Text>
@@ -156,7 +146,6 @@ const EditProfileScreen: React.FC = () => {
   );
 };
 
-// --- СТИЛІ ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -171,7 +160,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     paddingHorizontal: 10,
-    paddingVertical: Platform.OS === "ios" ? 10 : 20,
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
   },

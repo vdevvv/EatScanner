@@ -3,7 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   Dimensions,
@@ -16,6 +15,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type RootStackParamList = {
   HomePageScreen: undefined;
@@ -31,7 +31,6 @@ type RootStackParamList = {
   SavedScreen: undefined;
 };
 
-// --- Конфігурація ---
 const { width } = Dimensions.get("window");
 const COLORS = {
   primary: "#E9725C",
@@ -42,7 +41,6 @@ const COLORS = {
   divider: "#E5E7EB",
 };
 
-// --- Локальні зображення ---
 const AVATAR_SOURCE =
   require("../../assets/profile-avatar.jpg") as ImageSourcePropType;
 const DISH_1_SOURCE =
@@ -50,7 +48,6 @@ const DISH_1_SOURCE =
 const DISH_2_SOURCE =
   require("../../assets/potatoes-square.jpg") as ImageSourcePropType;
 
-// --- Дані користувача ---
 const USER_DATA = {
   handle: "@foodie_iryna",
   name: "Iryna Hvozdetka",
@@ -61,7 +58,6 @@ const USER_DATA = {
   avatar: AVATAR_SOURCE,
 };
 
-// --- Дані замовлень (усі з підписами) ---
 const PAST_ORDERS_DATA = [
   {
     id: "1",
@@ -101,13 +97,11 @@ const PAST_ORDERS_DATA = [
   },
 ];
 
-// --- Тип навігації ---
 type MyProfileNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "MyProfileScreen"
 >;
 
-// --- Компонент для статистики ---
 interface StatItemProps {
   count: number;
   label: string;
@@ -121,7 +115,6 @@ const StatItem: React.FC<StatItemProps> = ({ count, label, onPress }) => (
   </TouchableOpacity>
 );
 
-// --- Компонент для замовлення ---
 interface OrderItemProps {
   image: ImageSourcePropType;
   title: string;
@@ -159,15 +152,9 @@ const OrderItem: React.FC<OrderItemProps> = ({ image, title, restaurant }) => (
   </TouchableOpacity>
 );
 
-// --- Основний екран ---
-const MyProfileScreen: React.FC = () => {
+const MyProfileScreen = () => {
   const navigation = useNavigation<MyProfileNavigationProp>();
 
-  // --- Обробники навігації ---
-  const handleHomePress = () => navigation.navigate("HomePageScreen");
-  const handleDiscoveryPress = () => navigation.navigate("Discovery");
-  const handleFriendsPress = () => navigation.navigate("FriendsProfileFriends");
-  const handleProfilePress = () => console.log("Already on profile");
   const handleSettingsPress = () => navigation.navigate("MyProfileSettings");
   const handleSavedPress = () => navigation.navigate("MyProfileSaved");
   const handleFriendsListPress = () => navigation.navigate("FriendsScreen");
@@ -176,7 +163,6 @@ const MyProfileScreen: React.FC = () => {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
 
-      {/* --- Header --- */}
       <View style={styles.header}>
         <View style={{ width: 28 }} />
         <Text style={styles.headerTitle}>{USER_DATA.handle}</Text>
@@ -185,9 +171,7 @@ const MyProfileScreen: React.FC = () => {
         </TouchableOpacity>
       </View>
 
-      {/* --- Контент --- */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* --- Блок профілю --- */}
         <View style={styles.profileBlock}>
           <View style={styles.topRow}>
             <Image source={USER_DATA.avatar} style={styles.avatar} />
@@ -211,7 +195,6 @@ const MyProfileScreen: React.FC = () => {
           <Text style={styles.userName}>{USER_DATA.name}</Text>
         </View>
 
-        {/* --- Past Orders --- */}
         <View style={styles.pastOrdersHeader}>
           <Text style={styles.pastOrdersTitle}>Past Orders</Text>
         </View>
@@ -233,70 +216,10 @@ const MyProfileScreen: React.FC = () => {
 
         <View style={{ height: 80 }} />
       </ScrollView>
-
-      {/* --- Нижнє меню --- */}
-      <View style={styles.bottomTabBar}>
-        <TabBarItem
-          iconName="home-outline"
-          label="Home"
-          active={false}
-          onPress={handleHomePress}
-        />
-        <TabBarItem
-          iconName="search-outline"
-          label="Discovery"
-          active={false}
-          onPress={handleDiscoveryPress}
-        />
-        <TabBarItem
-          iconName="people-outline"
-          label="My Friends"
-          active={false}
-          onPress={handleFriendsPress}
-        />
-        <TabBarItem
-          iconName="person-outline"
-          label="Profile"
-          active={true}
-          onPress={handleProfilePress}
-        />
-      </View>
     </SafeAreaView>
   );
 };
 
-// --- Елемент нижньої навігації ---
-interface TabBarItemProps {
-  iconName: keyof typeof Ionicons.glyphMap;
-  label: string;
-  active: boolean;
-  onPress?: () => void;
-}
-
-const TabBarItem: React.FC<TabBarItemProps> = ({
-  iconName,
-  label,
-  active,
-  onPress,
-}) => (
-  <TouchableOpacity style={styles.tabBarItem} onPress={onPress}>
-    <Ionicons
-      name={iconName}
-      size={24}
-      color={active ? COLORS.primary : COLORS.textGrey}
-    />
-    <Text
-      style={[
-        styles.tabBarLabel,
-        { color: active ? COLORS.primary : COLORS.textGrey },
-      ]}
-    >
-      {label}
-    </Text>
-  </TouchableOpacity>
-);
-
-// --- Стилі ---
 const PADDING_HORIZONTAL = 20;
 const AVATAR_SIZE = 80;
 
@@ -386,21 +309,6 @@ const styles = StyleSheet.create({
     fontSize: 10,
     opacity: 0.9,
   },
-  bottomTabBar: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    height: 80,
-    borderTopColor: "#E0E0E0",
-    backgroundColor: COLORS.white,
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  tabBarItem: { alignItems: "center", flex: 1 },
-  tabBarLabel: { fontSize: 10, marginTop: 2, fontWeight: "500" },
 });
 
 export default MyProfileScreen;

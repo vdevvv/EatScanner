@@ -3,15 +3,14 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
-  Platform,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import {useAuthStore} from "../../stores/useAuthStore";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-// --- Типи навігації ---
 type RootStackParamList = {
   MyProfile: undefined;
   MyProfileSettings: undefined;
@@ -28,7 +27,6 @@ type MyProfileSettingsNavigationProp = NativeStackNavigationProp<
   "MyProfileSettings"
 >;
 
-// --- Тип елемента налаштування ---
 interface SettingItem {
   id: string;
   title: string;
@@ -40,16 +38,15 @@ interface SettingItem {
   isDestructive?: boolean;
 }
 
-// --- Основний компонент ---
-const MyProfileSettings: React.FC = () => {
+const MyProfileSettings = () => {
+  const logout = useAuthStore((state) => state.signOut)
   const navigation = useNavigation<MyProfileSettingsNavigationProp>();
 
-  // --- Обробники натискань ---
   const handleBack = () => {
     if (navigation.canGoBack()) {
       navigation.goBack();
     } else {
-      navigation.navigate("MyProfile"); // резервне повернення
+      navigation.navigate("MyProfile");
     }
   };
 
@@ -61,9 +58,8 @@ const MyProfileSettings: React.FC = () => {
   const handleTermsAndConditions = () =>
     navigation.navigate("MyProfileTermsConditions");
   const handleHelpAndSupport = () => navigation.navigate("MyProfileHelpSuport");
-  const handleLogOut = () => navigation.navigate("SignIn");
+  const handleLogOut = () => logout();
 
-  // --- Масив опцій ---
   const SETTINGS_OPTIONS: SettingItem[] = [
     {
       id: "EditProfile",
@@ -112,7 +108,6 @@ const MyProfileSettings: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* --- Header --- */}
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <Ionicons name="chevron-back" size={26} color="#333" />
@@ -120,8 +115,6 @@ const MyProfileSettings: React.FC = () => {
         <Text style={styles.screenTitle}>Settings</Text>
         <View style={{ width: 40 }} />
       </View>
-
-      {/* --- Список опцій --- */}
       <View style={styles.listContainer}>
         {SETTINGS_OPTIONS.map((item) => (
           <SettingRow key={item.id} item={item} />
@@ -131,7 +124,6 @@ const MyProfileSettings: React.FC = () => {
   );
 };
 
-// --- Компонент одного рядка ---
 const SettingRow: React.FC<{ item: SettingItem }> = ({ item }) => {
   const IconComponent =
     item.iconLibrary === "Ionicons" ? Ionicons : MaterialCommunityIcons;
@@ -150,7 +142,6 @@ const SettingRow: React.FC<{ item: SettingItem }> = ({ item }) => {
           color={item.isDestructive ? "#E53935" : "#333"}
         />
       </View>
-
       <Text
         style={[
           styles.rowTitle,
@@ -165,7 +156,6 @@ const SettingRow: React.FC<{ item: SettingItem }> = ({ item }) => {
   );
 };
 
-// --- Стилі ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -177,7 +167,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
-    paddingVertical: Platform.OS === "ios" ? 12 : 16,
     paddingHorizontal: 16,
   },
   backButton: {

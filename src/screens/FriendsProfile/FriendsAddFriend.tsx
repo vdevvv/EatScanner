@@ -99,7 +99,7 @@ const FriendsProfileFriends: React.FC = () => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
 
   const handleBackPress = () => {
-    navigation.navigate("HomePageScreen");
+    navigation.goBack();
   };
 
   const handleMenuPress = () => {
@@ -129,7 +129,6 @@ const FriendsProfileFriends: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBackPress} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="#000" />
@@ -141,7 +140,6 @@ const FriendsProfileFriends: React.FC = () => {
       </View>
 
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Profile Section */}
         <View style={styles.profileSection}>
           <Image
             source={PROFILE_DATA.profileImage}
@@ -153,7 +151,6 @@ const FriendsProfileFriends: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Mutual Friends Section */}
         <View style={styles.mutualFriendsSection}>
           <Text style={styles.mutualFriendsText}>
             {PROFILE_DATA.mutualFriends} Mutual Friends
@@ -168,7 +165,6 @@ const FriendsProfileFriends: React.FC = () => {
           />
         </View>
 
-        {/* Past Orders Section */}
         <View style={styles.pastOrdersSection}>
           <Text style={styles.sectionTitle}>Past Orders</Text>
           <FlatList
@@ -182,7 +178,6 @@ const FriendsProfileFriends: React.FC = () => {
         </View>
       </ScrollView>
 
-      {/* Context Menu Modal */}
       <Modal
         visible={isMenuVisible}
         transparent={true}

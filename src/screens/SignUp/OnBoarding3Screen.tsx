@@ -27,25 +27,19 @@ const OnBoarding3Screen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
-
-      {/* 🖼 Один фон замість 8 фото */}
       <Image
         source={require("../../assets/OnBoarding3.png")}
         style={styles.backgroundImage}
         resizeMode="cover"
       />
-
-      {/* Контент поверх */}
       <View style={styles.overlay}>
-        <Text style={styles.title}>Discover Delicious{"\n"}Food Nearby!</Text>
-
+        <Text style={styles.title}>See What Your Friends Are Enjoying!</Text>
         <View style={styles.progressContainer}>
           <View style={styles.progressBar} />
           <View style={styles.progressBar} />
           <View style={[styles.progressBar, styles.activeBar]} />
           <View style={styles.progressBar} />
         </View>
-
         <TouchableOpacity
           style={styles.continueButton}
           onPress={handleContinue}
@@ -64,8 +58,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-
-  // 🖼 Фон
   backgroundImage: {
     position: "absolute",
     top: 0,
@@ -74,8 +66,6 @@ const styles = StyleSheet.create({
     height: 510,
     marginTop: 0,
   },
-
-  // Контент поверх фону
   overlay: {
     flex: 1,
     justifyContent: "flex-end",
@@ -84,7 +74,6 @@ const styles = StyleSheet.create({
     paddingBottom: 60,
     zIndex: 1,
   },
-
   title: {
     fontSize: 26,
     fontWeight: "700",
@@ -92,14 +81,12 @@ const styles = StyleSheet.create({
     color: "#000",
     marginBottom: 30,
   },
-
   progressContainer: {
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 30,
   },
-
   progressBar: {
     width: 25,
     height: 4,
@@ -107,11 +94,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#E0E0E0",
     marginHorizontal: 5,
   },
-
   activeBar: {
     backgroundColor: "#E57373",
   },
-
   continueButton: {
     backgroundColor: "#E57373",
     borderRadius: 12,
@@ -125,7 +110,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
-
   continueText: {
     color: "#fff",
     fontSize: 16,

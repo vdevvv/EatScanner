@@ -3,7 +3,6 @@ import {
   StyleSheet,
   Text,
   View,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   Dimensions,
@@ -19,6 +18,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const { width, height } = Dimensions.get("window");
 
@@ -176,15 +176,6 @@ const UserProfileScreen: React.FC = () => {
     }
   };
 
-  const openShareModal = () => {
-    setShareVisible(true);
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration: 250,
-      useNativeDriver: true,
-    }).start();
-  };
-
   const closeShareModal = () => {
     Animated.timing(slideAnim, {
       toValue: height,
@@ -206,8 +197,6 @@ const UserProfileScreen: React.FC = () => {
         navigation.navigate("ChatsScreen");
         break;
       case "Remove Friend":
-        // Логіка видалення друга
-
         setTimeout(() => {
           navigation.navigate("RemoveFriend");
         }, 300);
@@ -215,7 +204,7 @@ const UserProfileScreen: React.FC = () => {
       case "Block User":
         setTimeout(() => {
           navigation.navigate("FriendAlertBlockUser");
-        }, 300); // 2 секунди
+        }, 300);
         break;
       case "Report":
         setTimeout(() => {
@@ -258,11 +247,9 @@ const UserProfileScreen: React.FC = () => {
     </TouchableOpacity>
   );
 
-  // -----------------------------------
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
           <Ionicons name="chevron-back" size={28} color={COLORS.textDark} />
@@ -278,7 +265,6 @@ const UserProfileScreen: React.FC = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Profile */}
         <View style={styles.profileBlock}>
           <View style={styles.topRow}>
             <Image source={USER_DATA.avatar} style={styles.avatar} />
@@ -298,7 +284,6 @@ const UserProfileScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Mutual friends */}
         <View style={styles.mutualRow}>
           <View style={styles.mutualLeft}>
             <Text style={styles.mutualCount}>
@@ -322,7 +307,6 @@ const UserProfileScreen: React.FC = () => {
           </ScrollView>
         </View>
 
-        {/* Past Orders */}
         <View style={styles.pastOrdersHeader}>
           <Text style={styles.pastOrdersTitle}>Past Orders</Text>
         </View>
@@ -341,7 +325,6 @@ const UserProfileScreen: React.FC = () => {
         />
       </ScrollView>
 
-      {/* Popup Menu */}
       <Modal visible={menuVisible} transparent animationType="none">
         <TouchableWithoutFeedback onPress={toggleMenu}>
           <Animated.View style={[styles.overlay, { opacity: fadeAnim }]} />
@@ -383,7 +366,6 @@ const UserProfileScreen: React.FC = () => {
         </Animated.View>
       </Modal>
 
-      {/* Bottom Share Modal */}
       <Modal visible={shareVisible} transparent animationType="none">
         <TouchableWithoutFeedback onPress={closeShareModal}>
           <View style={styles.overlay} />
@@ -431,7 +413,6 @@ const UserProfileScreen: React.FC = () => {
                   if (o.label === "Message") {
                     navigation.navigate("ChatsScreen");
                   }
-                  // Інші опції можна додати пізніше
                 }}
               >
                 <View style={styles.shareIconCircle}>
@@ -466,8 +447,6 @@ const UserProfileScreen: React.FC = () => {
 
 export default UserProfileScreen;
 
-// --------------------------------------------------
-// СТИЛІ
 const PADDING_HORIZONTAL = 20;
 const AVATAR_SIZE = 80;
 const FRIEND_AVATAR_SIZE = 56;
@@ -560,7 +539,6 @@ const styles = StyleSheet.create({
     height: 16,
   },
   friendName: { fontSize: 11, color: COLORS.textGrey, textAlign: "center" },
-
   pastOrdersHeader: { paddingVertical: 12, alignItems: "center" },
   pastOrdersTitle: { fontSize: 18, fontWeight: "600", color: COLORS.textDark },
   orderItemContainer: { width: GRID_ITEM_SIZE, height: GRID_ITEM_SIZE * 1.5 },
@@ -595,8 +573,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 18,
   },
   menuText: { fontSize: 16, color: COLORS.textDark, fontWeight: "500" },
-
-  // Share Modal
   shareSheet: {
     position: "absolute",
     bottom: 0,

@@ -3,18 +3,17 @@ import {
   View,
   Text,
   TouchableOpacity,
-  SafeAreaView,
   StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import {SafeAreaView} from "react-native-safe-area-context";
+import {COLORS} from "../../constants/colors";
 
-// Типи для навігації
 type RootStackParamList = {
   ResetPassword4: undefined;
-  SignIn: undefined;
-  SignUp: undefined;
+  Auth: undefined;
 };
 
 type ResetPassword4NavigationProp = NativeStackNavigationProp<
@@ -25,22 +24,12 @@ type ResetPassword4NavigationProp = NativeStackNavigationProp<
 export default function SuccessScreen() {
   const navigation = useNavigation<ResetPassword4NavigationProp>();
 
-  const handleContinue = () => {
-    navigation.navigate("SignIn");
-  };
-
-  const handleBack = () => {
-    navigation.navigate("SignUp");
-  };
-
   return (
     <SafeAreaView style={styles.container}>
-      {/* Кнопка назад */}
-      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
         <Ionicons name="chevron-back" size={22} color="black" />
       </TouchableOpacity>
 
-      {/* Контент */}
       <View style={styles.content}>
         <Text style={styles.title}>Successful</Text>
         <Text style={styles.subtitle}>
@@ -48,7 +37,7 @@ export default function SuccessScreen() {
           to login
         </Text>
 
-        <TouchableOpacity style={styles.button} onPress={handleContinue}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Auth")}>
           <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
       </View>
@@ -59,11 +48,11 @@ export default function SuccessScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-    paddingHorizontal: 24,
+    backgroundColor: COLORS.white,
   },
   backButton: {
     marginTop: 10,
+    marginLeft: 20
   },
   content: {
     flex: 1,
@@ -74,13 +63,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#000",
+    color: COLORS.black,
     textAlign: "center",
   },
   subtitle: {
     marginTop: 8,
     fontSize: 14,
-    color: "#555",
+    color: COLORS.black,
     textAlign: "center",
     lineHeight: 20,
   },
@@ -88,13 +77,13 @@ const styles = StyleSheet.create({
     marginTop: 40,
     width: "90%",
     height: 50,
-    backgroundColor: "#C56B57",
+    backgroundColor: COLORS.orange,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
   },
   buttonText: {
-    color: "#FFFFFF",
+    color: COLORS.white,
     fontSize: 16,
     fontWeight: "600",
   },

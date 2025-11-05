@@ -82,7 +82,7 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
           Please enter your email{"\n"}to reset the password
         </Text>
 
-        {/* 📧 Поле вводу Email */}
+        {/* 📧 Поле вводу EnterEmail */}
         <TextInput
           style={styles.input}
           placeholder="example@gmail.com"

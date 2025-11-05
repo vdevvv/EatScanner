@@ -1,20 +1,25 @@
-import React, { useState } from "react";
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import {Ionicons} from "@expo/vector-icons";
+import {useNavigation} from "@react-navigation/native";
+import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+import {SafeAreaView} from "react-native-safe-area-context";
+import {Controller, useForm} from "react-hook-form";
+import {emailSchema, EmailSchema} from "../../schemas/auth/email.schema";
+import {zodResolver} from "@hookform/resolvers/zod";
+import {handleApiError} from "../../utils/handleApiError";
+import {commonStyles} from "../../components/Auth/common.styles";
+import {useResetPassword} from "../../hooks/auth";
+import {getInputWrapperStyles} from "../../utils/helpers";
 
-// Типи для навігації
 type RootStackParamList = {
   ResetPassword1: undefined;
-  ResetPassword2: undefined;
+  ResetPassword2: {userId: string};
   SignUp: undefined;
 };
 
@@ -25,26 +30,30 @@ type ResetPasswordNavigationProp = NativeStackNavigationProp<
 
 export default function ForgotPasswordScreen() {
   const navigation = useNavigation<ResetPasswordNavigationProp>();
-  const [email, setEmail] = useState("");
+  const {mutate, isPending} = useResetPassword();
+  const {
+    control,
+    handleSubmit,
+    formState: {errors, isValid},
+  } = useForm<EmailSchema>({
+    resolver: zodResolver(emailSchema)
+  });
 
-  const isEmailEntered = email.trim().length > 0;
-
-  const handleResetPassword = () => {
-    navigation.navigate("ResetPassword2");
-  };
-
-  const handleBack = () => {
-    navigation.navigate("SignUp");
-  };
+  const onSubmit = async (payload: EmailSchema) => {
+    mutate(payload, {
+      onSuccess: ({userId}) => {
+        navigation.navigate("ResetPassword2", {userId});
+      },
+      onError: (error) => handleApiError(error),
+    });
+  }
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Назад */}
-      <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-        <Ionicons name="chevron-back" size={22} color="black" />
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Ionicons name="chevron-back" size={22} color="black"/>
       </TouchableOpacity>
 
-      {/* Контент */}
       <View style={styles.content}>
         <Text style={styles.title}>Forgot password</Text>
         <Text style={styles.subtitle}>
@@ -52,27 +61,31 @@ export default function ForgotPasswordScreen() {
         </Text>
 
         <View style={styles.form}>
-          <TextInput
-            style={styles.input}
-            placeholder="example@gmail.com"
-            placeholderTextColor="#BDBDBD"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
+          <Controller
+            control={control}
+            name='email'
+            render={({field: {onChange, value, onBlur}}) => (
+              <TextInput
+                style={[styles.input, getInputWrapperStyles(value)]}
+                placeholder="example@gmail.com"
+                placeholderTextColor="#BDBDBD"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                onBlur={onBlur}
+                value={value}
+                onChangeText={onChange}
+              />
+            )}
           />
+          {errors.email && <Text style={commonStyles.errorText}>{errors.email.message}</Text>}
 
           <TouchableOpacity
-            style={[styles.button, isEmailEntered && styles.buttonActive]}
-            disabled={!isEmailEntered}
-            onPress={handleResetPassword}
+            disabled={!isValid || isPending}
+            style={[styles.button, isValid && styles.buttonActive]}
+            onPress={handleSubmit(onSubmit)}
           >
-            <Text
-              style={[
-                styles.buttonText,
-                isEmailEntered && styles.buttonTextActive,
-              ]}
-            >
-              Reset Password
+            <Text style={[styles.buttonText, isValid && styles.buttonTextActive]}>
+              {isPending ? 'Loading...' : 'Reset Password'}
             </Text>
           </TouchableOpacity>
         </View>
@@ -85,10 +98,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    paddingHorizontal: 20,
   },
   backButton: {
     marginTop: 10,
+    marginLeft: 20,
   },
   content: {
     marginTop: 80,
@@ -108,14 +121,13 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
   form: {
-    width: "85%", // 👈 тепер не на всю ширину екрану
+    width: "85%",
     marginTop: 30,
   },
   input: {
     width: "100%",
     height: 48,
     borderWidth: 1,
-    borderColor: "#E0E0E0",
     borderRadius: 8,
     paddingHorizontal: 14,
     fontSize: 14,

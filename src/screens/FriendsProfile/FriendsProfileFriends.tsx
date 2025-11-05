@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   FlatList,
   TextInput,
   TouchableOpacity,
@@ -12,6 +11,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type RootStackParamList = {
   HomePageScreen: undefined;
@@ -33,14 +33,13 @@ const COLORS = {
   divider: "#E5E7EB",
 };
 
-// Демодані
 const FRIENDS = [
   {
     id: "1",
     name: "Iryna Hvozdetska",
     handle: "@foodie_iryna",
     avatar: require("../../assets/friend1.jpg"),
-    status: "add", // add | cancel | message
+    status: "add",
   },
   {
     id: "2",
@@ -107,30 +106,12 @@ export default function FriendsListScreen() {
     navigation.goBack();
   };
 
-  const handleHomePress = () => {
-    navigation.navigate("HomePageScreen");
-  };
-
-  const handleDiscoveryPress = () => {
-    navigation.navigate("Discovery");
-  };
-
-  const handleFriendsPress = () => {
-    console.log("Friends pressed");
-  };
-
-  const handleProfilePress = () => {
-    navigation.navigate("MyProfileScreen");
-  };
-
   const handleFriendPress = (friendId: string) => {
     navigation.navigate("FriendsProfileScreen");
   };
 
-  // Функції для обробки натискань кнопок дій
   const handleAddFriend = (friendId: string) => {
     console.log(`Adding friend with ID: ${friendId}`);
-    // Видаляємо друга зі списку після додавання
     setFriendsList((prevList) =>
       prevList.filter((friend) => friend.id !== friendId)
     );
@@ -138,7 +119,6 @@ export default function FriendsListScreen() {
 
   const handleCancelRequest = (friendId: string) => {
     console.log(`Cancelling request for friend with ID: ${friendId}`);
-    // Видаляємо друга зі списку після скасування запиту
     setFriendsList((prevList) =>
       prevList.filter((friend) => friend.id !== friendId)
     );
@@ -197,7 +177,6 @@ export default function FriendsListScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
           <Ionicons name="chevron-back" size={26} color={COLORS.textDark} />
@@ -208,7 +187,6 @@ export default function FriendsListScreen() {
         <View style={{ width: 26 }} />
       </View>
 
-      {/* Search */}
       <View style={styles.searchContainer}>
         <Ionicons name="search-outline" size={18} color={COLORS.textGrey} />
         <TextInput
@@ -220,7 +198,6 @@ export default function FriendsListScreen() {
         />
       </View>
 
-      {/* List */}
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.id}
@@ -246,56 +223,9 @@ export default function FriendsListScreen() {
         contentContainerStyle={{ paddingHorizontal: 20, paddingVertical: 10 }}
         showsVerticalScrollIndicator={false}
       />
-
-      {/* 🔻 Bottom Navigation */}
-      <View style={styles.bottomTabBar}>
-        <TabBarItem
-          iconName="home-outline"
-          label="Home"
-          active={false}
-          onPress={handleHomePress}
-        />
-        <TabBarItem
-          iconName="search-outline"
-          label="Discovery"
-          active={false}
-          onPress={handleDiscoveryPress}
-        />
-        <TabBarItem
-          iconName="people-outline"
-          label="My Friends"
-          active={true}
-          onPress={handleFriendsPress}
-        />
-        <TabBarItem
-          iconName="person-outline"
-          label="Profile"
-          active={false}
-          onPress={handleProfilePress}
-        />
-      </View>
     </SafeAreaView>
   );
 }
-
-/* --- Tab Bar Item --- */
-const TabBarItem = ({ iconName, label, active, onPress }: any) => (
-  <TouchableOpacity style={styles.tabBarItem} onPress={onPress}>
-    <Ionicons
-      name={iconName}
-      size={24}
-      color={active ? COLORS.primary : COLORS.textGrey}
-    />
-    <Text
-      style={[
-        styles.tabBarLabel,
-        { color: active ? COLORS.primary : COLORS.textGrey },
-      ]}
-    >
-      {label}
-    </Text>
-  </TouchableOpacity>
-);
 
 const styles = StyleSheet.create({
   container: {
@@ -388,21 +318,4 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 14,
   },
-
-  /* --- Bottom Navigation --- */
-  bottomTabBar: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    height: 80,
-    borderTopColor: "#E0E0E0",
-    backgroundColor: COLORS.background,
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  tabBarItem: { alignItems: "center", flex: 1 },
-  tabBarLabel: { fontSize: 10, marginTop: 2, fontWeight: "500" },
 });

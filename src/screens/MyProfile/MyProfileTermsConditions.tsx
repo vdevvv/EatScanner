@@ -3,14 +3,13 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native"; // ✅ додано
+import { useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-// --- УМОВИ ТА ПОЛОЖЕННЯ ---
 const termsAndConditionsContent = {
   introduction:
     'Welcome to EatScanner. These Terms & Conditions ("Terms") govern your use of our mobile application and related services. By accessing or using the app, you agree to these Terms. If you do not agree, please do not use the app.',
@@ -92,7 +91,6 @@ const termsAndConditionsContent = {
   ],
 };
 
-// --- Типи ---
 interface TermsSectionData {
   title: string;
   paragraphs: string[];
@@ -104,7 +102,6 @@ interface TermsSectionProps {
   section: TermsSectionData;
 }
 
-// --- Компонент розділу ---
 const TermsSection: React.FC<TermsSectionProps> = ({ section }) => (
   <View style={styles.sectionContainer}>
     <Text style={styles.sectionTitle}>{section.title}</Text>
@@ -134,17 +131,15 @@ const TermsSection: React.FC<TermsSectionProps> = ({ section }) => (
   </View>
 );
 
-// --- Головний екран ---
 const TermsAndConditionsScreen: React.FC = () => {
-  const navigation = useNavigation(); // ✅ ініціалізація навігації
+  const navigation = useNavigation();
 
   const handleBack = () => {
-    navigation.goBack(); // ✅ повернення назад
+    navigation.goBack();
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Header */}
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <Ionicons name="chevron-back" size={28} color="#000" />
@@ -152,7 +147,6 @@ const TermsAndConditionsScreen: React.FC = () => {
         <Text style={styles.screenTitle}>Terms & Conditions</Text>
       </View>
 
-      {/* Контент */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.introductionText}>
           {termsAndConditionsContent.introduction}
@@ -166,7 +160,6 @@ const TermsAndConditionsScreen: React.FC = () => {
   );
 };
 
-// --- Стилі ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -176,7 +169,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
-    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#f2f2f2",
     backgroundColor: "#fff",

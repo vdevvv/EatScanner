@@ -64,10 +64,10 @@ export default function SignUpScreen() {
             Discover meals you love.{"\n"}Watch it. Want it. Get it.
           </Text>
 
-          {/* Email */}
+          {/* EnterEmail */}
           <TextInput
             style={styles.input}
-            placeholder="Email"
+            placeholder="EnterEmail"
             placeholderTextColor="#999"
             value={email}
             onChangeText={setEmail}

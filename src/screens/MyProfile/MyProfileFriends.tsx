@@ -1,23 +1,22 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  SafeAreaView,
   TextInput,
   Image,
   Dimensions,
   Platform,
   ImageSourcePropType,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import {Ionicons} from "@expo/vector-icons";
+import {useNavigation} from "@react-navigation/native";
+import {SafeAreaView} from "react-native-safe-area-context";
 
-const { width } = Dimensions.get("window");
+const {width} = Dimensions.get("window");
 
-// --- ІМІТАЦІЯ ДАНИХ ---
 const IMAGE_ASSETS = {
   profile1: 1,
   profile2: 2,
@@ -100,25 +99,23 @@ const SEARCH_RESULTS: Friend[] = [
   },
 ];
 
-// --- Аватар ---
 const getAvatarSource = (key: AvatarKey): ImageSourcePropType => {
   switch (key) {
     case "profile1":
-      return { uri: "https://placehold.co/50x50/E57373/FFFFFF?text=P1" };
+      return {uri: "https://placehold.co/50x50/E57373/FFFFFF?text=P1"};
     case "profile2":
-      return { uri: "https://placehold.co/50x50/3498DB/FFFFFF?text=P2" };
+      return {uri: "https://placehold.co/50x50/3498DB/FFFFFF?text=P2"};
     case "profile3":
-      return { uri: "https://placehold.co/50x50/2ECC71/FFFFFF?text=P3" };
+      return {uri: "https://placehold.co/50x50/2ECC71/FFFFFF?text=P3"};
     default:
-      return { uri: "https://placehold.co/50x50/9B59B6/FFFFFF?text=P4" };
+      return {uri: "https://placehold.co/50x50/9B59B6/FFFFFF?text=P4"};
   }
 };
 
-// --- Елемент списку ---
-const FriendListItemFixed: React.FC<{ 
-  friend: Friend; 
+const FriendListItemFixed: React.FC<{
+  friend: Friend;
   onRemoveFriend?: (friendId: string) => void;
-}> = ({ friend, onRemoveFriend }) => {
+}> = ({friend, onRemoveFriend}) => {
   const buttonText = friend.isFriend ? "Remove" : "Add";
   const buttonStyle = friend.isFriend
     ? styles.removeButtonContainer
@@ -154,7 +151,6 @@ const FriendListItemFixed: React.FC<{
   );
 };
 
-// --- Основний екран ---
 const FriendsScreenFinal: React.FC = () => {
   const navigation = useNavigation();
   const [searchText, setSearchText] = useState("");
@@ -167,7 +163,7 @@ const FriendsScreenFinal: React.FC = () => {
   };
 
   const handleRemoveFriend = (friendId: string) => {
-    setFriendsList(prevList => 
+    setFriendsList(prevList =>
       prevList.filter(friend => friend.id !== friendId)
     );
     console.log(`Friend with ID ${friendId} removed from list`);
@@ -175,16 +171,14 @@ const FriendsScreenFinal: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Шапка */}
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-          <Ionicons name="chevron-back" size={28} color="#333" />
+          <Ionicons name="chevron-back" size={28} color="#333"/>
         </TouchableOpacity>
         <Text style={styles.screenTitle}>Friends</Text>
-        <View style={{ width: 48 }} />
+        <View style={{width: 48}}/>
       </View>
 
-      {/* Пошук */}
       <View style={styles.searchBarContainer}>
         <Ionicons
           name="search-outline"
@@ -204,20 +198,19 @@ const FriendsScreenFinal: React.FC = () => {
             onPress={() => setSearchText("")}
             style={styles.clearButton}
           >
-            <Ionicons name="close-circle" size={20} color="#999" />
+            <Ionicons name="close-circle" size={20} color="#999"/>
           </TouchableOpacity>
         )}
       </View>
 
-      {/* Список друзів */}
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
         {displayList.map((friend) => (
-          <FriendListItemFixed 
-            key={friend.id} 
-            friend={friend} 
+          <FriendListItemFixed
+            key={friend.id}
+            friend={friend}
             onRemoveFriend={handleRemoveFriend}
           />
         ))}
@@ -234,7 +227,6 @@ const FriendsScreenFinal: React.FC = () => {
   );
 };
 
-// --- СТИЛІ ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -283,7 +275,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     ...Platform.select({
-      android: { paddingVertical: 0 },
+      android: {paddingVertical: 0},
     }),
   },
   clearButton: {

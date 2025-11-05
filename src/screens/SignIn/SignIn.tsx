@@ -16,7 +16,6 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-// Типи для навігації
 type RootStackParamList = {
   CheckEmailscreen: undefined;
   SignIn: undefined;
@@ -44,7 +43,7 @@ export default function AuthScreen() {
     }
 
     console.log("Sign In:", email, password);
-    navigation.navigate("HomePageScreen"); // тимчасово, до інтеграції бекенду
+    navigation.navigate("HomePageScreen");
   };
 
   const handleSignUp = () => {
@@ -76,9 +75,7 @@ export default function AuthScreen() {
             />
           </View>
 
-          {/* Контент під логотипом */}
           <View style={styles.contentWrapper}>
-            {/* Tabs */}
             <View style={styles.tabContainer}>
               <TouchableOpacity
                 style={[styles.tab, activeTab === "signin" && styles.activeTab]}
@@ -98,7 +95,7 @@ export default function AuthScreen() {
                 style={[styles.tab, activeTab === "signup" && styles.activeTab]}
                 onPress={() => {
                   setActiveTab("signup");
-                  navigation.navigate("SignUp");
+                  // navigation.navigate("SignUp");
                 }}
               >
                 <Text
@@ -112,7 +109,6 @@ export default function AuthScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Welcome Text */}
             <View style={styles.welcomeContainer}>
               <Text style={styles.welcomeTitle}>Welcome!</Text>
               <Text style={styles.welcomeSubtitle}>
@@ -120,10 +116,9 @@ export default function AuthScreen() {
               </Text>
             </View>
 
-            {/* Email Input */}
             <View style={styles.inputContainer}>
               <TextInput
-                placeholder="Email"
+                placeholder="EnterEmail"
                 placeholderTextColor="#aaa"
                 value={email}
                 onChangeText={setEmail}
@@ -133,7 +128,6 @@ export default function AuthScreen() {
               />
             </View>
 
-            {/* Password Input */}
             <View style={styles.inputContainer}>
               <TextInput
                 placeholder="Password"
@@ -155,7 +149,6 @@ export default function AuthScreen() {
               </TouchableOpacity>
             </View>
 
-            {/* Sign In / Sign Up Button */}
             <TouchableOpacity
               style={[
                 styles.button,
@@ -171,7 +164,6 @@ export default function AuthScreen() {
               </Text>
             </TouchableOpacity>
 
-            {/* Reset Password */}
             {activeTab === "signin" && (
               <View style={styles.resetContainer}>
                 <Text style={styles.resetText}>Forgot your password?</Text>
@@ -184,7 +176,6 @@ export default function AuthScreen() {
             )}
           </View>
 
-          {/* Terms & Privacy */}
           <View style={styles.termsContainer}>
             <Text style={styles.termsText}>
               By logging in, you confirm you agree to{" "}

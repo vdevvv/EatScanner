@@ -1,9 +1,8 @@
-import React, { useState, useMemo } from "react";
+import React, {useState, useMemo, FC} from "react";
 import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   TextInput,
   ScrollView,
@@ -13,8 +12,8 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-// --- Типи для навігації ---
 type RootStackParamList = {
   HomePageScreen: undefined;
   Discovery: undefined;
@@ -30,7 +29,6 @@ type RootStackParamList = {
   SavedScreen: undefined;
 };
 
-// --- ІНТЕРФЕЙС ---
 interface MealItem {
   id: string;
   title: string;
@@ -38,7 +36,6 @@ interface MealItem {
   image: any;
 }
 
-// --- ЛОКАЛЬНІ ДАНІ ---
 const mockMeals: MealItem[] = [
   {
     id: "m1",
@@ -78,7 +75,6 @@ const mockMeals: MealItem[] = [
   },
 ];
 
-// --- КАРТКА СТРАВИ ---
 const MealCard: React.FC<{ item: MealItem }> = ({ item }) => (
   <TouchableOpacity style={styles.cardContainer}>
     <Image source={item.image} style={styles.cardImage} resizeMode="cover" />
@@ -92,7 +88,6 @@ const MealCard: React.FC<{ item: MealItem }> = ({ item }) => (
   </TouchableOpacity>
 );
 
-// --- СЕКЦІЯ ---
 const MealSection: React.FC<{ title: string; data: MealItem[] }> = ({
   title,
   data,
@@ -118,82 +113,17 @@ const MealSection: React.FC<{ title: string; data: MealItem[] }> = ({
   );
 };
 
-// --- НИЖНЯ ПАНЕЛЬ ---
-const TabBar: React.FC<{
-  onHomePress: () => void;
-  onDiscoveryPress: () => void;
-  onFriendsPress: () => void;
-  onProfilePress: () => void;
-}> = ({
-  onHomePress,
-  onDiscoveryPress,
-  onFriendsPress,
-  onProfilePress,
-}) => {
-  const tabs = [
-    { name: "Home", icon: "home-outline", active: false, onPress: onHomePress },
-    {
-      name: "Discovery",
-      icon: "search-outline",
-      active: true,
-      onPress: onDiscoveryPress,
-    },
-    {
-      name: "Friends",
-      icon: "people-outline",
-      active: false,
-      onPress: onFriendsPress,
-    },
-    {
-      name: "Profile",
-      icon: "person-outline",
-      active: false,
-      onPress: onProfilePress,
-    },
-  ];
-
-  return (
-    <View style={styles.tabBarContainer}>
-      {tabs.map((tab) => (
-        <TouchableOpacity
-          key={tab.name}
-          style={styles.tabItem}
-          onPress={tab.onPress}
-        >
-          <Ionicons
-            name={tab.icon as any}
-            size={24}
-            color={tab.active ? "#E9725C" : "#999"}
-          />
-          <Text
-            style={[styles.tabText, { color: tab.active ? "#E9725C" : "#999" }]}
-          >
-            {tab.name}
-          </Text>
-        </TouchableOpacity>
-      ))}
-    </View>
-  );
-};
-
-// --- ГОЛОВНИЙ ЕКРАН ---
 type DiscoveryNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Discovery"
 >;
 
-const DiscoveryScreen: React.FC = () => {
+const DiscoveryScreen: FC = () => {
   const navigation = useNavigation<DiscoveryNavigationProp>();
   const [searchQuery, setSearchQuery] = useState("");
 
-  // --- Навігація табів ---
-  const handleHomePress = () => navigation.navigate("HomePageScreen");
-  const handleDiscoveryPress = () => {}; // вже на цьому екрані
-  const handleFriendsPress = () => navigation.navigate("FriendsProfileFriends");
-  const handleProfilePress = () => navigation.navigate("MyProfileScreen");
   const handleFiltersPress = () => navigation.navigate("DiscoveryFiltersPage");
 
-  // --- Фільтрація ---
   const filteredMeals = useMemo(() => {
     if (!searchQuery.trim()) return mockMeals;
     return mockMeals.filter(
@@ -206,7 +136,6 @@ const DiscoveryScreen: React.FC = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        {/* Локація */}
         <View style={styles.locationContainer}>
           <Text style={styles.locationLabel}>Current location</Text>
           <View style={styles.locationDetails}>
@@ -215,7 +144,6 @@ const DiscoveryScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Пошук */}
         <View style={styles.searchContainer}>
           <Ionicons
             name="search-outline"
@@ -238,7 +166,6 @@ const DiscoveryScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Секції */}
         <MealSection title="Recommended for you:" data={filteredMeals} />
         <MealSection title="Gluten-Free:" data={filteredMeals.slice(1, 4)} />
         <MealSection title="Vegetarian:" data={filteredMeals.slice(0, 3)} />
@@ -246,18 +173,10 @@ const DiscoveryScreen: React.FC = () => {
 
         <View style={{ height: 100 }} />
       </ScrollView>
-
-      <TabBar
-        onHomePress={handleHomePress}
-        onDiscoveryPress={handleDiscoveryPress}
-        onFriendsPress={handleFriendsPress}
-        onProfilePress={handleProfilePress}
-      />
     </SafeAreaView>
   );
 };
 
-// --- СТИЛІ ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -355,21 +274,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     marginLeft: 3,
   },
-  tabBarContainer: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    height: 80,
-    borderTopColor: "#E0E0E0",
-    backgroundColor: "#fff",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  tabItem: { alignItems: "center", flex: 1 },
-  tabText: { fontSize: 10, marginTop: 2, fontWeight: "500" },
 });
 
 export default DiscoveryScreen;

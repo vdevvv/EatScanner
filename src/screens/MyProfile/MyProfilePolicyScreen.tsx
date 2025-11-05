@@ -3,15 +3,14 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   TouchableOpacity,
   ScrollView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-// --- Типізація навігації ---
 type RootStackParamList = {
   PrivacyPolicyScreen: undefined;
   MyProfileScreen: undefined;
@@ -34,7 +33,7 @@ const privacyPolicyContent = {
           text: "We may collect the following:",
           list: [
             "Name and profile photo",
-            "Email address or phone number",
+            "EnterEmail address or phone number",
             "Location (for delivery and restaurant suggestions)",
             "Payment and billing information (via secure third-party processors)",
           ],
@@ -118,7 +117,6 @@ const privacyPolicyContent = {
   ],
 };
 
-// --- ІНТЕРФЕЙСИ ---
 interface PolicyItem {
   subtitle?: string;
   text: string | null;
@@ -137,14 +135,12 @@ interface PolicySectionProps {
   section: PolicySectionData;
 }
 
-// --- КОМПОНЕНТ ОКРЕМОГО РОЗДІЛУ ---
 const PolicySection: React.FC<PolicySectionProps> = ({ section }) => (
   <View style={styles.sectionContainer}>
     <Text style={styles.sectionTitle}>{section.title}</Text>
 
     {section.text && <Text style={styles.sectionText}>{section.text}</Text>}
 
-    {/* Якщо є підрозділи */}
     {section.items &&
       section.items.map((item, index) => (
         <View key={index} style={styles.itemContainer}>
@@ -165,7 +161,6 @@ const PolicySection: React.FC<PolicySectionProps> = ({ section }) => (
         </View>
       ))}
 
-    {/* Якщо просто список */}
     {!section.items && section.list && (
       <View style={styles.listContainer}>
         {section.list.map((listItem, liIndex) => (
@@ -183,17 +178,15 @@ const PolicySection: React.FC<PolicySectionProps> = ({ section }) => (
   </View>
 );
 
-// --- ГОЛОВНИЙ КОМПОНЕНТ ---
 const PrivacyPolicyScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
 
   const handleBack = () => {
-    navigation.goBack(); // ✅ повернення на попередній екран
+    navigation.goBack();
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Header */}
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <Ionicons name="chevron-back" size={28} color="#000" />
@@ -201,7 +194,6 @@ const PrivacyPolicyScreen: React.FC = () => {
         <Text style={styles.screenTitle}>Privacy Policy</Text>
       </View>
 
-      {/* Content */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.introductionText}>
           {privacyPolicyContent.introduction}
@@ -215,7 +207,6 @@ const PrivacyPolicyScreen: React.FC = () => {
   );
 };
 
-// --- СТИЛІ ---
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
@@ -229,7 +220,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 10,
-    paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: "#f5f5f5",
   },

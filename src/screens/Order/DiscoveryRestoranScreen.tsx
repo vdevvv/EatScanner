@@ -36,7 +36,6 @@ const PASTA_SMALL_IMAGE = require("../../assets/pasta.jpg");
 
 const { width } = Dimensions.get("window");
 
-// --- Дані ---
 interface HighlightedItem {
   id: number;
   name: string;
@@ -171,38 +170,6 @@ const MenuItemCard: React.FC<{
   </TouchableOpacity>
 );
 
-// --- Компонент нижньої панелі ---
-const TabBarItem = ({
-  iconName,
-  label,
-  onPress,
-  active = false,
-}: {
-  iconName: keyof typeof Ionicons.glyphMap;
-  label: string;
-  onPress: () => void;
-  active?: boolean;
-}) => (
-  <TouchableOpacity
-    onPress={onPress}
-    style={[styles.tabItem, active && styles.tabItemActive]}
-  >
-    <Ionicons
-      name={iconName}
-      size={22}
-      color={active ? "#E57373" : "#999"}
-      style={{ marginBottom: 2 }}
-    />
-    <Text
-      style={[styles.tabLabel, { color: active ? "#E57373" : "#999" }]}
-      numberOfLines={1}
-    >
-      {label}
-    </Text>
-  </TouchableOpacity>
-);
-
-// --- Головний екран ---
 const DiscoveryRestoranScreen: React.FC = () => {
   const navigation = useNavigation<DiscoveryRestoranNavigationProp>();
   const insets = useSafeAreaInsets();
@@ -223,7 +190,6 @@ const DiscoveryRestoranScreen: React.FC = () => {
         translucent
       />
 
-      {/* Верхній банер */}
       <ImageBackground source={MAIN_IMAGE} style={styles.headerImageBackground}>
         <View style={[styles.headerContentOverlay, { paddingTop: insets.top }]}>
           <TouchableOpacity style={styles.backButton} onPress={handleBackPress}>
@@ -236,7 +202,6 @@ const DiscoveryRestoranScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollViewContentContainer}
       >
-        {/* Інфо ресторану */}
         <View style={styles.infoBlock}>
           <Text style={styles.restaurantTitle}>La Pasta House</Text>
           <Text style={styles.restaurantSubtitle}>
@@ -265,7 +230,6 @@ const DiscoveryRestoranScreen: React.FC = () => {
           </View>
         </View>
 
-        {/* Виділені страви */}
         <View style={styles.highlightedSection}>
           <View style={styles.highlightedHeader}>
             <Text style={styles.sectionTitle}>Highlighted items:</Text>
@@ -285,7 +249,6 @@ const DiscoveryRestoranScreen: React.FC = () => {
           </ScrollView>
         </View>
 
-        {/* Меню */}
         <View style={styles.menuSection}>
           <Text style={styles.sectionTitle}>Menu</Text>
           <View style={styles.filterContainer}>
@@ -294,7 +257,7 @@ const DiscoveryRestoranScreen: React.FC = () => {
             <MenuFilterButton icon="🥤" label="Drink" isActive={false} />
           </View>
 
-          <View style={styles.menuList}>
+          <View>
             {MENU_ITEMS.map((item) => (
               <MenuItemCard
                 key={item.id}
@@ -305,36 +268,10 @@ const DiscoveryRestoranScreen: React.FC = () => {
           </View>
         </View>
       </ScrollView>
-
-      {/* Нижня панель навігації */}
-      <View style={styles.bottomTabBar}>
-        <TabBarItem
-          iconName="home-outline"
-          label="Home"
-          onPress={() => navigation.navigate("HomePageScreen")}
-        />
-        <TabBarItem
-          iconName="search-outline"
-          label="Discovery"
-          active
-          onPress={() => navigation.navigate("DiscoveryRestoranScreen")}
-        />
-        <TabBarItem
-          iconName="people-outline"
-          label="My Friends"
-          onPress={() => navigation.navigate("FriendsProfileFriends")}
-        />
-        <TabBarItem
-          iconName="person-outline"
-          label="Profile"
-          onPress={() => navigation.navigate("MyProfileScreen")}
-        />
-      </View>
     </View>
   );
 };
 
-// --- Стилі ---
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
   headerImageBackground: {
@@ -471,30 +408,6 @@ const styles = StyleSheet.create({
   menuItemTitle: { fontSize: 16, fontWeight: "600", color: "#333" },
   menuItemDescription: { fontSize: 13, color: "#888", marginVertical: 3 },
   menuItemPrice: { fontSize: 16, fontWeight: "700", color: "#E57373" },
-
-  // --- Нижня навігація ---
-  bottomTabBar: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
-    backgroundColor: "#fff",
-  },
-  tabItem: {
-    alignItems: "center",
-    justifyContent: "center",
-    flex: 1,
-  },
-  tabItemActive: {},
-  tabLabel: {
-    fontSize: 11,
-    fontWeight: "500",
-    textAlign: "center",
-  },
-  menuList: {}
 });
 
 export default DiscoveryRestoranScreen;

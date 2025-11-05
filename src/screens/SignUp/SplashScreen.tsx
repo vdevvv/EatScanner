@@ -1,11 +1,9 @@
-// screens/WelcomeScreen.tsx
 import React, { useEffect } from "react";
 import { StyleSheet, ImageBackground, StatusBar, View } from "react-native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../App";
 
-// імпорт локального зображення
 const BACKGROUND_IMAGE = require("../../assets/background.png");
 
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<
@@ -19,7 +17,7 @@ const WelcomeScreen: React.FC = () => {
   useEffect(() => {
     const timeout = setTimeout(() => {
       navigation.navigate("HomePageScreen");
-    }, 2000); // 2 секунди
+    }, 2000);
 
     return () => clearTimeout(timeout);
   }, [navigation]);

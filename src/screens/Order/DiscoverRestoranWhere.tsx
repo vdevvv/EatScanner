@@ -57,7 +57,6 @@ const DELIVERY_OPTIONS: DeliveryOption[] = [
   },
 ];
 
-/* ---------------- Компонент шапки ресторану ---------------- */
 const RestaurantHeader: React.FC<{
   restaurantName: string;
   restaurantSubtitle: string;
@@ -91,7 +90,6 @@ const RestaurantHeader: React.FC<{
   </View>
 );
 
-/* ---------------- Карточка опції доставки ---------------- */
 const DeliveryOptionCard: React.FC<{
   option: DeliveryOption;
   isSelected: boolean;
@@ -139,7 +137,6 @@ const DeliveryOptionCard: React.FC<{
   );
 };
 
-/* ---------------- Головний екран ---------------- */
 const DiscoverRestoranWhere: React.FC = () => {
   const navigation = useNavigation();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -169,7 +166,6 @@ const DiscoverRestoranWhere: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* ---------- Header ---------- */}
       <View style={styles.headerContainer}>
         <TouchableOpacity
           style={styles.backButton}
@@ -194,7 +190,7 @@ const DiscoverRestoranWhere: React.FC = () => {
         <View style={styles.optionsSection}>
           <Text style={styles.availableOnTitle}>Available on:</Text>
 
-          <View style={styles.deliveryList}>
+          <View>
             {DELIVERY_OPTIONS.map((option) => (
               <DeliveryOptionCard
                 key={option.id}
@@ -230,7 +226,6 @@ const DiscoverRestoranWhere: React.FC = () => {
   );
 };
 
-/* ---------------- Стилі ---------------- */
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: "#fff" },
   headerContainer: {

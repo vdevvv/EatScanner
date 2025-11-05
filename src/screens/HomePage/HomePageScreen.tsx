@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import {DishData} from "../../components/restaurantItem";
 import React, {useRef, useState} from "react";
-import TabBars from "./TabBars";
 import {Ionicons} from "@expo/vector-icons";
 import {StyleSheet} from "react-native";
 import {useIsFocused, useNavigation} from "@react-navigation/native";
@@ -136,7 +135,6 @@ const HomePageScreen = () => {
     });
   };
 
-
   return (
     <View style={{flex: 1, backgroundColor: '#000'}}>
       <StatusBar
@@ -195,7 +193,6 @@ const HomePageScreen = () => {
           />
         )}
       />
-      <TabBars/>
     </View>
   );
 };

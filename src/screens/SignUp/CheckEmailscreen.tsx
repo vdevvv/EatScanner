@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../App"; // Імпорт типів навігації
+import { RootStackParamList } from "../../../App";
 
 type AuthScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -24,19 +24,18 @@ const AuthScreen = () => {
 
   const handleSubmit = () => {
     if (activeTab === "signup") {
-      navigation.navigate("SignUpConfirmationCode1"); // 🔥 перехід на екран підтвердження
+      navigation.navigate("SignUpConfirmationCode1");
     } else {
-      navigation.navigate("SignIn"); // 🔥 перехід на сторінку Sign In
+      navigation.navigate("SignIn");
     }
   };
 
   const handleSignInTabPress = () => {
-    navigation.navigate("SignIn"); // 🔥 перехід на сторінку Sign In при натисканні табу
+    navigation.navigate("SignIn");
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Лого позаду */}
       <View style={styles.logoContainer}>
         <Image
           source={require("../../assets/logoScaner.png")}
@@ -46,9 +45,7 @@ const AuthScreen = () => {
       </View>
 
       <View style={styles.content}>
-        {/* Верхня частина */}
         <View style={styles.topSection}>
-          {/* Tabs */}
           <View style={styles.tabContainer}>
             <TouchableOpacity onPress={handleSignInTabPress} style={styles.tab}>
               <Text
@@ -75,8 +72,6 @@ const AuthScreen = () => {
               </Text>
             </TouchableOpacity>
           </View>
-
-          {/* Підкреслення активного табу */}
           <View style={styles.tabUnderlineContainer}>
             <View
               style={[
@@ -85,24 +80,18 @@ const AuthScreen = () => {
               ]}
             />
           </View>
-
-          {/* Заголовки */}
           <Text style={styles.title}>Enter your email</Text>
           <Text style={styles.subtitle}>
             We asking your email to send you verification code{"\n"}to confirm
             your account
           </Text>
-
-          {/* Поле вводу */}
           <TextInput
             style={styles.input}
-            placeholder="Email"
+            placeholder="EnterEmail"
             placeholderTextColor="#999"
             value={email}
             onChangeText={setEmail}
           />
-
-          {/* Кнопка */}
           <TouchableOpacity
             style={[
               styles.submitButton,
@@ -122,16 +111,13 @@ const AuthScreen = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Нижня частина - соціальні кнопки */}
         <View style={styles.bottomSection}>
-          {/* Divider */}
           <View style={styles.dividerContainer}>
             <View style={styles.line} />
             <Text style={styles.orText}>Or with</Text>
             <View style={styles.line} />
           </View>
 
-          {/* Social buttons */}
           <TouchableOpacity style={styles.socialButton}>
             <Image
               source={require("../../assets/google.png")}
@@ -162,11 +148,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-
-  // --- Лого ---
   logoContainer: {
     position: "absolute",
-    top: 20, // 🔼 зміщено вище
+    top: 20,
     alignSelf: "center",
     zIndex: -1,
     pointerEvents: "none",
@@ -177,8 +161,6 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     opacity: 0.95,
   },
-
-  // --- Основний контент ---
   content: {
     flex: 1,
     alignItems: "center",
@@ -195,7 +177,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     width: "100%",
   },
-
   tabContainer: {
     flexDirection: "row",
     justifyContent: "center",

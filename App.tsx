@@ -1,51 +1,14 @@
-// App.tsx
-import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import WelcomeScreen from "./src/screens/SignUp/SplashScreen";
-import OnBoarding1Screen from "./src/screens/SignUp/OnBoarding1Screen";
-import OnBoarding2Screen from "./src/screens/SignUp/OnBoarding2Screen";
-import OnBoarding3Screen from "./src/screens/SignUp/OnBoarding3Screen";
-import OnBoarding4Screen from "./src/screens/SignUp/OnBoarding4Screen";
-import OnBoarding5Screen from "./src/screens/SignUp/OnBoarding5Screen";
-import CheckEmailscreen from "./src/screens/SignUp/CheckEmailscreen";
-import SignUpConfirmationCode1 from "./src/screens/SignUp/SignUpConfirmationCode1";
-import SignUpSetPassword1 from "./src/screens/SignUp/SignUpSetPassword1";
-import SignUp from "./src/screens/SignUp/SignUp";
-import MyProfileScreen from "./src/screens/MyProfile/MyProfileScreen";
-import AuthScreen from "./src/screens/SignIn/SplashScreen";
-import HomePageScreen from "./src/screens/HomePage/HomePageScreen";
-import FriendsProfileScreen from "./src/screens/FriendsProfile/FriendsProfileScreen";
-import Discovery from "./src/screens/Discovery/DiscoveryPage";
-import FriendsProfileFriends from "./src/screens/FriendsProfile/FriendsProfileFriends";
-import Notifications from "./src/screens/Notifications/Notifications";
-import Order from "./src/screens/Order/DiscoveryRestoranScreen";
-import Splash from "./src/screens/SignIn/SplashScreen";
-import SignIn from "./src/screens/SignIn/SignIn";
-import FriendLockedInfo from "./src/screens/FriendsProfile/FriendLockedInfo";
-import FriendsProfileScreenShare from "./src/screens/FriendsProfile/FriendsProfileScreenShare";
-import RemoveFriend from "./src/screens/FriendsProfile/RemoveFriend";
-import FriendAlertBlockUser from "./src/screens/FriendsProfile/FriendAlertBlockUser";
-import BlockUser from "./src/screens/FriendsProfile/BlockUser";
-import FriendsReportUser from "./src/screens/FriendsProfile/FriendsReportUser";
-import ResetPassword1 from "./src/screens/ResetPassword/ResetPassword1";
-import ResetPassword2 from "./src/screens/ResetPassword/ResetPassword2";
-import ResetPassword3 from "./src/screens/ResetPassword/ResetPassword3";
-import ResetPassword4 from "./src/screens/ResetPassword/ResetPassword4";
-import DiscoveryFiltersPage from "./src/screens/Discovery/DiscoveryFiltersPage";
-import MyProfileSettings from "./src/screens/MyProfile/MyProfileSettings";
-import MyProfilePolicyScreen from "./src/screens/MyProfile/MyProfilePolicyScreen";
-import MyProfileTermsConditions from "./src/screens/MyProfile/MyProfileTermsConditions";
-import MyProfileHelpSuport from "./src/screens/MyProfile/MyProfileHelpSuport";
-import MyProfileEdit from "./src/screens/MyProfile/MyProfileEdit";
-import MyProfileChangePassword from "./src/screens/MyProfile/MyProfileChangePassword";
-import MyProfileSaved from "./src/screens/MyProfile/MyProfileSaved";
-import FriendsScreen from "./src/screens/MyProfile/MyProfileFriends";
-import DiscoverRestoranWhere from "./src/screens/Order/DiscoverRestoranWhere";
-import DishDetailScreen from "./src/screens/Order/DiscoveryRestoranScreen";
-import DiscoveryRestoranOrderScreen from "./src/screens/Order/DiscoveryRestoranOrderScreen";
+import React, {useEffect} from 'react';
+import {useAuthStore} from "./src/stores/useAuthStore";
+import {NavigationContainer} from "@react-navigation/native";
+import AuthNavigator from "./src/navigations/AuthNavigator";
+import AppNavigator from "./src/navigations/AppNavigator";
+import Toast from 'react-native-toast-message';
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {SafeAreaProvider, useSafeAreaInsets} from "react-native-safe-area-context";
 
 export type RootStackParamList = {
+  Auth: undefined
   Welcome: undefined;
   DiscoverRestoranWhere: undefined;
   FriendsScreen: undefined;
@@ -94,96 +57,34 @@ export type RootStackParamList = {
   SavedScreen: undefined;
 };
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
-const App: React.FC = () => {
-  return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Welcome" component={WelcomeScreen} />
-        <Stack.Screen
-          name="DiscoveryRestoranOrderScreen"
-          component={DiscoveryRestoranOrderScreen}
-        />
-        <Stack.Screen name="DishDetailScreen" component={DishDetailScreen} />
-        <Stack.Screen
-          name="DiscoverRestoranWhere"
-          component={DiscoverRestoranWhere}
-        />
-        <Stack.Screen name="FriendsScreen" component={FriendsScreen} />
-        <Stack.Screen name="MyProfileSaved" component={MyProfileSaved} />
-        <Stack.Screen name="MyProfileEdit" component={MyProfileEdit} />
-        <Stack.Screen
-          name="MyProfileChangePassword"
-          component={MyProfileChangePassword}
-        />
-        <Stack.Screen
-          name="MyProfileHelpSuport"
-          component={MyProfileHelpSuport}
-        />
-        <Stack.Screen
-          name="MyProfileTermsConditions"
-          component={MyProfileTermsConditions}
-        />
-        <Stack.Screen
-          name="MyProfilePolicyScreen"
-          component={MyProfilePolicyScreen}
-        />
-        <Stack.Screen name="ResetPassword2" component={ResetPassword2} />
-        <Stack.Screen name="ResetPassword3" component={ResetPassword3} />
-        <Stack.Screen name="RemoveFriend" component={RemoveFriend} />
-        <Stack.Screen
-          name="DiscoveryFiltersPage"
-          component={DiscoveryFiltersPage}
-        />
-        <Stack.Screen name="FriendsReportUser" component={FriendsReportUser} />
-        <Stack.Screen name="BlockUser" component={BlockUser} />
-        <Stack.Screen
-          name="FriendAlertBlockUser"
-          component={FriendAlertBlockUser}
-        />
-        <Stack.Screen name="SignIn" component={SignIn} />
-        <Stack.Screen name="FriendLockedInfo" component={FriendLockedInfo} />
-        <Stack.Screen
-          name="FriendsProfileScreenShare"
-          component={FriendsProfileScreenShare}
-        />
-        <Stack.Screen name="Splash" component={Splash} />
-        <Stack.Screen
-          name="FriendsProfileFriends"
-          component={FriendsProfileFriends}
-        />
-        <Stack.Screen name="Order" component={Order} />
-        <Stack.Screen name="AuthScreen" component={AuthScreen} />
-        <Stack.Screen
-          name="FriendsProfileScreen"
-          component={FriendsProfileScreen}
-        />
-        <Stack.Screen name="HomePageScreen" component={HomePageScreen} />
-        <Stack.Screen name="Notifications" component={Notifications} />
-        <Stack.Screen name="Discovery" component={Discovery} />
-        <Stack.Screen name="OnBoarding1Screen" component={OnBoarding1Screen} />
-        <Stack.Screen name="OnBoarding2Screen" component={OnBoarding2Screen} />
-        <Stack.Screen name="OnBoarding3Screen" component={OnBoarding3Screen} />
-        <Stack.Screen name="OnBoarding4Screen" component={OnBoarding4Screen} />
-        <Stack.Screen name="OnBoarding5Screen" component={OnBoarding5Screen} />
-        <Stack.Screen name="CheckEmailscreen" component={CheckEmailscreen} />
-        <Stack.Screen
-          name="SignUpSetPassword1"
-          component={SignUpSetPassword1}
-        />
-        <Stack.Screen name="SignUp" component={SignUp} />
-        <Stack.Screen
-          name="SignUpConfirmationCode1"
-          component={SignUpConfirmationCode1}
-        />
-        <Stack.Screen name="MyProfileScreen" component={MyProfileScreen} />
-        <Stack.Screen name="MyProfileSettings" component={MyProfileSettings} />
-        <Stack.Screen name="ResetPassword1" component={ResetPassword1} />
-        <Stack.Screen name="ResetPassword4" component={ResetPassword4} />
+const App = () => {
+  const queryClient = new QueryClient();
+  const {loadUserOnStartup, isAuth} = useAuthStore(state => state);
 
-      </Stack.Navigator>
-    </NavigationContainer>
+  useEffect(() => {
+    void loadUserOnStartup();
+  }, [loadUserOnStartup]);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <SafeAreaProvider>
+        <AppContent isAuth={isAuth}/>
+      </SafeAreaProvider>
+    </QueryClientProvider>
   );
 };
+
+function AppContent({isAuth}: { isAuth: boolean }) {
+  const {top} = useSafeAreaInsets();
+
+  return (
+    <>
+      <NavigationContainer>
+        {isAuth ? <AppNavigator/> : <AuthNavigator/>}
+      </NavigationContainer>
+      <Toast topOffset={top}/>
+    </>
+  )
+}
 
 export default App;

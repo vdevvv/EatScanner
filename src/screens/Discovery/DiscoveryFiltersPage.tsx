@@ -5,24 +5,21 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-// --- Типи маршрутів ---
 type RootStackParamList = {
   MyProfileSaved: undefined;
   FiltersScreen: undefined;
 };
 
-// --- Тип навігації ---
 type FiltersNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "FiltersScreen"
 >;
 
-// --- Компонент одного "чіпа" ---
 const Chip = ({ label, active, onPress }: any) => (
   <TouchableOpacity
     style={[styles.chip, active && styles.chipActive]}
@@ -34,7 +31,6 @@ const Chip = ({ label, active, onPress }: any) => (
   </TouchableOpacity>
 );
 
-// --- Компонент секції (заголовок + чіпи) ---
 const Section = ({ title, children }: any) => (
   <View style={styles.section}>
     <Text style={styles.sectionTitle}>{title}</Text>
@@ -63,13 +59,11 @@ export default function FiltersScreen() {
     }
   };
 
-  // --- Обробники ---
   const handleBack = () => navigation.goBack();
   const handleApply = () => navigation.goBack(); // або navigate("MyProfileSaved")
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* --- Header --- */}
       <View style={styles.header}>
         <TouchableOpacity onPress={handleBack}>
           <Text style={styles.backArrow}>‹</Text>
@@ -77,13 +71,11 @@ export default function FiltersScreen() {
         <Text style={styles.headerTitle}>Filters</Text>
       </View>
 
-      {/* --- Основний контент --- */}
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Cuisine */}
         <Section title="Cuisine:">
           {[
             "🍝 Italian",
@@ -107,7 +99,6 @@ export default function FiltersScreen() {
           ))}
         </Section>
 
-        {/* Meal Type */}
         <Section title="Meal Type:">
           {[
             "🍳 Breakfast",
@@ -130,7 +121,6 @@ export default function FiltersScreen() {
           ))}
         </Section>
 
-        {/* Dietary Restrictions */}
         <Section title="Dietary Restrictions:">
           {[
             "🥦 Vegetarian",
@@ -155,7 +145,6 @@ export default function FiltersScreen() {
           ))}
         </Section>
 
-        {/* Spice Level */}
         <Section title="Spice Level:">
           {["🥛 Mild", "🌶 Medium", "🌶🌶 Spicy", "🌶🌶🌶 Extra Spicy"].map(
             (item) => (
@@ -171,7 +160,6 @@ export default function FiltersScreen() {
           )}
         </Section>
 
-        {/* Ratings */}
         <Section title="Ratings:">
           {[
             "⭐ 4.5 & up",
@@ -191,7 +179,6 @@ export default function FiltersScreen() {
         </Section>
       </ScrollView>
 
-      {/* --- Кнопка застосування --- */}
       <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
         <Text style={styles.applyButtonText}>Apply filters</Text>
       </TouchableOpacity>
@@ -199,7 +186,6 @@ export default function FiltersScreen() {
   );
 }
 
-// --- Стилі ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,
