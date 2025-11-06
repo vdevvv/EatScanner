@@ -16,9 +16,10 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import {RouteProp, useNavigation, useRoute} from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { SafeAreaView } from "react-native-safe-area-context";
+import {FriendsStackParamList} from "../../navigations/AppNavigator";
 
 const { width, height } = Dimensions.get("window");
 
@@ -32,7 +33,6 @@ const COLORS = {
   overlay: "rgba(0,0,0,0.4)",
 };
 
-// Локальні зображення
 const AVATAR_SOURCE =
   require("../../assets/profile-avatar.jpg") as ImageSourcePropType;
 const DISH_1_SOURCE =
@@ -48,7 +48,6 @@ const FRIEND_3_SOURCE =
 const FRIEND_4_SOURCE =
   require("../../assets/friend4.jpg") as ImageSourcePropType;
 
-// Іконки месенджерів
 const MESSENGER_ICON =
   require("../../assets/MessengerIconFriend.png") as ImageSourcePropType;
 const WHATSAPP_ICON =
@@ -56,7 +55,6 @@ const WHATSAPP_ICON =
 const MESSAGES_ICON =
   require("../../assets/MessagesFriend.png") as ImageSourcePropType;
 
-// Demo Data
 const USER_DATA = {
   handle: "@foodie_iryna",
   name: "Talia Gomez",
@@ -132,7 +130,6 @@ const BOTTOM_ACTIONS = [
   { id: "2", label: "Add to reading list", icon: "book-outline" },
 ];
 
-// Типи для навігації
 type RootStackParamList = {
   HomePageScreen: undefined;
   FriendsProfileScreen: undefined;
@@ -150,7 +147,14 @@ type UserProfileNavigationProp = NativeStackNavigationProp<
   "FriendsProfileScreen"
 >;
 
-const UserProfileScreen: React.FC = () => {
+type FriendsProfileScreenRouteProp = RouteProp<FriendsStackParamList, 'FriendsProfileScreen'>;
+
+const UserProfileScreen = () => {
+  const route = useRoute<FriendsProfileScreenRouteProp>();
+  const {userId} = route.params;
+
+  console.log(userId);
+
   const navigation = useNavigation<UserProfileNavigationProp>();
   const [menuVisible, setMenuVisible] = useState(false);
   const [shareVisible, setShareVisible] = useState(false);
@@ -216,7 +220,6 @@ const UserProfileScreen: React.FC = () => {
     }
   };
 
-  // -----------------------------------
   const StatItem = ({ count, label }: { count: number; label: string }) => (
     <View style={styles.statItem}>
       <Text style={styles.statCount}>{count}</Text>

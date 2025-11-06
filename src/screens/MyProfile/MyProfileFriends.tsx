@@ -1,182 +1,72 @@
-import React, {useState} from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
   TouchableOpacity,
   TextInput,
-  Image,
   Dimensions,
-  Platform,
-  ImageSourcePropType,
+  Platform, FlatList, ActivityIndicator,
 } from "react-native";
-import {Ionicons} from "@expo/vector-icons";
-import {useNavigation} from "@react-navigation/native";
-import {SafeAreaView} from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useMyFriends, useRemoveFriend } from "../../hooks/friends";
+import { handleApiError } from "../../utils/handleApiError";
+import FriendListItem from "../../components/Friends/FriendListItem";
+import { useDebounce } from "../../hooks/use-debounce";
+import { Friend } from "../../types";
+import {FriendsNavigationProp} from "../../navigations/AppNavigator";
 
-const {width} = Dimensions.get("window");
+const { width } = Dimensions.get("window");
 
-const IMAGE_ASSETS = {
-  profile1: 1,
-  profile2: 2,
-  profile3: 3,
-  profile4: 4,
-} as const;
-
-type AvatarKey = keyof typeof IMAGE_ASSETS;
-
-interface Friend {
-  id: string;
-  name: string;
-  username: string;
-  avatar: AvatarKey;
-  isFriend: boolean;
-}
-
-const INITIAL_FRIEND_LIST: Friend[] = [
-  {
-    id: "1",
-    name: "Iryna Hvozdetsta",
-    username: "@foodie_iryna",
-    avatar: "profile1",
-    isFriend: true,
-  },
-  {
-    id: "2",
-    name: "Talia Gomer",
-    username: "@foodie_iryna",
-    avatar: "profile2",
-    isFriend: true,
-  },
-  {
-    id: "3",
-    name: "Iryna Hvozdetsta",
-    username: "@foodie_iryna",
-    avatar: "profile3",
-    isFriend: true,
-  },
-  {
-    id: "4",
-    name: "Talia Goman",
-    username: "@foodie_iryna",
-    avatar: "profile4",
-    isFriend: true,
-  },
-];
-
-const FRIEND_LIST: Friend[] = [
-  ...INITIAL_FRIEND_LIST,
-  ...INITIAL_FRIEND_LIST.map((f, i) => ({
-    ...f,
-    id: `d${i + 5}`,
-    isFriend: true,
-    name: f.name.replace("(Copy)", "").trim() + " (Copy)",
-  })),
-];
-
-const SEARCH_RESULTS: Friend[] = [
-  {
-    id: "s1",
-    name: "Talia Gomez",
-    username: "@foodie_iryna",
-    avatar: "profile1",
-    isFriend: false,
-  },
-  {
-    id: "s2",
-    name: "Talia Goman",
-    username: "@foodie_iryna",
-    avatar: "profile2",
-    isFriend: false,
-  },
-  {
-    id: "s3",
-    name: "Talia Gower",
-    username: "@foodie_iryna",
-    avatar: "profile3",
-    isFriend: false,
-  },
-];
-
-const getAvatarSource = (key: AvatarKey): ImageSourcePropType => {
-  switch (key) {
-    case "profile1":
-      return {uri: "https://placehold.co/50x50/E57373/FFFFFF?text=P1"};
-    case "profile2":
-      return {uri: "https://placehold.co/50x50/3498DB/FFFFFF?text=P2"};
-    case "profile3":
-      return {uri: "https://placehold.co/50x50/2ECC71/FFFFFF?text=P3"};
-    default:
-      return {uri: "https://placehold.co/50x50/9B59B6/FFFFFF?text=P4"};
-  }
-};
-
-const FriendListItemFixed: React.FC<{
-  friend: Friend;
-  onRemoveFriend?: (friendId: string) => void;
-}> = ({friend, onRemoveFriend}) => {
-  const buttonText = friend.isFriend ? "Remove" : "Add";
-  const buttonStyle = friend.isFriend
-    ? styles.removeButtonContainer
-    : styles.addButtonContainer;
-  const textStyle = friend.isFriend ? styles.removeText : styles.addText;
-
-  const handleAction = () => {
-    if (friend.isFriend && onRemoveFriend) {
-      onRemoveFriend(friend.id);
-    } else {
-      console.log(`Add ${friend.name}`);
-    }
-  };
-
-  return (
-    <View style={styles.listItemContainer}>
-      <Image
-        source={getAvatarSource(friend.avatar)}
-        style={styles.avatar}
-        defaultSource={{
-          uri: "https://placehold.co/50x50/CCCCCC/333333?text=User",
-        }}
-      />
-      <View style={styles.userInfo}>
-        <Text style={styles.nameText}>{friend.name}</Text>
-        <Text style={styles.usernameText}>{friend.username}</Text>
-      </View>
-
-      <TouchableOpacity style={buttonStyle} onPress={handleAction}>
-        <Text style={textStyle}>{buttonText}</Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
-
-const FriendsScreenFinal: React.FC = () => {
-  const navigation = useNavigation();
+const FriendsScreenFinal = () => {
+  const navigation = useNavigation<FriendsNavigationProp>();
+  const [page, setPage] = useState(1);
   const [searchText, setSearchText] = useState("");
-  const [friendsList, setFriendsList] = useState<Friend[]>(FRIEND_LIST);
-  const isSearching = searchText.length > 0;
-  const displayList = isSearching ? SEARCH_RESULTS : friendsList;
+  const [debounceSearchText, setDebounceSearchText] = useState("");
 
-  const handleBack = () => {
-    navigation.goBack();
-  };
+  const { data, isError, error, isFetching } = useMyFriends(debounceSearchText, page);
+  const { mutate } = useRemoveFriend();
 
-  const handleRemoveFriend = (friendId: string) => {
-    setFriendsList(prevList =>
-      prevList.filter(friend => friend.id !== friendId)
-    );
-    console.log(`Friend with ID ${friendId} removed from list`);
-  };
+  const hasMore = data && page < data?.meta.pageCount;
+  const [friends, setFriends] = useState<Friend[]>([]);
+
+  useEffect(() => {
+    if (!data?.data || data.data.length === 0) return;
+
+    if (page === 1) {
+      setFriends([...data.data]);
+    } else {
+      const firstIdFromNewData = data.data[0].id;
+      const isAlreadyLoaded = friends.some(friend => friend.id === firstIdFromNewData);
+
+      if (!isAlreadyLoaded) {
+        setFriends(prev => [...prev, ...data.data]);
+      }
+    }
+  }, [data]);
+
+  const debouncedSearch = useDebounce((value: string) => {
+    setDebounceSearchText(value);
+    setPage(1);
+    setFriends([]);
+  }, 400);
+
+  if (isError) handleApiError(error);
+
+  const handlePressUser = (userId: string) => {
+    navigation.navigate('FriendsProfileScreen', {userId})
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-          <Ionicons name="chevron-back" size={28} color="#333"/>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back" size={28} color="#333" />
         </TouchableOpacity>
         <Text style={styles.screenTitle}>Friends</Text>
-        <View style={{width: 48}}/>
+        <View style={{ width: 48 }} />
       </View>
 
       <View style={styles.searchBarContainer}>
@@ -191,38 +81,68 @@ const FriendsScreenFinal: React.FC = () => {
           placeholder="Search anyone..."
           placeholderTextColor="#999"
           value={searchText}
-          onChangeText={setSearchText}
+          onChangeText={(value) => {
+            setSearchText(value);
+            debouncedSearch(value);
+          }}
         />
         {searchText.length > 0 && (
           <TouchableOpacity
-            onPress={() => setSearchText("")}
+            onPress={() => {
+              setSearchText("");
+              setDebounceSearchText("");
+              setPage(1);
+              setFriends([]);
+            }}
             style={styles.clearButton}
           >
-            <Ionicons name="close-circle" size={20} color="#999"/>
+            <Ionicons name="close-circle" size={20} color="#999" />
           </TouchableOpacity>
         )}
       </View>
 
-      <ScrollView
+      <FlatList
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
-      >
-        {displayList.map((friend) => (
-          <FriendListItemFixed
-            key={friend.id}
-            friend={friend}
-            onRemoveFriend={handleRemoveFriend}
+        data={friends}
+        keyExtractor={(item) => item.id}
+        onEndReached={() => {
+          if (hasMore && !isFetching) {
+            setPage(prev => prev + 1);
+          }
+        }}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          isFetching && page > 1 ? <ActivityIndicator style={{ marginVertical: 20 }} /> : null
+        }
+        renderItem={({ item }) => (
+          <FriendListItem
+            friend={item}
+            handlePressUser={handlePressUser}
+            onRemoveFriend={() => {
+              mutate(item.id, {
+                onSuccess: () => {
+                  setPage(1);
+                  setFriends([]);
+                }
+              });
+            }}
           />
-        ))}
-
-        {isSearching && displayList.length === 0 && (
-          <View style={styles.noResultsContainer}>
-            <Text style={styles.noResultsText}>
-              No users found matching "{searchText}"
-            </Text>
-          </View>
         )}
-      </ScrollView>
+      />
+      {searchText.length > 0 && !isFetching && friends.length === 0 && (
+        <View style={styles.noResultsContainer}>
+          <Text style={styles.noResultsText}>
+            No users found matching "{searchText}"
+          </Text>
+        </View>
+      )}
+
+      {isFetching && page === 1 && friends.length === 0 && (
+        <View style={styles.loadingOverlay}>
+          <ActivityIndicator size="large" />
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -241,7 +161,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#f0f0f0",
     position: "relative",
-    width: width,
+    width,
   },
   backButton: {
     padding: 10,
@@ -275,7 +195,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     ...Platform.select({
-      android: {paddingVertical: 0},
+      android: { paddingVertical: 0 },
     }),
   },
   clearButton: {
@@ -285,68 +205,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 20,
-  },
-  listItemContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
-  },
-  avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 12,
-    backgroundColor: "#ccc",
-  },
-  userInfo: {
-    flex: 1,
-    justifyContent: "center",
-  },
-  nameText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#333",
-  },
-  usernameText: {
-    fontSize: 14,
-    color: "#999",
-  },
-  addButtonContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#e5e5e5",
-  },
-  removeButtonContainer: {
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "rgba(229, 115, 115, 0.1)",
-    borderWidth: 1,
-    borderColor: "#E57373",
-  },
-  addText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#333",
-  },
-  removeText: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#E57373",
+    flexGrow: 1,
   },
   noResultsContainer: {
     alignItems: "center",
+    justifyContent: "center",
     paddingTop: 50,
   },
   noResultsText: {
     color: "#999",
     fontSize: 16,
   },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  }
 });
 
 export default FriendsScreenFinal;

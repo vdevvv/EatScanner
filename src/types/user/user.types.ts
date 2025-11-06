@@ -1,9 +1,9 @@
 export type User = {
   id: string
   email: string
-  firstName: any
-  lastName: any
-  phone: any
+  fullName: string | null
+  userName: string | null
+  phone: string | null
   isEmailVerified: boolean
   createdAt: string
   updatedAt: string

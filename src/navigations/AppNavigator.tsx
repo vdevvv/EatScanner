@@ -1,11 +1,11 @@
-import React, {FC} from "react";
+import React from "react";
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import {Ionicons} from "@expo/vector-icons";
 
 import HomePageScreen from "../screens/HomePage/HomePageScreen";
 import MyProfileScreen from "../screens/MyProfile/MyProfileScreen";
 import Discovery from "../screens/Discovery/DiscoveryPage";
-import {createNativeStackNavigator} from "@react-navigation/native-stack";
+import {createNativeStackNavigator, NativeStackNavigationProp} from "@react-navigation/native-stack";
 import DishDetailScreen from "../screens/Order/DiscoveryRestoranOrderScreen";
 import Notifications from "../screens/Notifications/Notifications";
 import Order from "../screens/Order/DiscoveryRestoranScreen";
@@ -37,6 +37,17 @@ export type RootTabParamList = {
   Profile: undefined;
 };
 
+export type FriendsStackParamList = {
+  FriendsScreen: undefined;
+  FriendsProfileScreen: {userId: string};
+  FriendsProfileScreenShare: undefined;
+  RemoveFriend: undefined;
+  FriendAlertBlockUser: undefined;
+  BlockUser: undefined;
+  FriendsReportUser: undefined;
+};
+export type FriendsNavigationProp = NativeStackNavigationProp<FriendsStackParamList>;
+
 const AppNavigator = () => {
   const Tab = createBottomTabNavigator<RootTabParamList>();
 
@@ -54,36 +65,37 @@ const AppNavigator = () => {
   const DiscoveryStack = createNativeStackNavigator();
   const DiscoverStackNavigator = () => (
     <DiscoveryStack.Navigator screenOptions={{headerShown: false}}>
-      <DiscoveryStack.Screen name="Discovery" component={Discovery} />
-      <DiscoveryStack.Screen name="DiscoveryFiltersPage" component={DiscoveryFiltersPage} />
+      <DiscoveryStack.Screen name="Discovery" component={Discovery}/>
+      <DiscoveryStack.Screen name="DiscoveryFiltersPage" component={DiscoveryFiltersPage}/>
     </DiscoveryStack.Navigator>
   )
 
-  const FriendsStack = createNativeStackNavigator();
+  const FriendsStack = createNativeStackNavigator<FriendsStackParamList>();
   const FriendsStackNavigator = () => (
     <FriendsStack.Navigator screenOptions={{headerShown: false}}>
-      <FriendsStack.Screen name="FriendsProfileFriends" component={FriendsProfileFriends}/>
-      <FriendsStack.Screen name="FriendsProfileScreen" component={FriendsProfileScreen} />
-      <FriendsStack.Screen name="FriendsProfileScreenShare" component={FriendsProfileScreenShare} />
-      <FriendsStack.Screen name="RemoveFriend" component={RemoveFriend} />
-      <FriendsStack.Screen name="FriendAlertBlockUser" component={FriendAlertBlockUser} />
-      <FriendsStack.Screen name="BlockUser" component={BlockUser} />
-      <FriendsStack.Screen name="FriendsReportUser" component={FriendsReportUser} />
+      <FriendsStack.Screen name="FriendsScreen" component={FriendsScreen}/>
+      {/*<FriendsStack.Screen name="FriendsProfileFriends" component={FriendsProfileFriends}/>*/}
+      <FriendsStack.Screen name="FriendsProfileScreen" component={FriendsProfileScreen}/>
+      <FriendsStack.Screen name="FriendsProfileScreenShare" component={FriendsProfileScreenShare}/>
+      <FriendsStack.Screen name="RemoveFriend" component={RemoveFriend}/>
+      <FriendsStack.Screen name="FriendAlertBlockUser" component={FriendAlertBlockUser}/>
+      <FriendsStack.Screen name="BlockUser" component={BlockUser}/>
+      <FriendsStack.Screen name="FriendsReportUser" component={FriendsReportUser}/>
     </FriendsStack.Navigator>
   )
 
   const MyProfileStack = createNativeStackNavigator();
   const MyProfileStackNavigator = () => (
     <MyProfileStack.Navigator screenOptions={{headerShown: false}}>
-      <MyProfileStack.Screen name="Profile" component={MyProfileScreen} />
-      <MyProfileStack.Screen name="MyProfileSettings" component={MyProfileSettings} />
-      <MyProfileStack.Screen name="MyProfileSaved" component={MyProfileSaved} />
-      <MyProfileStack.Screen name="FriendsScreen" component={FriendsScreen} />
-      <MyProfileStack.Screen name="MyProfileEdit" component={MyProfileEdit} />
-      <MyProfileStack.Screen name="MyProfileChangePassword" component={MyProfileChangePassword} />
-      <MyProfileStack.Screen name="MyProfilePolicyScreen" component={MyProfilePolicyScreen} />
-      <MyProfileStack.Screen name="MyProfileTermsConditions" component={MyProfileTermsConditions} />
-      <MyProfileStack.Screen name="MyProfileHelpSuport" component={MyProfileHelpSuport} />
+      <MyProfileStack.Screen name="Profile" component={MyProfileScreen}/>
+      <MyProfileStack.Screen name="MyProfileSettings" component={MyProfileSettings}/>
+      <MyProfileStack.Screen name="MyProfileSaved" component={MyProfileSaved}/>
+      <MyProfileStack.Screen name="FriendsScreen" component={FriendsScreen}/>
+      <MyProfileStack.Screen name="MyProfileEdit" component={MyProfileEdit}/>
+      <MyProfileStack.Screen name="MyProfileChangePassword" component={MyProfileChangePassword}/>
+      <MyProfileStack.Screen name="MyProfilePolicyScreen" component={MyProfilePolicyScreen}/>
+      <MyProfileStack.Screen name="MyProfileTermsConditions" component={MyProfileTermsConditions}/>
+      <MyProfileStack.Screen name="MyProfileHelpSuport" component={MyProfileHelpSuport}/>
     </MyProfileStack.Navigator>
   )
 
