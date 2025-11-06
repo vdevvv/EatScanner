@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import {
   StyleSheet,
   Text,
@@ -11,17 +11,21 @@ import {
   FlatList,
   ImageSourcePropType,
   ImageBackground,
-  Modal,
   Animated,
-  TouchableWithoutFeedback,
+  Share, ActivityIndicator,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import {Ionicons} from "@expo/vector-icons";
 import {RouteProp, useNavigation, useRoute} from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { SafeAreaView } from "react-native-safe-area-context";
+import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+import {SafeAreaView} from "react-native-safe-area-context";
 import {FriendsStackParamList} from "../../navigations/AppNavigator";
+import {useUser} from "../../hooks/user";
+import RemoveFriendModal from "../../components/modals/RemoveFriendModal";
+import BlockUserModal from "../../components/modals/BlockUserModal";
+import ReportUserModal from "../../components/modals/ReportUserModal";
+import FriendsProfileMenu from "../../components/modals/FriendActionsModal";
 
-const { width, height } = Dimensions.get("window");
+const {width} = Dimensions.get("window");
 
 const COLORS = {
   primary: "#E9725C",
@@ -33,8 +37,6 @@ const COLORS = {
   overlay: "rgba(0,0,0,0.4)",
 };
 
-const AVATAR_SOURCE =
-  require("../../assets/profile-avatar.jpg") as ImageSourcePropType;
 const DISH_1_SOURCE =
   require("../../assets/sushi-dragons.jpg") as ImageSourcePropType;
 const DISH_2_SOURCE =
@@ -48,24 +50,23 @@ const FRIEND_3_SOURCE =
 const FRIEND_4_SOURCE =
   require("../../assets/friend4.jpg") as ImageSourcePropType;
 
-const MESSENGER_ICON =
-  require("../../assets/MessengerIconFriend.png") as ImageSourcePropType;
-const WHATSAPP_ICON =
-  require("../../assets/WhatsappIconFriend.png") as ImageSourcePropType;
-const MESSAGES_ICON =
-  require("../../assets/MessagesFriend.png") as ImageSourcePropType;
+const stats = [
+  {label: "Saved", count: 46},
+  {label: "Friends", count: 212},
+  {label: "Shared orders", count: 212},
+  {label: "Shared videos", count: 212},
+]
 
 const USER_DATA = {
   handle: "@foodie_iryna",
   name: "Talia Gomez",
   stats: [
-    { label: "Saved", count: 46 },
-    { label: "Friends", count: 212 },
-    { label: "Shared orders", count: 212 },
-    { label: "Shared videos", count: 212 },
+    {label: "Saved", count: 46},
+    {label: "Friends", count: 212},
+    {label: "Shared orders", count: 212},
+    {label: "Shared videos", count: 212},
   ],
   mutualFriendsCount: 40,
-  avatar: AVATAR_SOURCE,
 };
 
 const PAST_ORDERS_DATA = [
@@ -88,46 +89,22 @@ const MUTUAL_FRIENDS = [
     id: "m1",
     avatar: FRIEND_1_SOURCE,
     name: "Max",
-    messengerIcon: MESSENGER_ICON,
   },
   {
     id: "m2",
     avatar: FRIEND_2_SOURCE,
     name: "Anna",
-    messengerIcon: WHATSAPP_ICON,
   },
   {
     id: "m3",
     avatar: FRIEND_3_SOURCE,
     name: "Tom",
-    messengerIcon: MESSAGES_ICON,
   },
   {
     id: "m4",
     avatar: FRIEND_4_SOURCE,
     name: "Ira",
-    messengerIcon: MESSAGES_ICON,
   },
-];
-
-const MENU_OPTIONS = [
-  "Share Profile",
-  "Add to the Group",
-  "Remove Friend",
-  "Block User",
-  "Report",
-];
-
-const SHARE_OPTIONS = [
-  { id: "1", label: "Message", icon: "chatbubble-outline" },
-  { id: "2", label: "Mail", icon: "mail-outline" },
-  { id: "3", label: "Messenger", icon: "logo-messenger" },
-  { id: "4", label: "Whatsapp", icon: "logo-whatsapp" },
-];
-
-const BOTTOM_ACTIONS = [
-  { id: "1", label: "Copy", icon: "copy-outline" },
-  { id: "2", label: "Add to reading list", icon: "book-outline" },
 ];
 
 type RootStackParamList = {
@@ -149,29 +126,41 @@ type UserProfileNavigationProp = NativeStackNavigationProp<
 
 type FriendsProfileScreenRouteProp = RouteProp<FriendsStackParamList, 'FriendsProfileScreen'>;
 
+type ModalState =
+  | "none"
+  | "menu"
+  | "share"
+  | "removeFriend"
+  | "blockUser"
+  | "report";
+
 const UserProfileScreen = () => {
   const route = useRoute<FriendsProfileScreenRouteProp>();
   const {userId} = route.params;
-
-  console.log(userId);
-
+  const {data, isLoading} = useUser(userId)
   const navigation = useNavigation<UserProfileNavigationProp>();
-  const [menuVisible, setMenuVisible] = useState(false);
-  const [shareVisible, setShareVisible] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
-  const [slideAnim] = useState(new Animated.Value(height));
+  const [modalState, setModalState] = useState<ModalState>('none');
+  const closeModal = () => setModalState('none');
 
-  const handleBack = () => navigation.goBack();
+
+  if (isLoading || !data) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <ActivityIndicator size="large"/>
+      </SafeAreaView>
+    );
+  }
 
   const toggleMenu = () => {
-    if (menuVisible) {
+    if (modalState === "menu") {
       Animated.timing(fadeAnim, {
         toValue: 0,
         duration: 150,
         useNativeDriver: true,
-      }).start(() => setMenuVisible(false));
+      }).start(() => setModalState('none'))
     } else {
-      setMenuVisible(true);
+      setModalState('menu');
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 150,
@@ -180,62 +169,56 @@ const UserProfileScreen = () => {
     }
   };
 
-  const closeShareModal = () => {
-    Animated.timing(slideAnim, {
-      toValue: height,
-      duration: 200,
-      useNativeDriver: true,
-    }).start(() => setShareVisible(false));
-  };
+  const onShare = () => {
+    try {
+      void Share.share({
+        message: `Check out this profile: ${data?.fullName} (@${data?.userName})`,
+        url: "https://yourapp.com/user/" + userId
+      });
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   const handleMenuOption = (option: string) => {
     toggleMenu();
-
-    switch (option) {
-      case "Share Profile":
-        setTimeout(() => {
-          navigation.navigate("FriendsProfileScreenShare");
-        }, 300);
-        break;
-      case "Add to the Group":
-        navigation.navigate("ChatsScreen");
-        break;
-      case "Remove Friend":
-        setTimeout(() => {
-          navigation.navigate("RemoveFriend");
-        }, 300);
-        break;
-      case "Block User":
-        setTimeout(() => {
-          navigation.navigate("FriendAlertBlockUser");
-        }, 300);
-        break;
-      case "Report":
-        setTimeout(() => {
-          navigation.navigate("FriendsReportUser");
-        }, 300);
-        break;
-      default:
-        break;
-    }
+    setTimeout(() => {
+      switch (option) {
+        case "Share Profile":
+          onShare()
+          break;
+        case "Remove Friend":
+          setModalState('removeFriend');
+          break
+        case "Block User":
+          setModalState('blockUser');
+          break;
+        case "Report":
+          setModalState('report')
+          break;
+        default:
+          break;
+      }
+    }, 300)
   };
 
-  const StatItem = ({ count, label }: { count: number; label: string }) => (
+  const StatItem = ({count, label}: { count: number; label: string }) => (
     <View style={styles.statItem}>
       <Text style={styles.statCount}>{count}</Text>
       <Text style={styles.statLabel}>{label}</Text>
     </View>
   );
 
-  const OrderItem = ({
-    dishName,
-    restaurant,
-    image,
-  }: {
-    dishName: string;
-    restaurant: string;
-    image: ImageSourcePropType;
-  }) => (
+  const OrderItem = (
+    {
+      dishName,
+      restaurant,
+      image,
+    }: {
+      dishName: string;
+      restaurant: string;
+      image: ImageSourcePropType;
+    }) => (
     <TouchableOpacity style={styles.orderItemContainer} activeOpacity={0.8}>
       <ImageBackground
         source={image}
@@ -251,200 +234,91 @@ const UserProfileScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" />
-      <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack}>
-          <Ionicons name="chevron-back" size={28} color={COLORS.textDark} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{USER_DATA.handle}</Text>
-        <TouchableOpacity onPress={toggleMenu}>
-          <Ionicons
-            name="ellipsis-horizontal"
-            size={24}
-            color={COLORS.textDark}
-          />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.profileBlock}>
-          <View style={styles.topRow}>
-            <Image source={USER_DATA.avatar} style={styles.avatar} />
-            <View style={styles.statsContainer}>
-              {USER_DATA.stats.map((s, i) => (
-                <StatItem key={i} count={s.count} label={s.label} />
-              ))}
-            </View>
-          </View>
-
-          <Text style={styles.userName}>{USER_DATA.name}</Text>
-          <TouchableOpacity
-            style={styles.messageButton}
-            onPress={() => navigation.navigate("ChatsScreen")}
-          >
-            <Text style={styles.messageButtonText}>Send message</Text>
+    <>
+      <SafeAreaView style={styles.safeArea}>
+        <StatusBar barStyle="dark-content"/>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="chevron-back" size={28} color={COLORS.textDark}/>
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>@{data?.userName}</Text>
+          <TouchableOpacity onPress={toggleMenu}>
+            <Ionicons
+              name="ellipsis-horizontal"
+              size={24}
+              color={COLORS.textDark}
+            />
           </TouchableOpacity>
         </View>
 
-        <View style={styles.mutualRow}>
-          <View style={styles.mutualLeft}>
-            <Text style={styles.mutualCount}>
-              {USER_DATA.mutualFriendsCount}
-            </Text>
-            <Text style={styles.mutualLabel}>Mutual Friends</Text>
-          </View>
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.friendsAvatarsScroll}
-          >
-            {MUTUAL_FRIENDS.map((f) => (
-              <View key={f.id} style={styles.friendPill}>
-                <View style={styles.avatarContainer}>
-                  <Image source={f.avatar} style={styles.friendAvatar} />
-                </View>
-                <Text style={styles.friendName}>{f.name}</Text>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
+          <View style={styles.profileBlock}>
+            <View style={styles.topRow}>
+              <Image source={{uri: data?.avatar}} style={styles.avatar}/>
+              <View style={styles.statsContainer}>
+                {stats.map((s, i) => (
+                  <StatItem key={i} count={s.count} label={s.label}/>
+                ))}
               </View>
-            ))}
-          </ScrollView>
-        </View>
-
-        <View style={styles.pastOrdersHeader}>
-          <Text style={styles.pastOrdersTitle}>Past Orders</Text>
-        </View>
-        <FlatList
-          data={PAST_ORDERS_DATA}
-          renderItem={({ item }) => (
-            <OrderItem
-              dishName={item.dishName}
-              restaurant={item.restaurant}
-              image={item.image}
-            />
-          )}
-          keyExtractor={(item) => item.id}
-          numColumns={3}
-          scrollEnabled={false}
-        />
-      </ScrollView>
-
-      <Modal visible={menuVisible} transparent animationType="none">
-        <TouchableWithoutFeedback onPress={toggleMenu}>
-          <Animated.View style={[styles.overlay, { opacity: fadeAnim }]} />
-        </TouchableWithoutFeedback>
-
-        <Animated.View
-          style={[
-            styles.menuContainer,
-            { opacity: fadeAnim, transform: [{ scale: fadeAnim }] },
-          ]}
-        >
-          {MENU_OPTIONS.map((option, index) => (
-            <TouchableOpacity
-              key={index}
-              style={[
-                styles.menuItem,
-                option === "Report" && {
-                  borderTopWidth: 1,
-                  borderColor: COLORS.divider,
-                },
-              ]}
-              onPress={() => handleMenuOption(option)}
-            >
-              <Text
-                style={[
-                  styles.menuText,
-                  option === "Report" && { color: "#E53E3E" },
-                ]}
-              >
-                {option}
-              </Text>
-              <Ionicons
-                name="person-outline"
-                size={18}
-                color={option === "Report" ? "#E53E3E" : COLORS.textDark}
-              />
-            </TouchableOpacity>
-          ))}
-        </Animated.View>
-      </Modal>
-
-      <Modal visible={shareVisible} transparent animationType="none">
-        <TouchableWithoutFeedback onPress={closeShareModal}>
-          <View style={styles.overlay} />
-        </TouchableWithoutFeedback>
-
-        <Animated.View
-          style={[
-            styles.shareSheet,
-            { transform: [{ translateY: slideAnim }] },
-          ]}
-        >
-          <View style={styles.shareHeader}>
-            <Image source={USER_DATA.avatar} style={styles.shareAvatar} />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.shareName}>{USER_DATA.name}</Text>
-              <Text style={styles.shareHandle}>{USER_DATA.handle}</Text>
             </View>
-            <TouchableOpacity onPress={closeShareModal}>
-              <Ionicons name="close" size={22} color={COLORS.textDark} />
+
+            <Text style={styles.userName}>{data?.fullName}</Text>
+            <TouchableOpacity style={styles.messageButton}>
+              <Text style={styles.messageButtonText}>Send message</Text>
             </TouchableOpacity>
           </View>
 
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.shareFriendsScroll}
-          >
-            {MUTUAL_FRIENDS.map((f) => (
-              <View key={f.id} style={styles.shareFriendItem}>
-                <Image source={f.avatar} style={styles.shareFriendAvatar} />
-                <Text style={styles.shareFriendName}>{f.name}</Text>
-              </View>
-            ))}
-          </ScrollView>
-
-          <View style={styles.shareDivider} />
-
-          <View style={styles.shareIconsRow}>
-            {SHARE_OPTIONS.map((o) => (
-              <TouchableOpacity
-                key={o.id}
-                style={styles.shareIconBlock}
-                onPress={() => {
-                  closeShareModal();
-                  if (o.label === "Message") {
-                    navigation.navigate("ChatsScreen");
-                  }
-                }}
-              >
-                <View style={styles.shareIconCircle}>
-                  <Ionicons
-                    name={o.icon as any}
-                    size={22}
-                    color={COLORS.textDark}
-                  />
+          <View style={styles.mutualRow}>
+            <View style={styles.mutualLeft}>
+              <Text style={styles.mutualCount}>
+                {USER_DATA.mutualFriendsCount}
+              </Text>
+              <Text style={styles.mutualLabel}>Mutual Friends</Text>
+            </View>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.friendsAvatarsScroll}
+            >
+              {MUTUAL_FRIENDS.map((f) => (
+                <View key={f.id} style={styles.friendPill}>
+                  <View style={styles.avatarContainer}>
+                    <Image source={f.avatar} style={styles.friendAvatar}/>
+                  </View>
+                  <Text style={styles.friendName}>{f.name}</Text>
                 </View>
-                <Text style={styles.shareIconLabel}>{o.label}</Text>
-              </TouchableOpacity>
-            ))}
+              ))}
+            </ScrollView>
           </View>
 
-          <View style={styles.bottomActions}>
-            {BOTTOM_ACTIONS.map((a) => (
-              <TouchableOpacity key={a.id} style={styles.actionRow}>
-                <Text style={styles.actionLabel}>{a.label}</Text>
-                <Ionicons
-                  name={a.icon as any}
-                  size={18}
-                  color={COLORS.textDark}
-                />
-              </TouchableOpacity>
-            ))}
+          <View style={styles.pastOrdersHeader}>
+            <Text style={styles.pastOrdersTitle}>Past Orders</Text>
           </View>
-        </Animated.View>
-      </Modal>
-    </SafeAreaView>
+          <FlatList
+            data={PAST_ORDERS_DATA}
+            renderItem={({item}) => (
+              <OrderItem
+                dishName={item.dishName}
+                restaurant={item.restaurant}
+                image={item.image}
+              />
+            )}
+            keyExtractor={(item) => item.id}
+            numColumns={3}
+            scrollEnabled={false}
+          />
+        </ScrollView>
+      </SafeAreaView>
+      <FriendsProfileMenu
+        isVisible={modalState === 'menu'}
+        fadeAnim={fadeAnim}
+        closeModal={toggleMenu}
+        onPressOption={handleMenuOption}
+      />
+      <RemoveFriendModal isVisible={modalState === 'removeFriend'} closeModal={closeModal}/>
+      <BlockUserModal isVisible={modalState === 'blockUser'} closeModal={closeModal}/>
+      <ReportUserModal isVisible={modalState === 'report'} closeModal={closeModal}/>
+    </>
   );
 };
 
@@ -456,8 +330,15 @@ const FRIEND_AVATAR_SIZE = 56;
 const GRID_ITEM_SIZE = width / 3;
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.background },
-  scrollContent: { paddingBottom: 20 },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: COLORS.background,
+  },
+
+  safeArea: {flex: 1, backgroundColor: COLORS.background},
+  scrollContent: {paddingBottom: 20},
 
   header: {
     flexDirection: "row",
@@ -466,7 +347,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: PADDING_HORIZONTAL,
     paddingVertical: 10,
   },
-  headerTitle: { fontSize: 18, fontWeight: "600", color: COLORS.textDark },
+  headerTitle: {fontSize: 18, fontWeight: "600", color: COLORS.textDark},
 
   profileBlock: {
     paddingHorizontal: PADDING_HORIZONTAL,
@@ -474,7 +355,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.divider,
   },
-  topRow: { flexDirection: "row", alignItems: "center", marginBottom: 12 },
+  topRow: {flexDirection: "row", alignItems: "center", marginBottom: 12},
   avatar: {
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
@@ -486,9 +367,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
   },
-  statItem: { alignItems: "center", flex: 1 },
-  statCount: { fontSize: 20, fontWeight: "700", color: COLORS.textDark },
-  statLabel: { fontSize: 12, color: COLORS.textGrey, textAlign: "center" },
+  statItem: {alignItems: "center", flex: 1},
+  statCount: {fontSize: 20, fontWeight: "700", color: COLORS.textDark},
+  statLabel: {fontSize: 12, color: COLORS.textGrey, textAlign: "center"},
   userName: {
     fontSize: 22,
     fontWeight: "700",
@@ -501,7 +382,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     alignItems: "center",
   },
-  messageButtonText: { fontSize: 16, fontWeight: "700", color: COLORS.white },
+  messageButtonText: {fontSize: 16, fontWeight: "700", color: COLORS.white},
 
   mutualRow: {
     flexDirection: "row",
@@ -511,11 +392,11 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.divider,
   },
-  mutualLeft: { width: 96, alignItems: "center" },
-  mutualCount: { fontSize: 20, fontWeight: "700", color: COLORS.textDark },
-  mutualLabel: { fontSize: 12, color: COLORS.textGrey },
-  friendsAvatarsScroll: { paddingLeft: 10, paddingRight: 20 },
-  friendPill: { alignItems: "center", marginRight: 14 },
+  mutualLeft: {width: 96, alignItems: "center"},
+  mutualCount: {fontSize: 20, fontWeight: "700", color: COLORS.textDark},
+  mutualLabel: {fontSize: 12, color: COLORS.textGrey},
+  friendsAvatarsScroll: {paddingLeft: 10, paddingRight: 20},
+  friendPill: {alignItems: "center", marginRight: 14},
   avatarContainer: {
     position: "relative",
   },
@@ -541,99 +422,12 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
   },
-  friendName: { fontSize: 11, color: COLORS.textGrey, textAlign: "center" },
-  pastOrdersHeader: { paddingVertical: 12, alignItems: "center" },
-  pastOrdersTitle: { fontSize: 18, fontWeight: "600", color: COLORS.textDark },
-  orderItemContainer: { width: GRID_ITEM_SIZE, height: GRID_ITEM_SIZE * 1.5 },
-  orderImage: { flex: 1, justifyContent: "flex-end" },
-  orderTextOverlay: { padding: 8, backgroundColor: "rgba(0,0,0,0.35)" },
-  orderDishName: { fontSize: 12, fontWeight: "600", color: COLORS.white },
-  orderRestaurantName: { fontSize: 10, color: COLORS.white },
-
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: COLORS.overlay,
-  },
-  menuContainer: {
-    position: "absolute",
-    top: 80,
-    right: 20,
-    backgroundColor: COLORS.white,
-    borderRadius: 16,
-    paddingVertical: 6,
-    minWidth: 220,
-    shadowColor: "#000",
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 6,
-  },
-  menuItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingVertical: 14,
-    paddingHorizontal: 18,
-  },
-  menuText: { fontSize: 16, color: COLORS.textDark, fontWeight: "500" },
-  shareSheet: {
-    position: "absolute",
-    bottom: 0,
-    width: "100%",
-    backgroundColor: COLORS.white,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    shadowColor: "#000",
-    shadowOpacity: 0.25,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: -3 },
-    elevation: 10,
-  },
-  shareHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 8,
-  },
-  shareAvatar: { width: 50, height: 50, borderRadius: 25, marginRight: 10 },
-  shareName: { fontSize: 16, fontWeight: "600", color: COLORS.textDark },
-  shareHandle: { fontSize: 14, color: COLORS.textGrey },
-  shareFriendsScroll: { paddingVertical: 10 },
-  shareFriendItem: { alignItems: "center", marginRight: 18 },
-  shareFriendAvatar: { width: 54, height: 54, borderRadius: 27 },
-  shareFriendName: { fontSize: 12, color: COLORS.textDark },
-  shareDivider: {
-    height: 1,
-    backgroundColor: COLORS.divider,
-    marginVertical: 8,
-  },
-  shareIconsRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginBottom: 8,
-  },
-  shareIconBlock: { alignItems: "center" },
-  shareIconCircle: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    backgroundColor: "#F3F4F6",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 4,
-  },
-  shareIconLabel: { fontSize: 12, color: COLORS.textDark },
-  bottomActions: {
-    borderTopWidth: 1,
-    borderTopColor: COLORS.divider,
-    paddingTop: 6,
-  },
-  actionRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 12,
-  },
-  actionLabel: { fontSize: 15, color: COLORS.textDark },
+  friendName: {fontSize: 11, color: COLORS.textGrey, textAlign: "center"},
+  pastOrdersHeader: {paddingVertical: 12, alignItems: "center"},
+  pastOrdersTitle: {fontSize: 18, fontWeight: "600", color: COLORS.textDark},
+  orderItemContainer: {width: GRID_ITEM_SIZE, height: GRID_ITEM_SIZE * 1.5},
+  orderImage: {flex: 1, justifyContent: "flex-end"},
+  orderTextOverlay: {padding: 8, backgroundColor: "rgba(0,0,0,0.35)"},
+  orderDishName: {fontSize: 12, fontWeight: "600", color: COLORS.white},
+  orderRestaurantName: {fontSize: 10, color: COLORS.white},
 });

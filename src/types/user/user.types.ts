@@ -3,6 +3,7 @@ export type User = {
   email: string
   fullName: string | null
   userName: string | null
+  avatar: string
   phone: string | null
   isEmailVerified: boolean
   createdAt: string

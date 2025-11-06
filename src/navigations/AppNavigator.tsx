@@ -17,8 +17,6 @@ import FriendsProfileFriends from "../screens/FriendsProfile/FriendsProfileFrien
 import FriendsProfileScreen from "../screens/FriendsProfile/FriendsProfileScreen";
 import FriendsProfileScreenShare from "../screens/FriendsProfile/FriendsProfileScreenShare";
 import RemoveFriend from "../screens/FriendsProfile/RemoveFriend";
-import FriendAlertBlockUser from "../screens/FriendsProfile/FriendAlertBlockUser";
-import FriendsReportUser from "../screens/FriendsProfile/FriendsReportUser";
 import BlockUser from "../screens/FriendsProfile/BlockUser";
 
 import MyProfileSettings from "../screens/MyProfile/MyProfileSettings";
@@ -78,9 +76,7 @@ const AppNavigator = () => {
       <FriendsStack.Screen name="FriendsProfileScreen" component={FriendsProfileScreen}/>
       <FriendsStack.Screen name="FriendsProfileScreenShare" component={FriendsProfileScreenShare}/>
       <FriendsStack.Screen name="RemoveFriend" component={RemoveFriend}/>
-      <FriendsStack.Screen name="FriendAlertBlockUser" component={FriendAlertBlockUser}/>
       <FriendsStack.Screen name="BlockUser" component={BlockUser}/>
-      <FriendsStack.Screen name="FriendsReportUser" component={FriendsReportUser}/>
     </FriendsStack.Navigator>
   )
 

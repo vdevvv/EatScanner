@@ -11,7 +11,6 @@ import {
   ImageBackground,
   Modal,
   Dimensions,
-  Animated,
   TouchableWithoutFeedback,
   StatusBar,
 } from "react-native";
