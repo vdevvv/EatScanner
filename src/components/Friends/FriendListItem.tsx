@@ -1,6 +1,7 @@
 import React, {FC} from 'react';
 import {Friend} from "../../types";
 import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {COLORS} from "../../constants/colors";
 
 interface FriendListItemProps {
   friend: Friend;
@@ -36,8 +37,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
   },
   avatar: {
     width: 50,
@@ -53,24 +52,23 @@ const styles = StyleSheet.create({
   nameText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#333",
+    color: COLORS.black,
   },
   usernameText: {
     fontSize: 14,
-    color: "#999",
+    color: "#555453",
   },
   removeButtonContainer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: "rgba(229, 115, 115, 0.1)",
+    borderRadius: 10,
+    backgroundColor: 'rgba(219, 101, 81, 0.05)',
     borderWidth: 1,
-    borderColor: "#E57373",
+    borderColor: COLORS.orange,
   },
   removeText: {
     fontSize: 14,
-    fontWeight: "600",
-    color: "#E57373",
+    fontWeight: "500",
   },
 })
 

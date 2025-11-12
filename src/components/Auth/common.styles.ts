@@ -80,7 +80,7 @@ export const commonStyles = StyleSheet.create({
     backgroundColor: COLORS.stroke1,
   },
   buttonActive: {
-    backgroundColor: COLORS.orange,
+    backgroundColor: COLORS.red,
   },
   buttonText: {
     color: COLORS.grey30,

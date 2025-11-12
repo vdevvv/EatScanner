@@ -16,6 +16,7 @@ import {handleApiError} from "../../utils/handleApiError";
 import {commonStyles} from "../../components/Auth/common.styles";
 import {useResetPassword} from "../../hooks/auth";
 import {getInputWrapperStyles} from "../../utils/helpers";
+import {COLORS} from "../../constants/colors";
 
 type RootStackParamList = {
   ResetPassword1: undefined;
@@ -68,7 +69,7 @@ export default function ForgotPasswordScreen() {
               <TextInput
                 style={[styles.input, getInputWrapperStyles(value)]}
                 placeholder="example@gmail.com"
-                placeholderTextColor="#BDBDBD"
+                placeholderTextColor={COLORS.grey30}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 onBlur={onBlur}
@@ -81,10 +82,10 @@ export default function ForgotPasswordScreen() {
 
           <TouchableOpacity
             disabled={!isValid || isPending}
-            style={[styles.button, isValid && styles.buttonActive]}
+            style={[commonStyles.button, isValid && commonStyles.buttonActive]}
             onPress={handleSubmit(onSubmit)}
           >
-            <Text style={[styles.buttonText, isValid && styles.buttonTextActive]}>
+            <Text style={[commonStyles.buttonText, isValid && commonStyles.buttonTextActive]}>
               {isPending ? 'Loading...' : 'Reset Password'}
             </Text>
           </TouchableOpacity>
@@ -97,7 +98,7 @@ export default function ForgotPasswordScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: COLORS.white,
   },
   backButton: {
     marginTop: 10,
@@ -110,13 +111,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#000",
+    color: COLORS.black,
     textAlign: "center",
   },
   subtitle: {
     marginTop: 8,
     fontSize: 14,
-    color: "#777",
+    color: COLORS.black,
     textAlign: "center",
     lineHeight: 20,
   },
@@ -131,27 +132,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     paddingHorizontal: 14,
     fontSize: 14,
-    color: "#000",
-    backgroundColor: "#fff",
-  },
-  button: {
-    width: "100%",
-    height: 48,
-    borderRadius: 8,
-    backgroundColor: "#F5F5F5",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 20,
-  },
-  buttonActive: {
-    backgroundColor: "#C56B57",
-  },
-  buttonText: {
-    color: "#A0A0A0",
-    fontSize: 15,
-    fontWeight: "500",
-  },
-  buttonTextActive: {
-    color: "#FFFFFF",
+    color: COLORS.black,
+    backgroundColor: COLORS.white,
   },
 });

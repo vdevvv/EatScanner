@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   buttonActive: {
-    backgroundColor: COLORS.orange,
+    backgroundColor: COLORS.red,
   },
   buttonText: {
     color: COLORS.grey30,

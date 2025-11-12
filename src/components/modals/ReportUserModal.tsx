@@ -44,7 +44,7 @@ const ReportUserModal: FC<ModalProps> = ({isVisible, closeModal}) => {
             <Text
               style={[
                 styles.dropdownText,
-                !selectedReason && {color: "#9CA3AF"},
+                !selectedReason && {color: COLORS.grey30},
               ]}
             >
               {selectedReason || "Select a reason"}
@@ -52,7 +52,7 @@ const ReportUserModal: FC<ModalProps> = ({isVisible, closeModal}) => {
             <Ionicons
               name={dropdownOpen ? "chevron-up" : "chevron-down"}
               size={18}
-              color="#6B7280"
+              color={COLORS.black}
             />
           </TouchableOpacity>
           {dropdownOpen && (
@@ -75,19 +75,14 @@ const ReportUserModal: FC<ModalProps> = ({isVisible, closeModal}) => {
             </View>
           )}
           <TouchableOpacity
-            style={[
-              styles.submitButton,
-              {
-                backgroundColor: selectedReason
-                  ? "#E9725C"
-                  : '#E5E7EB',
-              },
-            ]}
+            style={[styles.submitButton, {backgroundColor: selectedReason ? COLORS.red : COLORS.stroke1}]}
             disabled={!selectedReason}
             onPress={handleSubmit}
             activeOpacity={0.9}
           >
-            <Text style={styles.submitText}>Submit Report</Text>
+            <Text style={[styles.submitText, {color: selectedReason ? COLORS.white : COLORS.grey30}]}>
+              Submit Report
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.cancelButton}

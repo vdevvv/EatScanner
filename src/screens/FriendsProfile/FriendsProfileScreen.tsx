@@ -5,12 +5,10 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
-  Dimensions,
   StatusBar,
   Image,
   FlatList,
   ImageSourcePropType,
-  ImageBackground,
   Animated,
   Share, ActivityIndicator,
 } from "react-native";
@@ -24,18 +22,8 @@ import RemoveFriendModal from "../../components/modals/RemoveFriendModal";
 import BlockUserModal from "../../components/modals/BlockUserModal";
 import ReportUserModal from "../../components/modals/ReportUserModal";
 import FriendsProfileMenu from "../../components/modals/FriendActionsModal";
-
-const {width} = Dimensions.get("window");
-
-const COLORS = {
-  primary: "#E9725C",
-  background: "#FFFFFF",
-  textDark: "#1F2937",
-  textGrey: "#6B7280",
-  white: "#FFFFFF",
-  divider: "#E5E7EB",
-  overlay: "rgba(0,0,0,0.4)",
-};
+import {COLORS} from "../../constants/colors";
+import OrderItem from "../../components/Friends/PastOrderItem";
 
 const DISH_1_SOURCE =
   require("../../assets/sushi-dragons.jpg") as ImageSourcePropType;
@@ -115,7 +103,6 @@ type RootStackParamList = {
   MyProfileScreen: undefined;
   BlockUserScreen: undefined;
   FriendsReportUser: undefined;
-  RemoveFriend: undefined;
   FriendAlertBlockUser: undefined;
 };
 
@@ -142,7 +129,6 @@ const UserProfileScreen = () => {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [modalState, setModalState] = useState<ModalState>('none');
   const closeModal = () => setModalState('none');
-
 
   if (isLoading || !data) {
     return (
@@ -209,44 +195,20 @@ const UserProfileScreen = () => {
     </View>
   );
 
-  const OrderItem = (
-    {
-      dishName,
-      restaurant,
-      image,
-    }: {
-      dishName: string;
-      restaurant: string;
-      image: ImageSourcePropType;
-    }) => (
-    <TouchableOpacity style={styles.orderItemContainer} activeOpacity={0.8}>
-      <ImageBackground
-        source={image}
-        style={styles.orderImage}
-        resizeMode="cover"
-      >
-        <View style={styles.orderTextOverlay}>
-          <Text style={styles.orderDishName}>{dishName}</Text>
-          <Text style={styles.orderRestaurantName}>{restaurant}</Text>
-        </View>
-      </ImageBackground>
-    </TouchableOpacity>
-  );
-
   return (
     <>
       <SafeAreaView style={styles.safeArea}>
         <StatusBar barStyle="dark-content"/>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="chevron-back" size={28} color={COLORS.textDark}/>
+            <Ionicons name="chevron-back" size={28} color={COLORS.black}/>
           </TouchableOpacity>
           <Text style={styles.headerTitle}>@{data?.userName}</Text>
           <TouchableOpacity onPress={toggleMenu}>
             <Ionicons
               name="ellipsis-horizontal"
               size={24}
-              color={COLORS.textDark}
+              color={COLORS.black}
             />
           </TouchableOpacity>
         </View>
@@ -327,7 +289,6 @@ export default UserProfileScreen;
 const PADDING_HORIZONTAL = 20;
 const AVATAR_SIZE = 80;
 const FRIEND_AVATAR_SIZE = 56;
-const GRID_ITEM_SIZE = width / 3;
 
 const styles = StyleSheet.create({
   loadingContainer: {
@@ -336,10 +297,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: COLORS.background,
   },
-
   safeArea: {flex: 1, backgroundColor: COLORS.background},
   scrollContent: {paddingBottom: 20},
-
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -347,13 +306,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: PADDING_HORIZONTAL,
     paddingVertical: 10,
   },
-  headerTitle: {fontSize: 18, fontWeight: "600", color: COLORS.textDark},
-
+  headerTitle: {fontSize: 18, fontWeight: "600", color: COLORS.black},
   profileBlock: {
     paddingHorizontal: PADDING_HORIZONTAL,
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.divider,
+    borderBottomColor: COLORS.stroke2,
   },
   topRow: {flexDirection: "row", alignItems: "center", marginBottom: 12},
   avatar: {
@@ -368,16 +326,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   statItem: {alignItems: "center", flex: 1},
-  statCount: {fontSize: 20, fontWeight: "700", color: COLORS.textDark},
-  statLabel: {fontSize: 12, color: COLORS.textGrey, textAlign: "center"},
+  statCount: {fontSize: 20, fontWeight: "700", color: COLORS.black},
+  statLabel: {fontSize: 12, color: COLORS.black, textAlign: "center"},
   userName: {
     fontSize: 22,
     fontWeight: "700",
-    color: COLORS.textDark,
+    color: COLORS.black,
     marginBottom: 12,
   },
   messageButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.red,
     borderRadius: 12,
     paddingVertical: 12,
     alignItems: "center",
@@ -389,12 +347,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: PADDING_HORIZONTAL,
     paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.divider,
   },
   mutualLeft: {width: 96, alignItems: "center"},
-  mutualCount: {fontSize: 20, fontWeight: "700", color: COLORS.textDark},
-  mutualLabel: {fontSize: 12, color: COLORS.textGrey},
+  mutualCount: {fontSize: 20, fontWeight: "700", color: COLORS.black},
+  mutualLabel: {fontSize: 12, color: COLORS.black},
   friendsAvatarsScroll: {paddingLeft: 10, paddingRight: 20},
   friendPill: {alignItems: "center", marginRight: 14},
   avatarContainer: {
@@ -422,12 +378,8 @@ const styles = StyleSheet.create({
     width: 16,
     height: 16,
   },
-  friendName: {fontSize: 11, color: COLORS.textGrey, textAlign: "center"},
+  friendName: {fontSize: 11, color: COLORS.black, textAlign: "center"},
   pastOrdersHeader: {paddingVertical: 12, alignItems: "center"},
-  pastOrdersTitle: {fontSize: 18, fontWeight: "600", color: COLORS.textDark},
-  orderItemContainer: {width: GRID_ITEM_SIZE, height: GRID_ITEM_SIZE * 1.5},
-  orderImage: {flex: 1, justifyContent: "flex-end"},
-  orderTextOverlay: {padding: 8, backgroundColor: "rgba(0,0,0,0.35)"},
-  orderDishName: {fontSize: 12, fontWeight: "600", color: COLORS.white},
-  orderRestaurantName: {fontSize: 10, color: COLORS.white},
+  pastOrdersTitle: {fontSize: 18, fontWeight: "600", color: COLORS.black},
+
 });

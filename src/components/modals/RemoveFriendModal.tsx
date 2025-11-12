@@ -2,6 +2,7 @@ import React, {FC} from 'react';
 import {Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {Ionicons} from "@expo/vector-icons";
 import {ModalProps} from "./modal.types";
+import {COLORS} from "../../constants/colors";
 
 const RemoveFriendModal: FC<ModalProps> = ({isVisible, closeModal}) => {
   return (
@@ -42,7 +43,7 @@ const RemoveFriendModal: FC<ModalProps> = ({isVisible, closeModal}) => {
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.4)",
+    backgroundColor: COLORS.overlay,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
@@ -50,7 +51,7 @@ const styles = StyleSheet.create({
   modalCard: {
     width: "100%",
     maxWidth: 360,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
     borderRadius: 20,
     paddingHorizontal: 24,
     paddingVertical: 32,
@@ -61,28 +62,28 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#1F2937",
+    color: COLORS.black,
     textAlign: "center",
     marginTop: 8,
   },
   modalSubtitle: {
     fontSize: 14,
-    color: "#6B7280",
+    color: COLORS.black,
     textAlign: "center",
     marginTop: 10,
     lineHeight: 20,
   },
   removeButton: {
-    backgroundColor: "#E9725C",
+    backgroundColor: COLORS.red,
     borderRadius: 12,
     width: "100%",
     paddingVertical: 14,
     alignItems: "center",
     marginTop: 22,
   },
-  removeButtonText: { fontSize: 16, fontWeight: "700", color: "#fff" },
+  removeButtonText: { fontSize: 16, fontWeight: "700", color: COLORS.white },
   cancelButton: { marginTop: 16 },
-  cancelButtonText: { fontSize: 15, color: "#6B7280", fontWeight: "600" },
+  cancelButtonText: { fontSize: 15, color: COLORS.grey30, fontWeight: "600" },
 })
 
 export default RemoveFriendModal;

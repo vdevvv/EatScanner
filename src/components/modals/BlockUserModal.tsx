@@ -4,6 +4,7 @@ import {Ionicons} from "@expo/vector-icons";
 import {FriendsNavigationProp} from "../../navigations/AppNavigator";
 import {useNavigation} from "@react-navigation/native";
 import {ModalProps} from "./modal.types";
+import {COLORS} from "../../constants/colors";
 
 const BlockUserModal: FC<ModalProps> = ({isVisible, closeModal}) => {
   const navigation = useNavigation<FriendsNavigationProp>()
@@ -49,7 +50,7 @@ const BlockUserModal: FC<ModalProps> = ({isVisible, closeModal}) => {
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.45)',
+    backgroundColor: COLORS.overlay,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: 20,
@@ -57,7 +58,7 @@ const styles = StyleSheet.create({
   modalCard: {
     width: "100%",
     maxWidth: 380,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
     borderRadius: 18,
     paddingHorizontal: 26,
     paddingVertical: 32,
@@ -68,28 +69,28 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#1F2937",
+    color: COLORS.black,
     textAlign: "center",
     marginTop: 8,
   },
   modalSubtitle: {
     fontSize: 15,
-    color: "#6B7280",
+    color: COLORS.black,
     textAlign: "center",
     marginTop: 12,
     lineHeight: 22,
   },
   blockButton: {
-    backgroundColor: "#E9725C",
+    backgroundColor: COLORS.red,
     borderRadius: 12,
     width: "100%",
     paddingVertical: 14,
     alignItems: "center",
     marginTop: 24,
   },
-  blockButtonText: {fontSize: 16, fontWeight: "700", color: "#fff"},
+  blockButtonText: {fontSize: 16, fontWeight: "700", color: COLORS.white},
   cancelButton: {marginTop: 16},
-  cancelButtonText: {fontSize: 15, color: "#6B7280", fontWeight: "600"},
+  cancelButtonText: {fontSize: 15, color: COLORS.grey30, fontWeight: "600"},
 })
 
 export default BlockUserModal;

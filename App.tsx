@@ -22,7 +22,6 @@ export type RootStackParamList = {
   FriendsReportUser: undefined;
   BlockUser: undefined;
   FriendAlertBlockUser: undefined;
-  RemoveFriend: undefined;
   FriendsProfileScreenShare: undefined;
   AddFriend: undefined;
   OnBoarding1Screen: undefined;

@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  SafeAreaView,
   FlatList,
   TouchableOpacity,
   StatusBar,
@@ -11,8 +10,8 @@ import {
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { SafeAreaView } from "react-native-safe-area-context";
 
-// Типи для навігації
 type RootStackParamList = {
   HomePageScreen: undefined;
   Notifications: undefined;
@@ -23,7 +22,6 @@ type NotificationsNavigationProp = NativeStackNavigationProp<
   "Notifications"
 >;
 
-// 🔹 Список мокових сповіщень
 const notifications = [
   {
     id: "1",
@@ -90,7 +88,6 @@ const NotificationsScreen = () => {
     navigation.navigate("HomePageScreen");
   };
 
-  // 🔸 Рендер кожного елемента списку
   const renderItem = ({
     item,
   }: {
@@ -108,7 +105,6 @@ const NotificationsScreen = () => {
     };
   }) => (
     <TouchableOpacity style={styles.item} activeOpacity={0.8}>
-      {/* Іконка */}
       <View style={styles.iconWrapper}>
         <View style={styles.iconBackground}>
           <Ionicons name={item.icon} size={22} color="#fff" />
@@ -116,13 +112,11 @@ const NotificationsScreen = () => {
         </View>
       </View>
 
-      {/* Текст */}
       <View style={styles.textContainer}>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.time}>{item.time}</Text>
       </View>
 
-      {/* Стрілка */}
       <Feather name="chevron-right" size={20} color="#999" />
     </TouchableOpacity>
   );
@@ -131,7 +125,6 @@ const NotificationsScreen = () => {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.headerLeft} onPress={handleBackPress}>
           <Ionicons name="chevron-back" size={24} color="#222" />
@@ -142,7 +135,6 @@ const NotificationsScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* Список */}
       <FlatList
         data={notifications}
         keyExtractor={(item) => item.id}

@@ -1,62 +1,20 @@
-import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  TouchableOpacity,
-  Dimensions,
-  StatusBar,
-  Image,
-  FlatList,
-  ImageSourcePropType,
-  ImageBackground,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { SafeAreaView } from "react-native-safe-area-context";
+import React from 'react';
+import {FlatList, Image, ImageSourcePropType, StatusBar, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {SafeAreaView} from "react-native-safe-area-context";
+import {LinearGradient} from "expo-linear-gradient";
+import {COLORS} from "../../constants/colors";
+import Badge from "../../components/Profile/Badge";
+import PastOrderItem from "../../components/Profile/PastOrderItem";
+import {Feather} from "@expo/vector-icons";
+import {useNavigation} from "@react-navigation/native";
+import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+import {RootStackParamList} from "../../../App";
 
-type RootStackParamList = {
-  HomePageScreen: undefined;
-  Discovery: undefined;
-  FriendsScreen: undefined;
-  FriendsProfileFriends: undefined;
-  ProfileScreen: undefined;
-  MyProfileScreen: undefined;
-  MyProfileSettings: undefined;
-  MyProfileSaved: undefined;
-  DishDetailScreen: undefined;
-  OrderScreen: undefined;
-  SavedScreen: undefined;
-};
-
-const { width } = Dimensions.get("window");
-const COLORS = {
-  primary: "#E9725C",
-  background: "#FFFFFF",
-  textDark: "#1F2937",
-  textGrey: "#6B7280",
-  white: "#FFFFFF",
-  divider: "#E5E7EB",
-};
-
-const AVATAR_SOURCE =
-  require("../../assets/profile-avatar.jpg") as ImageSourcePropType;
 const DISH_1_SOURCE =
   require("../../assets/sushi-dragons.jpg") as ImageSourcePropType;
 const DISH_2_SOURCE =
   require("../../assets/potatoes-square.jpg") as ImageSourcePropType;
 
-const USER_DATA = {
-  handle: "@foodie_iryna",
-  name: "Iryna Hvozdetka",
-  stats: [
-    { label: "Saved", count: 46 },
-    { label: "Friends", count: 212 },
-  ],
-  avatar: AVATAR_SOURCE,
-};
 
 const PAST_ORDERS_DATA = [
   {
@@ -97,60 +55,35 @@ const PAST_ORDERS_DATA = [
   },
 ];
 
+const AVATAR_SOURCE = require("../../assets/profile-avatar.jpg") as ImageSourcePropType;
+
+const badges = [
+  {
+    title: 'Sweet Tooth',
+    emoji: '🍰',
+    color: '#F31994',
+  },
+  {
+    title: 'Café Connoisseur',
+    emoji: '☕️',
+    color: '#E17C00',
+  },
+  {
+    title: 'Healthy Hustler',
+    emoji: '🥬',
+    color: '#08DE00',
+  },
+  {
+    title: 'Spice Lord',
+    emoji: '🌶️',
+    color: '#CF0000',
+  },
+]
+
 type MyProfileNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "MyProfileScreen"
 >;
-
-interface StatItemProps {
-  count: number;
-  label: string;
-  onPress?: () => void;
-}
-
-const StatItem: React.FC<StatItemProps> = ({ count, label, onPress }) => (
-  <TouchableOpacity style={styles.statItem} onPress={onPress}>
-    <Text style={styles.statCount}>{count}</Text>
-    <Text style={styles.statLabel}>{label}</Text>
-  </TouchableOpacity>
-);
-
-interface OrderItemProps {
-  image: ImageSourcePropType;
-  title: string;
-  restaurant: string;
-}
-
-const GRID_ITEM_SIZE = width / 3;
-
-const OrderItem: React.FC<OrderItemProps> = ({ image, title, restaurant }) => (
-  <TouchableOpacity style={styles.orderItemContainer} activeOpacity={0.8}>
-    <ImageBackground
-      source={image}
-      style={styles.orderImage}
-      resizeMode="cover"
-      imageStyle={{ borderRadius: 8 }}
-    >
-      <View style={styles.overlay} />
-      <View style={styles.orderTextContainer}>
-        <Text style={styles.orderTitle} numberOfLines={1}>
-          {title}
-        </Text>
-        <View style={styles.restaurantRow}>
-          <Ionicons
-            name="home-outline"
-            size={12}
-            color={COLORS.white}
-            style={{ marginRight: 3 }}
-          />
-          <Text style={styles.orderRestaurant} numberOfLines={1}>
-            {restaurant}
-          </Text>
-        </View>
-      </View>
-    </ImageBackground>
-  </TouchableOpacity>
-);
 
 const MyProfileScreen = () => {
   const navigation = useNavigation<MyProfileNavigationProp>();
@@ -159,155 +92,169 @@ const MyProfileScreen = () => {
   const handleSavedPress = () => navigation.navigate("MyProfileSaved");
   const handleFriendsListPress = () => navigation.navigate("FriendsScreen");
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" />
-
-      <View style={styles.header}>
-        <View style={{ width: 28 }} />
-        <Text style={styles.headerTitle}>{USER_DATA.handle}</Text>
+  const renderHeader = () => (
+    <>
+      <LinearGradient
+        colors={["#9F0B08", "#FF7F3F"]}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 0}}
+        style={styles.gradient}
+      >
+        <View/>
+        <Text style={styles.username}>@foodie_iryna</Text>
         <TouchableOpacity onPress={handleSettingsPress}>
-          <Ionicons name="settings-outline" size={24} color={COLORS.textDark} />
+          <Feather name='settings' size={24} color={COLORS.white}/>
         </TouchableOpacity>
+      </LinearGradient>
+
+      <View style={styles.avatarWrapper}>
+        <Image source={AVATAR_SOURCE} style={styles.avatar}/>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <View style={styles.profileBlock}>
-          <View style={styles.topRow}>
-            <Image source={USER_DATA.avatar} style={styles.avatar} />
+      <View style={styles.headerContent}>
+        <Text style={styles.name}>Iryna Hvozdetska</Text>
+        <Text style={styles.subtitle}>Always on the hunt for tasty food</Text>
 
-            <View style={styles.statsContainer}>
-              <StatItem
-                count={USER_DATA.stats[0].count}
-                label="Saved"
-                onPress={handleSavedPress}
-              />
-              <StatItem
-                count={USER_DATA.stats[1].count}
-                label="Friends"
-                onPress={handleFriendsListPress}
-              />
-              <View style={styles.statItemPlaceholder} />
-              <View style={styles.statItemPlaceholder} />
-            </View>
-          </View>
-
-          <Text style={styles.userName}>{USER_DATA.name}</Text>
+        <View style={styles.statsWrapper}>
+          <TouchableOpacity style={styles.statButton}>
+            <Text style={styles.statTitle}>230</Text>
+            <Text>Favorites</Text>
+          </TouchableOpacity>
+          <View style={styles.divider}/>
+          <TouchableOpacity style={styles.statButton} onPress={handleSavedPress}>
+            <Text style={styles.statTitle}>46</Text>
+            <Text>Saved</Text>
+          </TouchableOpacity>
+          <View style={styles.divider}/>
+          <TouchableOpacity style={styles.statButton} onPress={handleFriendsListPress}>
+            <Text style={styles.statTitle}>212</Text>
+            <Text>Friends</Text>
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.pastOrdersHeader}>
-          <Text style={styles.pastOrdersTitle}>Past Orders</Text>
+        <View style={styles.badgesContainer}>
+          {badges.map((badge, index) => (
+            <Badge badge={badge} key={index}/>
+          ))}
         </View>
 
-        <FlatList
-          data={PAST_ORDERS_DATA}
-          renderItem={({ item }) => (
-            <OrderItem
-              image={item.image}
-              title={item.title}
-              restaurant={item.restaurant}
-            />
-          )}
-          keyExtractor={(item) => item.id}
-          numColumns={3}
-          scrollEnabled={false}
-          columnWrapperStyle={styles.columnWrapper}
-        />
+        <Text style={styles.h2}>Past Orders</Text>
+      </View>
+    </>
+  );
 
-        <View style={{ height: 80 }} />
-      </ScrollView>
+  return (
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <StatusBar barStyle="dark-content"/>
+      <FlatList
+        data={PAST_ORDERS_DATA}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        numColumns={2}
+        renderItem={({item}) => (
+          <PastOrderItem
+            image={item.image}
+            title={item.title}
+            restaurant={item.restaurant}
+          />
+        )}
+        ListHeaderComponent={renderHeader}
+        contentContainerStyle={styles.listContentContainer}
+        columnWrapperStyle={{marginHorizontal: 13}}
+      />
     </SafeAreaView>
   );
 };
 
-const PADDING_HORIZONTAL = 20;
-const AVATAR_SIZE = 80;
+const AVATAR_SIZE = 105;
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: COLORS.background },
-  scrollContent: { paddingBottom: 20 },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingHorizontal: PADDING_HORIZONTAL,
-    paddingVertical: 10,
+  headerContent: {
+    alignItems: 'center',
+    paddingTop: 12,
   },
-  headerTitle: { fontSize: 18, fontWeight: "600", color: COLORS.textDark },
-  profileBlock: {
-    paddingHorizontal: PADDING_HORIZONTAL,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.divider,
+  listContentContainer: {
+    paddingBottom: 60,
   },
-  topRow: { flexDirection: "row", alignItems: "center", marginBottom: 15 },
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  gradient: {
+    paddingTop: 4,
+    paddingHorizontal: 15,
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingBottom: 120
+  },
+  username: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 10
+  },
   avatar: {
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
     borderRadius: AVATAR_SIZE / 2,
-    marginRight: 20,
-    borderWidth: 2,
-    borderColor: COLORS.divider,
+    borderWidth: 4,
+    borderColor: COLORS.red,
+    position: 'absolute',
+    top: -(AVATAR_SIZE / 2),
+    marginBottom: 40
   },
-  statsContainer: {
+  avatarWrapper: {
+    marginTop: -40,
+    backgroundColor: COLORS.white,
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    alignItems: 'center',
+    paddingTop: 60,
+  },
+  contentWrapper: {
     flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-around",
+    marginTop: AVATAR_SIZE / 2 - 40,
   },
-  statItem: { alignItems: "center", flex: 1, marginHorizontal: 5 },
-  statItemPlaceholder: { flex: 1, marginHorizontal: 5 },
-  statCount: { fontSize: 20, fontWeight: "bold", color: COLORS.textDark },
-  statLabel: { fontSize: 12, color: COLORS.textGrey, textAlign: "center" },
-  userName: {
+  descriptionWrapper: {
+    alignItems: 'center',
+  },
+  name: {
+    fontWeight: '800',
     fontSize: 20,
-    fontWeight: "500",
-    color: COLORS.textDark,
-    marginBottom: 20,
-    paddingTop: 5,
   },
-  pastOrdersHeader: {
-    paddingHorizontal: PADDING_HORIZONTAL,
-    paddingVertical: 15,
+  subtitle: {
+    fontSize: 16,
   },
-  pastOrdersTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: COLORS.textDark,
-    textAlign: "center",
+  statsWrapper: {
+    flexDirection: 'row',
+    gap: 30,
+    marginTop: 16,
+    marginBottom: 24
   },
-  columnWrapper: { justifyContent: "flex-start" },
-  orderItemContainer: {
-    width: GRID_ITEM_SIZE,
-    height: GRID_ITEM_SIZE * 1.5,
-    padding: 2,
+  statButton: {
+    alignItems: 'center',
   },
-  orderImage: {
-    flex: 1,
-    borderRadius: 8,
-    overflow: "hidden",
+  statTitle: {
+    fontSize: 20,
+    fontWeight: '700',
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.15)",
-    borderRadius: 8,
+  divider: {
+    width: 1,
+    height: '70%',
+    backgroundColor: '#B9B9B9',
+    alignSelf: 'center',
   },
-  orderTextContainer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    paddingVertical: 6,
-    paddingHorizontal: 6,
-    backgroundColor: "rgba(0,0,0,0.4)",
-    borderBottomLeftRadius: 8,
-    borderBottomRightRadius: 8,
+  badgesContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
   },
-  orderTitle: { color: COLORS.white, fontSize: 12, fontWeight: "600" },
-  restaurantRow: { flexDirection: "row", alignItems: "center", marginTop: 2 },
-  orderRestaurant: {
-    color: COLORS.white,
-    fontSize: 10,
-    opacity: 0.9,
+  h2: {
+    fontSize: 16,
+    textAlign: 'center',
+    marginTop: 24,
+    marginBottom: 12
   },
 });
 

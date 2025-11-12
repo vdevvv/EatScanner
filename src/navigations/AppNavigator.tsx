@@ -13,10 +13,9 @@ import Order from "../screens/Order/DiscoveryRestoranScreen";
 import DiscoveryRestoranOrderScreen from "../screens/Order/DiscoveryRestoranOrderScreen";
 import DiscoveryFiltersPage from "../screens/Discovery/DiscoveryFiltersPage";
 
-import FriendsProfileFriends from "../screens/FriendsProfile/FriendsProfileFriends";
+// import FriendsProfileFriends from "../screens/FriendsProfile/FriendsProfileFriends";
 import FriendsProfileScreen from "../screens/FriendsProfile/FriendsProfileScreen";
 import FriendsProfileScreenShare from "../screens/FriendsProfile/FriendsProfileScreenShare";
-import RemoveFriend from "../screens/FriendsProfile/RemoveFriend";
 import BlockUser from "../screens/FriendsProfile/BlockUser";
 
 import MyProfileSettings from "../screens/MyProfile/MyProfileSettings";
@@ -75,7 +74,6 @@ const AppNavigator = () => {
       {/*<FriendsStack.Screen name="FriendsProfileFriends" component={FriendsProfileFriends}/>*/}
       <FriendsStack.Screen name="FriendsProfileScreen" component={FriendsProfileScreen}/>
       <FriendsStack.Screen name="FriendsProfileScreenShare" component={FriendsProfileScreenShare}/>
-      <FriendsStack.Screen name="RemoveFriend" component={RemoveFriend}/>
       <FriendsStack.Screen name="BlockUser" component={BlockUser}/>
     </FriendsStack.Navigator>
   )
@@ -84,9 +82,10 @@ const AppNavigator = () => {
   const MyProfileStackNavigator = () => (
     <MyProfileStack.Navigator screenOptions={{headerShown: false}}>
       <MyProfileStack.Screen name="Profile" component={MyProfileScreen}/>
+      <MyProfileStack.Screen name="FriendsScreen" component={FriendsScreen}/>
+      <FriendsStack.Screen name="FriendsProfileScreen" component={FriendsProfileScreen}/>
       <MyProfileStack.Screen name="MyProfileSettings" component={MyProfileSettings}/>
       <MyProfileStack.Screen name="MyProfileSaved" component={MyProfileSaved}/>
-      <MyProfileStack.Screen name="FriendsScreen" component={FriendsScreen}/>
       <MyProfileStack.Screen name="MyProfileEdit" component={MyProfileEdit}/>
       <MyProfileStack.Screen name="MyProfileChangePassword" component={MyProfileChangePassword}/>
       <MyProfileStack.Screen name="MyProfilePolicyScreen" component={MyProfilePolicyScreen}/>
@@ -106,8 +105,13 @@ const AppNavigator = () => {
           height: 80,
           paddingBottom: 10,
           paddingTop: 10,
+          borderTopLeftRadius: 20,
+          borderTopRightRadius: 20,
+          overflow: "hidden",
+          backgroundColor: "#fff",
+          borderTopWidth: 0,
         },
-        tabBarIcon: ({color, size}) => {
+        tabBarIcon: ({color}) => {
           let iconName: keyof typeof Ionicons.glyphMap = "home-outline";
 
           switch (route.name) {

@@ -14,12 +14,10 @@ import SignUp from "../screens/SignUp/SignUp";
 import SignUpSetPassword1 from "../screens/SignUp/SignUpSetPassword1";
 import SignUpConfirmationCode1 from "../screens/SignUp/SignUpConfirmationCode1";
 import SignIn from "../screens/SignIn/SignIn";
-import CheckEmailscreen from "../screens/SignUp/CheckEmailscreen";
 import Auth from "../screens/Auth/Auth";
 
 export type AuthStackParamList = {
   Auth?: { initialTab?: "signIn" | "signUp" };
-
   Welcome: undefined;
   OnBoarding1Screen: undefined;
   OnBoarding2Screen: undefined;
@@ -34,7 +32,6 @@ export type AuthStackParamList = {
   SignUpSetPassword1: undefined;
   SignUpConfirmationCode1: undefined;
   SignIn: undefined;
-  CheckEmailscreen: undefined;
 };
 
 const AuthNavigator = () => {
@@ -44,13 +41,10 @@ const AuthNavigator = () => {
     <AuthStack.Navigator screenOptions={{headerShown: false}}>
       <AuthStack.Screen name="Welcome" component={WelcomeScreen}  />
       <AuthStack.Screen name='Auth' component={Auth} />
-
-      <AuthStack.Screen name="CheckEmailscreen" component={CheckEmailscreen} />
       <AuthStack.Screen name="SignUp" component={SignUp}/>
       <AuthStack.Screen name="SignIn" component={SignIn} />
       <AuthStack.Screen name="SignUpSetPassword1" component={SignUpSetPassword1}/>
       <AuthStack.Screen name="SignUpConfirmationCode1" component={SignUpConfirmationCode1}/>
-
       <AuthStack.Screen name="OnBoarding1Screen" component={OnBoarding1Screen}/>
       <AuthStack.Screen name="OnBoarding2Screen" component={OnBoarding2Screen}/>
       <AuthStack.Screen name="OnBoarding3Screen" component={OnBoarding3Screen}/>

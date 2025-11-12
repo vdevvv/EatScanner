@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import {
   View,
   Text,
@@ -8,17 +8,18 @@ import {
   Dimensions,
   Platform, FlatList, ActivityIndicator,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { useMyFriends, useRemoveFriend } from "../../hooks/friends";
-import { handleApiError } from "../../utils/handleApiError";
+import {Ionicons} from "@expo/vector-icons";
+import {useNavigation} from "@react-navigation/native";
+import {SafeAreaView} from "react-native-safe-area-context";
+import {useMyFriends, useRemoveFriend} from "../../hooks/friends";
+import {handleApiError} from "../../utils/handleApiError";
 import FriendListItem from "../../components/Friends/FriendListItem";
-import { useDebounce } from "../../hooks/use-debounce";
-import { Friend } from "../../types";
+import {useDebounce} from "../../hooks/use-debounce";
+import {Friend} from "../../types";
 import {FriendsNavigationProp} from "../../navigations/AppNavigator";
+import {COLORS} from "../../constants/colors";
 
-const { width } = Dimensions.get("window");
+const {width} = Dimensions.get("window");
 
 const FriendsScreenFinal = () => {
   const navigation = useNavigation<FriendsNavigationProp>();
@@ -26,8 +27,8 @@ const FriendsScreenFinal = () => {
   const [searchText, setSearchText] = useState("");
   const [debounceSearchText, setDebounceSearchText] = useState("");
 
-  const { data, isError, error, isFetching } = useMyFriends(debounceSearchText, page);
-  const { mutate } = useRemoveFriend();
+  const {data, isError, error, isFetching} = useMyFriends(debounceSearchText, page);
+  const {mutate} = useRemoveFriend();
 
   const hasMore = data && page < data?.meta.pageCount;
   const [friends, setFriends] = useState<Friend[]>([]);
@@ -63,42 +64,28 @@ const FriendsScreenFinal = () => {
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={28} color="#333" />
+          <Ionicons name="chevron-back" size={28} color="#333" style={{marginRight: 10}}/>
+          <Text style={styles.screenTitle}>Friends</Text>
         </TouchableOpacity>
-        <Text style={styles.screenTitle}>Friends</Text>
-        <View style={{ width: 48 }} />
       </View>
 
       <View style={styles.searchBarContainer}>
         <Ionicons
           name="search-outline"
           size={20}
-          color="#999"
+          color={COLORS.black}
           style={styles.searchIcon}
         />
         <TextInput
           style={styles.searchInput}
           placeholder="Search anyone..."
-          placeholderTextColor="#999"
+          placeholderTextColor={COLORS.grey30}
           value={searchText}
           onChangeText={(value) => {
             setSearchText(value);
             debouncedSearch(value);
           }}
         />
-        {searchText.length > 0 && (
-          <TouchableOpacity
-            onPress={() => {
-              setSearchText("");
-              setDebounceSearchText("");
-              setPage(1);
-              setFriends([]);
-            }}
-            style={styles.clearButton}
-          >
-            <Ionicons name="close-circle" size={20} color="#999" />
-          </TouchableOpacity>
-        )}
       </View>
 
       <FlatList
@@ -113,9 +100,9 @@ const FriendsScreenFinal = () => {
         }}
         onEndReachedThreshold={0.5}
         ListFooterComponent={
-          isFetching && page > 1 ? <ActivityIndicator style={{ marginVertical: 20 }} /> : null
+          isFetching && page > 1 ? <ActivityIndicator style={{marginVertical: 20}}/> : null
         }
-        renderItem={({ item }) => (
+        renderItem={({item}) => (
           <FriendListItem
             friend={item}
             handlePressUser={handlePressUser}
@@ -140,7 +127,7 @@ const FriendsScreenFinal = () => {
 
       {isFetching && page === 1 && friends.length === 0 && (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" />
+          <ActivityIndicator size="large"/>
         </View>
       )}
     </SafeAreaView>
@@ -150,32 +137,22 @@ const FriendsScreenFinal = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
   },
   headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
     paddingHorizontal: 10,
     paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
     position: "relative",
     width,
   },
   backButton: {
-    padding: 10,
-    zIndex: 10,
+    flexDirection: "row",
+    alignItems: "center",
   },
   screenTitle: {
-    position: "absolute",
-    left: 0,
-    right: 0,
-    textAlign: "center",
-    fontSize: 18,
+    fontSize: 24,
     fontWeight: "600",
     color: "#333",
-    paddingVertical: 10,
   },
   searchBarContainer: {
     flexDirection: "row",
@@ -195,11 +172,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
     ...Platform.select({
-      android: { paddingVertical: 0 },
+      android: {paddingVertical: 0},
     }),
-  },
-  clearButton: {
-    padding: 5,
   },
   scrollContent: {
     paddingHorizontal: 16,
