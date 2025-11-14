@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Image, ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import Login from "../../components/Auth/Login/Login";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {RouteProp, useNavigation, useRoute} from "@react-navigation/native";
@@ -7,6 +7,7 @@ import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import {AuthStackParamList} from "../../navigations/AuthNavigator";
 import Register from "../../components/Auth/Register/Register";
 import {COLORS} from "../../constants/colors";
+import TaalEatsLogo from "../../components/icons/TaalEatsLogo";
 
 type AuthNavigationProp = NativeStackNavigationProp<
   AuthStackParamList,
@@ -26,11 +27,7 @@ const Auth = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.logoContainer}>
-          <Image
-            source={require("../../assets/eat-scanner-logo.png")}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+          <TaalEatsLogo style={styles.logo} />
         </View>
 
         <View style={styles.tabContainer}>
@@ -78,7 +75,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   logoContainer: {alignItems: "center",},
-  logo: {height: 120,},
+  logo: {height: 120, width: 120},
   tabContainer: {
     flexDirection: "row",
     justifyContent: "center",

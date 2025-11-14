@@ -7,21 +7,13 @@ import {MenuItem} from "../../types";
 import {useNavigation} from "@react-navigation/native";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import {RootStackParamList} from "./VideoWrappep";
+import {COLORS} from "../../constants/colors";
+import {BlurView} from "expo-blur";
 
 const shareIcon = require("../../assets/Telegram.png");
 const saveIcon = require("../../assets/Save.png");
 const saveIconRed = require("../../assets/Save-red.png");
 const heartIcon = require('../../assets/heart.png')
-
-export const COLORS = {
-  primary: "#E9725C",
-  secondary: "#A8574B",
-  white: "#FFFFFF",
-  text: "#333333",
-  textGrey: "#999",
-  shadow: "rgba(0, 0, 0, 0.4)",
-  background: "#F8F8F8",
-};
 
 interface VideoItemProps {
   restaurant: {
@@ -127,11 +119,14 @@ const VideoItem: FC<VideoItemProps> = (
 
           <View style={styles.buttonRow}>
             <TouchableOpacity
-              style={[styles.actionButton, styles.viewDishButton]}
+              style={[styles.actionButton, styles.viewDishButton, { overflow: 'hidden' }]}
               onPress={() => navigation.navigate("Order")}
             >
+              <BlurView intensity={10} tint="dark" style={StyleSheet.absoluteFill} />
+
               <Text style={styles.viewDishText}>View Menu</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
               style={[styles.actionButton, styles.orderNowButton]}
               onPress={() => navigation.navigate("DishDetailScreen")}
@@ -255,13 +250,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   viewDishButton: {
-    flex: 1,
-    backgroundColor: "rgba(233,114,92,0.3)",
-    borderWidth: 2,
-    borderColor: COLORS.primary,
+    paddingHorizontal: 27,
+    backgroundColor: `${COLORS.red}35`,
+    borderWidth: 1,
+    borderColor: COLORS.red,
+    borderRadius: 12,
   },
   viewDishText: {fontSize: 16, fontWeight: "bold", color: COLORS.white},
-  orderNowButton: {flex: 1, backgroundColor: COLORS.primary},
+  orderNowButton: {flex: 1, backgroundColor: COLORS.red},
   orderNowText: {fontSize: 16, fontWeight: "bold", color: COLORS.white},
   sideIcons: {
 

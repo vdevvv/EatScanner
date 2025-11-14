@@ -10,6 +10,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamList } from "../../../App";
+import {COLORS} from "../../constants/colors";
 
 type AllergiesScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
@@ -94,6 +95,7 @@ const AllergiesScreen = () => {
         <View style={styles.progressContainer}>
           <View style={styles.progressDot} />
           <View style={styles.progressDot} />
+          <View style={styles.progressDot} />
           <View style={[styles.progressDot, styles.activeDot]} />
           <View style={styles.progressDot} />
         </View>
@@ -124,11 +126,11 @@ export default AllergiesScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
   },
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
     paddingHorizontal: 16,
     justifyContent: "space-between",
   },
@@ -138,13 +140,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: "700",
-    color: "#111",
+    color: COLORS.black,
     textAlign: "left",
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 15,
-    color: "#666",
+    color: COLORS.black,
     marginBottom: 16,
   },
   listContent: {
@@ -156,8 +158,8 @@ const styles = StyleSheet.create({
   },
   option: {
     borderWidth: 1,
-    borderColor: "#E0E0E0",
-    backgroundColor: "#fff",
+    borderColor: COLORS.stroke1,
+    backgroundColor: COLORS.white,
     borderRadius: 14,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -167,16 +169,16 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   optionSelected: {
-    backgroundColor: "#FFE7E0",
-    borderColor: "#E57373",
+    backgroundColor: `${COLORS.red}20`,
+    borderColor: COLORS.red,
   },
   optionText: {
     fontSize: 16,
-    color: "#222",
+    color: COLORS.black,
+    fontWeight: 'semibold'
   },
   optionTextSelected: {
-    color: "#D84343",
-    fontWeight: "600",
+    color: COLORS.black,
   },
   progressContainer: {
     flexDirection: "row",
@@ -188,31 +190,31 @@ const styles = StyleSheet.create({
     width: 24,
     height: 4,
     borderRadius: 2,
-    backgroundColor: "#eee",
+    backgroundColor: COLORS.grey20,
     marginHorizontal: 4,
   },
   activeDot: {
-    backgroundColor: "#E57373",
+    backgroundColor: COLORS.red,
   },
   continueButton: {
     alignSelf: "center",
     width: "100%",
     maxWidth: 360,
-    backgroundColor: "#E57373",
+    backgroundColor: COLORS.red,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
     marginBottom: 20,
   },
   disabledButton: {
-    backgroundColor: "#f2f2f2",
+    backgroundColor: COLORS.stroke1,
   },
   continueText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#fff",
+    color: COLORS.white,
   },
   continueTextDisabled: {
-    color: "#aaa",
+    color: COLORS.grey30,
   },
 });

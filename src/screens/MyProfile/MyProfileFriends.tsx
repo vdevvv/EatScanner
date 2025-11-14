@@ -18,6 +18,7 @@ import {useDebounce} from "../../hooks/use-debounce";
 import {Friend} from "../../types";
 import {FriendsNavigationProp} from "../../navigations/AppNavigator";
 import {COLORS} from "../../constants/colors";
+import NoFriends from "../../components/Friends/NoFriends";
 
 const {width} = Dimensions.get("window");
 
@@ -60,6 +61,8 @@ const FriendsScreenFinal = () => {
     navigation.navigate('FriendsProfileScreen', {userId})
   }
 
+  const shouldShowNoFriends = !searchText && data?.data.length === 0 && !isFetching;
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
@@ -69,59 +72,67 @@ const FriendsScreenFinal = () => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.searchBarContainer}>
-        <Ionicons
-          name="search-outline"
-          size={20}
-          color={COLORS.black}
-          style={styles.searchIcon}
-        />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search anyone..."
-          placeholderTextColor={COLORS.grey30}
-          value={searchText}
-          onChangeText={(value) => {
-            setSearchText(value);
-            debouncedSearch(value);
-          }}
-        />
-      </View>
+      {!shouldShowNoFriends ? (
+        <>
+          <View style={styles.searchBarContainer}>
+            <Ionicons
+              name="search-outline"
+              size={20}
+              color={COLORS.black}
+              style={styles.searchIcon}
+            />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search anyone..."
+              placeholderTextColor={COLORS.grey30}
+              value={searchText}
+              onChangeText={(value) => {
+                setSearchText(value);
+                debouncedSearch(value);
+              }}
+            />
+          </View>
 
-      <FlatList
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-        data={friends}
-        keyExtractor={(item) => item.id}
-        onEndReached={() => {
-          if (hasMore && !isFetching) {
-            setPage(prev => prev + 1);
-          }
-        }}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={
-          isFetching && page > 1 ? <ActivityIndicator style={{marginVertical: 20}}/> : null
-        }
-        renderItem={({item}) => (
-          <FriendListItem
-            friend={item}
-            handlePressUser={handlePressUser}
-            onRemoveFriend={() => {
-              mutate(item.id, {
-                onSuccess: () => {
-                  setPage(1);
-                  setFriends([]);
-                }
-              });
+          <FlatList
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+            data={friends}
+            keyExtractor={(item) => item.id}
+            onEndReached={() => {
+              if (hasMore && !isFetching) {
+                setPage(prev => prev + 1);
+              }
             }}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={
+              isFetching && page > 1 ? <ActivityIndicator style={{marginVertical: 20}}/> : null
+            }
+            renderItem={({item}) => (
+              <FriendListItem
+                friend={item}
+                handlePressUser={handlePressUser}
+                onRemoveFriend={() => {
+                  mutate(item.id, {
+                    onSuccess: () => {
+                      setPage(1);
+                      setFriends([]);
+                    }
+                  });
+                }}
+              />
+            )}
           />
-        )}
-      />
-      {searchText.length > 0 && !isFetching && friends.length === 0 && (
-        <View style={styles.noResultsContainer}>
-          <Text style={styles.noResultsText}>
-            No users found matching "{searchText}"
-          </Text>
+          {searchText.length > 0 && !isFetching && friends.length === 0 && (
+            <View style={styles.noResultsContainer}>
+              <Text style={styles.noResultsText}>
+                No users found matching "{searchText}"
+              </Text>
+            </View>
+          )}
+        </>
+      ) : (
+        <View style={styles.noFriendsWrapper}>
+          <NoFriends/>
         </View>
       )}
 
@@ -196,6 +207,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 10,
+  },
+  noFriendsWrapper: {
+    flex: 1,
+    alignItems: "center",
   }
 });
 

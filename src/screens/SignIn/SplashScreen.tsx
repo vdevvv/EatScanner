@@ -4,14 +4,12 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../../../App";
 
-const BACKGROUND_IMAGE = require("../../assets/background.png");
-
 type WelcomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Welcome"
 >;
 
-const WelcomeScreen: React.FC = () => {
+const WelcomeScreen = () => {
   const navigation = useNavigation<WelcomeScreenNavigationProp>();
 
   useEffect(() => {
@@ -26,7 +24,7 @@ const WelcomeScreen: React.FC = () => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <ImageBackground
-        source={BACKGROUND_IMAGE}
+        source={require('../../assets/splash-screen.jpg')}
         style={styles.background}
         resizeMode="cover"
       />

@@ -9,6 +9,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {AuthStackParamList} from "../../navigations/AuthNavigator";
+import {COLORS} from "../../constants/colors";
 
 type NavigationProp = NativeStackNavigationProp<AuthStackParamList>;
 
@@ -73,8 +74,9 @@ const ShareContactsScreen = () => {
           <View style={styles.progressContainer}>
             <View style={styles.progressDot} />
             <View style={styles.progressDot} />
-            <View style={[styles.progressDot, styles.activeDot]} />
             <View style={styles.progressDot} />
+            <View style={styles.progressDot} />
+            <View style={[styles.progressDot, styles.activeDot]} />
           </View>
 
           <TouchableOpacity
@@ -105,13 +107,13 @@ export default ShareContactsScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
   },
   container: {
     flex: 1,
     justifyContent: "space-between",
     paddingHorizontal: 24,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
   },
   headerContainer: {
     marginTop: 40,
@@ -120,13 +122,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: "700",
-    color: "#111",
+    color: COLORS.black,
     marginBottom: 8,
     lineHeight: 32,
   },
   subtitle: {
     fontSize: 15,
-    color: "#666",
+    color: COLORS.black,
     lineHeight: 21,
   },
   optionsContainer: {
@@ -136,23 +138,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: "#E0E0E0",
+    borderColor: COLORS.stroke1,
     borderRadius: 14,
     paddingVertical: 14,
     paddingHorizontal: 14,
     marginBottom: 14,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
   },
   optionSelected: {
-    borderColor: "#E57373",
-    backgroundColor: "#FFF5F3",
+    borderColor: COLORS.black,
+    backgroundColor: COLORS.white,
   },
   radioCircle: {
     height: 22,
     width: 22,
     borderRadius: 11,
     borderWidth: 2,
-    borderColor: "#333",
+    borderColor: COLORS.black,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -161,11 +163,11 @@ const styles = StyleSheet.create({
     height: 10,
     width: 10,
     borderRadius: 5,
-    backgroundColor: "#E57373",
+    backgroundColor: COLORS.black,
   },
   optionLabel: {
-    fontSize: 16,
-    color: "#222",
+    fontSize: 14,
+    color: COLORS.black,
   },
   footerContainer: {
     marginBottom: 24,
@@ -180,27 +182,27 @@ const styles = StyleSheet.create({
     width: 24,
     height: 4,
     borderRadius: 2,
-    backgroundColor: "#eee",
+    backgroundColor: COLORS.grey20,
     marginHorizontal: 4,
   },
   activeDot: {
-    backgroundColor: "#E57373",
+    backgroundColor: COLORS.red,
   },
   continueButton: {
-    backgroundColor: "#E57373",
+    backgroundColor: COLORS.red,
     borderRadius: 12,
     paddingVertical: 16,
     alignItems: "center",
   },
   disabledButton: {
-    backgroundColor: "#f2f2f2",
+    backgroundColor: COLORS.stroke1,
   },
   continueText: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#fff",
+    color: COLORS.white,
   },
   continueTextDisabled: {
-    color: "#aaa",
+    color: COLORS.grey30,
   },
 });
