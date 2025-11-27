@@ -9,24 +9,19 @@ import React, {FC, useEffect, useRef, useState} from "react";
 import {RestaurantResponse} from "../../types";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 import VideoItem from "./VideoItem";
+import {COLORS} from "../../constants/colors";
+import {getDistanceMiles} from "../../utils/getDistance";
+import {LocationObjectCoords} from "expo-location";
 
 interface VideoWrapperProps {
   item: RestaurantResponse;
+  rating: number | null
   index: number;
   visibleIndex: number;
   isScreenFocused: boolean;
   isSaved: boolean;
+  coords: Pick<LocationObjectCoords, 'latitude' | 'longitude'> | null;
 }
-
-export const COLORS = {
-  primary: "#E9725C",
-  secondary: "#A8574B",
-  white: "#FFFFFF",
-  text: "#333333",
-  textGrey: "#999",
-  shadow: "rgba(0, 0, 0, 0.4)",
-  background: "#F8F8F8",
-};
 
 export type RootStackParamList = {
   HomePageScreen: undefined;
@@ -48,11 +43,12 @@ const VideoWrapper: FC<VideoWrapperProps> = (
     index,
     visibleIndex,
     isScreenFocused,
-    isSaved
+    isSaved,
+    rating,
+    coords
   }) => {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const isVisible = index === visibleIndex;
-  const videoFlatListRef = useRef<FlatList>(null);
 
   const {width, height} = useWindowDimensions();
   const {top} = useSafeAreaInsets()
@@ -73,12 +69,6 @@ const VideoWrapper: FC<VideoWrapperProps> = (
     }
   }).current;
 
-  const getItemLayoutVideo = (_data: any, index: number) => ({
-    length: width,
-    offset: width * index,
-    index,
-  });
-
   const videos = item.menu?.categories
     .flatMap(cat => cat.items)
     .map(i => i.video)
@@ -91,9 +81,15 @@ const VideoWrapper: FC<VideoWrapperProps> = (
   }
 
   const menuItems = getMenuItems(item);
+  const distance = getDistanceMiles({
+    lat1: item.latitude,
+    lon1: item.longitude,
+    lat2: coords?.latitude,
+    lon2: coords?.longitude
+  })
 
   return (
-    <View style={[styles.container, {width, height}]}>
+    <View style={styles.container}>
       <View style={[styles.topProgressWrapper, {top}]}>
         <View style={styles.topProgressContainer}>
           {videos.length > 1 && videos.map((_, i) => (
@@ -107,21 +103,23 @@ const VideoWrapper: FC<VideoWrapperProps> = (
           ))}
         </View>
       </View>
-
       <FlatList
-        ref={videoFlatListRef}
         data={menuItems}
-        horizontal
         pagingEnabled
+        horizontal
         showsHorizontalScrollIndicator={false}
+        onViewableItemsChanged={onViewableItemsChangedVideo}
+        viewabilityConfig={viewabilityConfigVideo}
+        scrollEnabled={videos.length > 1}
         keyExtractor={(_, idx) => `${item.id}-video-${idx}`}
         renderItem={({item: menuItem, index}) => (
           <VideoItem
+            distance={distance}
+            rating={rating}
             restaurant={{
               name: item.name,
-              trustpilotRating: item.trustpilotRating,
-              googleRating: item.googleRating,
               city: item.city,
+              menuId: item.menu?.id ?? null
             }}
             menuItem={menuItem}
             isVisible={isVisible && index === currentVideoIndex}
@@ -131,14 +129,6 @@ const VideoWrapper: FC<VideoWrapperProps> = (
             isSaved={isSaved}
           />
         )}
-        getItemLayout={getItemLayoutVideo}
-        onViewableItemsChanged={onViewableItemsChangedVideo}
-        viewabilityConfig={viewabilityConfigVideo}
-        snapToInterval={width}
-        snapToAlignment="start"
-        decelerationRate="fast"
-        scrollEnabled={videos.length > 1}
-        removeClippedSubviews={false}
       />
     </View>
   );
@@ -152,7 +142,8 @@ const areEqual = (prevProps: VideoWrapperProps, nextProps: VideoWrapperProps) =>
     prevProps.item.id === nextProps.item.id &&
     prevIsVisible === nextIsVisible &&
     prevProps.isScreenFocused === nextProps.isScreenFocused &&
-    prevProps.isSaved === nextProps.isSaved
+    prevProps.isSaved === nextProps.isSaved &&
+    prevProps.rating === nextProps.rating
   );
 };
 
@@ -180,5 +171,5 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginHorizontal: 3,
   },
-  topActiveBar: {backgroundColor: COLORS.primary,},
+  topActiveBar: {backgroundColor: COLORS.red},
 });

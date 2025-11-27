@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     width: "100%",
     marginTop: 30,
   },
-  confirmButtonActive: {backgroundColor: COLORS.orange,},
+  confirmButtonActive: {backgroundColor: COLORS.red,},
   confirmText: {
     fontSize: 16,
     fontWeight: "600",

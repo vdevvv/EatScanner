@@ -6,27 +6,49 @@ import {
   View,
   ViewToken,
   useWindowDimensions,
-} from "react-native";
-import React, {useEffect, useRef, useState} from "react";
-import {Ionicons} from "@expo/vector-icons";
-import {StyleSheet} from "react-native";
-import {useIsFocused, useNavigation} from "@react-navigation/native";
-import VideoWrapper, {COLORS} from "../../components/Home/VideoWrappep";
-import {useRestaurants} from "../../hooks/restaurants";
-import {RestaurantResponse} from "../../types";
-import {SafeAreaView} from "react-native-safe-area-context";
-import {HomePageNavigationProp} from "../../components/Home/VideoItem";
+} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet } from 'react-native';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import VideoWrapper from '../../components/Home/VideoWrappep';
+import { useRatings, useRestaurants } from '../../hooks/restaurants';
+import { RestaurantResponse, RestaurantReviewsResponse } from '../../types';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { COLORS } from '../../constants/colors';
+import { useLocationAlert } from '../../hooks/useLocationAlert';
+import { useLocationStore } from '../../stores/useLocationStore';
+import { HomeNavigationProp } from '../../navigations/app.types';
+import PageLoader from '../../components/Loader/PageLoader';
 
 const HomePageScreen = () => {
+  useLocationAlert();
+  const { coords, fetchLocation } = useLocationStore();
+
   const [page, setPage] = useState(1);
-  const {data, isFetching} = useRestaurants(page)
+  const { data, isFetching } = useRestaurants(page);
   const hasMore = data && page < data?.meta.pageCount;
-  const [savedVideos, setSavedVideos] = useState<Set<string>>(new Set());
   const [visibleIndex, setVisibleIndex] = useState<number>(0);
-  const navigation = useNavigation<HomePageNavigationProp>();
+  const navigation = useNavigation<HomeNavigationProp>();
   const isScreenFocused = useIsFocused();
-  const {height} = useWindowDimensions();
+  const { height } = useWindowDimensions();
   const [restaurants, setRestaurants] = useState<RestaurantResponse[]>([]);
+
+  const { data: ratingsBatch } = useRatings(data?.data.map(r => r.placeId) ?? []);
+  const [allRatings, setAllRatings] = useState<RestaurantReviewsResponse>({});
+
+  useEffect(() => {
+    void fetchLocation();
+  }, []);
+
+  useEffect(() => {
+    if (!ratingsBatch) return;
+
+    setAllRatings(prev => ({
+      ...prev,
+      ...ratingsBatch,
+    }));
+  }, [ratingsBatch]);
 
   useEffect(() => {
     if (!data?.data || data.data.length === 0) return;
@@ -50,7 +72,7 @@ const HomePageScreen = () => {
   };
 
   const onViewableItemsChanged = useRef((
-    {viewableItems}: { viewableItems: ViewToken[] }) => {
+    { viewableItems }: { viewableItems: ViewToken[] }) => {
     if (viewableItems.length > 0 && viewableItems[0].index !== null) {
       setVisibleIndex(viewableItems[0].index);
     }
@@ -62,8 +84,12 @@ const HomePageScreen = () => {
     index,
   });
 
+  if (!coords) {
+    return <PageLoader />;
+  }
+
   return (
-    <View style={{flex: 1, backgroundColor: '#000'}}>
+    <View style={{ flex: 1, backgroundColor: '#000' }}>
       <StatusBar
         translucent
         backgroundColor="transparent"
@@ -72,7 +98,7 @@ const HomePageScreen = () => {
       <SafeAreaView style={styles.headerFixed}>
         <TouchableOpacity
           style={styles.headerIcon}
-          onPress={() => navigation.navigate("Notifications")}
+          onPress={() => navigation.navigate('Notifications')}
         >
           <Ionicons
             name="notifications-outline"
@@ -96,11 +122,13 @@ const HomePageScreen = () => {
         snapToAlignment="start"
         decelerationRate="fast"
         onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={{itemVisiblePercentThreshold: 80}}
-        renderItem={({item, index}) => (
+        viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
+        renderItem={({ item, index }) => (
           <VideoWrapper
-            isSaved={savedVideos.has(item.id)}
+            coords={coords}
+            isSaved={false}
             item={item}
+            rating={allRatings?.[item.placeId]?.rating ?? null}
             index={index}
             visibleIndex={visibleIndex}
             isScreenFocused={isScreenFocused}
@@ -113,19 +141,19 @@ const HomePageScreen = () => {
 
 const styles = StyleSheet.create({
   headerFixed: {
-    position: "absolute",
-    top: Platform.select({ios: 45, android: StatusBar.currentHeight || 35}),
+    position: 'absolute',
+    top: Platform.select({ ios: 45, android: StatusBar.currentHeight || 35 }),
     left: 0,
     right: 0,
-    alignItems: "center",
+    alignItems: 'center',
     paddingHorizontal: 15,
     zIndex: 20,
   },
   headerIcon: {
-    position: "absolute",
+    position: 'absolute',
     right: 20,
-    top: Platform.select({ios: 0, android: -5}),
-  }
-})
+    top: Platform.select({ ios: 0, android: -5 }),
+  },
+});
 
 export default HomePageScreen;

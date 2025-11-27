@@ -1,11 +1,12 @@
-import React, {useEffect} from 'react';
-import {useAuthStore} from "./src/stores/useAuthStore";
-import {NavigationContainer} from "@react-navigation/native";
-import AuthNavigator from "./src/navigations/AuthNavigator";
-import AppNavigator from "./src/navigations/AppNavigator";
+import React, { useEffect } from 'react';
+import { useAuthStore } from './src/stores/useAuthStore';
+import { NavigationContainer } from '@react-navigation/native';
+import AuthNavigator from './src/navigations/AuthNavigator';
+import AppNavigator from './src/navigations/AppNavigator';
 import Toast from 'react-native-toast-message';
-import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
-import {SafeAreaProvider, useSafeAreaInsets} from "react-native-safe-area-context";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export type RootStackParamList = {
   Auth: undefined
@@ -58,7 +59,7 @@ export type RootStackParamList = {
 
 const App = () => {
   const queryClient = new QueryClient();
-  const {loadUserOnStartup, isAuth} = useAuthStore(state => state);
+  const { loadUserOnStartup, isAuth } = useAuthStore(state => state);
 
   useEffect(() => {
     void loadUserOnStartup();
@@ -67,23 +68,25 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
-        <AppContent isAuth={isAuth}/>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <AppContent isAuth={isAuth} />
+        </GestureHandlerRootView>
       </SafeAreaProvider>
     </QueryClientProvider>
   );
 };
 
-function AppContent({isAuth}: { isAuth: boolean }) {
-  const {top} = useSafeAreaInsets();
+function AppContent({ isAuth }: { isAuth: boolean }) {
+  const { top } = useSafeAreaInsets();
 
   return (
     <>
       <NavigationContainer>
-        {isAuth ? <AppNavigator/> : <AuthNavigator/>}
+        {isAuth ? <AppNavigator /> : <AuthNavigator />}
       </NavigationContainer>
-      <Toast topOffset={top}/>
+      <Toast topOffset={top} />
     </>
-  )
+  );
 }
 
 export default App;

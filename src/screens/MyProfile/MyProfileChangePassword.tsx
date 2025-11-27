@@ -1,99 +1,38 @@
-import React, { useState } from "react";
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  TextInput,
   ScrollView,
-  Alert,
   Platform,
-} from "react-native";
-import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { SafeAreaView } from "react-native-safe-area-context";
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import PasswordInput from '../../components/common/PasswordInput';
+import { COLORS } from '../../constants/colors';
+import { Controller, useForm } from 'react-hook-form';
+import { setNewPasswordSchema, SetNewPasswordSchema } from '../../schemas/user/set-new-password.schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useUpdatePassword } from '../../hooks/user';
 
-interface PasswordInputProps {
-  label: string;
-  value: string;
-  onChangeText: (text: string) => void;
-}
+const ChangePasswordScreen = () => {
+  const navigation = useNavigation();
+  const { mutate, isPending } = useUpdatePassword();
+  const { control, handleSubmit, formState: { errors } } = useForm<SetNewPasswordSchema>({
+    resolver: zodResolver(setNewPasswordSchema),
+  });
 
-const PasswordInput: React.FC<PasswordInputProps> = ({
-  label,
-  value,
-  onChangeText,
-}) => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  const toggleVisibility = () => {
-    setIsVisible((prev) => !prev);
-  };
-
-  return (
-    <View style={styles.inputGroup}>
-      <Text style={styles.label}>{label}</Text>
-      <View style={styles.textInputContainer}>
-        <TextInput
-          style={styles.textInput}
-          value={value}
-          onChangeText={onChangeText}
-          secureTextEntry={!isVisible}
-          autoCapitalize="none"
-          autoCorrect={false}
-          placeholder="••••••••••"
-          placeholderTextColor="#A0A0A0"
-        />
-        <TouchableOpacity
-          onPress={toggleVisibility}
-          style={styles.toggleButton}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          <MaterialCommunityIcons
-            name={isVisible ? "eye-off-outline" : "eye-outline"}
-            size={24}
-            color="#A0A0A0"
-          />
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-};
-
-const ChangePasswordScreen: React.FC = () => {
-  const navigation = useNavigation(); // ✅ додано
-  const [oldPassword, setOldPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
-  const handleBack = () => {
-    navigation.goBack();
-  };
-
-  const handleSaveChanges = () => {
-    if (!oldPassword || !newPassword || !confirmPassword) {
-      Alert.alert("Помилка", "Будь ласка, заповніть усі поля.");
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      Alert.alert("Помилка", "Новий пароль та підтвердження не збігаються.");
-      return;
-    }
-
-    console.log("Зміна пароля:", { oldPassword, newPassword });
-
-    Alert.alert("Успіх", "Пароль успішно змінено!");
-    setOldPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
-    navigation.goBack();
+  const onSubmit = async (data: SetNewPasswordSchema) => {
+    const { oldPassword, newPassword } = data;
+    mutate({ oldPassword, newPassword });
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
           <Ionicons name="chevron-back" size={28} color="#000" />
         </TouchableOpacity>
         <Text style={styles.screenTitle}>Settings</Text>
@@ -103,31 +42,59 @@ const ChangePasswordScreen: React.FC = () => {
         <Text style={styles.sectionTitle}>Change Password</Text>
 
         <View style={styles.formContainer}>
-          <PasswordInput
-            label="Old password"
-            value={oldPassword}
-            onChangeText={setOldPassword}
-          />
-          <PasswordInput
-            label="New password"
-            value={newPassword}
-            onChangeText={setNewPassword}
-          />
-          <PasswordInput
-            label="Confirm password"
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-          />
+          <View>
+            <Controller
+              control={control}
+              name="oldPassword"
+              render={({ field: { onChange, value } }) => (
+                <PasswordInput
+                  label="Old password"
+                  value={value}
+                  onChangeText={onChange}
+                />
+              )}
+            />
+            {errors.oldPassword && <Text style={styles.errorText}>{errors.oldPassword.message}</Text>}
+          </View>
+          <View>
+            <Controller
+              control={control}
+              name="newPassword"
+              render={({ field: { onChange, value } }) => (
+                <PasswordInput
+                  label="New password"
+                  value={value}
+                  onChangeText={onChange}
+                />
+              )}
+            />
+            {errors.newPassword && <Text style={styles.errorText}>{errors.newPassword.message}</Text>}
+          </View>
+          <View>
+            <Controller
+              control={control}
+              name="confirmPassword"
+              render={({ field: { onChange, value } }) => (
+                <PasswordInput
+                  label="Confirm password"
+                  value={value}
+                  onChangeText={onChange}
+                />
+              )}
+            />
+            {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword.message}</Text>}
+          </View>
         </View>
       </ScrollView>
 
       <View style={styles.footer}>
         <TouchableOpacity
+          disabled={isPending}
           style={styles.saveButton}
-          onPress={handleSaveChanges}
+          onPress={handleSubmit(onSubmit)}
           activeOpacity={0.8}
         >
-          <Text style={styles.saveButtonText}>Save changes</Text>
+          <Text style={styles.saveButtonText}>{isPending ? 'Loading...' : 'Save changes'}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -137,7 +104,7 @@ const ChangePasswordScreen: React.FC = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -145,89 +112,57 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   headerContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.white,
   },
-  backButton: {
-    padding: 10,
-  },
+  backButton: { padding: 10, },
   screenTitle: {
     fontSize: 24,
-    fontWeight: "700",
-    color: "#000",
+    fontWeight: '700',
+    color: COLORS.black,
     marginLeft: 5,
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: "700",
-    color: "#000",
+    fontWeight: '700',
+    color: COLORS.black,
     marginTop: 20,
     marginBottom: 10,
   },
-  formContainer: {},
-  inputGroup: {
-    marginBottom: 25,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#000",
-    marginBottom: 8,
-  },
-  textInputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#ddd",
-    borderRadius: 12,
-    paddingRight: 15,
-    backgroundColor: "#fff",
-  },
-  textInput: {
-    flex: 1,
-    paddingHorizontal: 15,
-    paddingVertical: Platform.OS === "ios" ? 15 : 12,
-    fontSize: 16,
-    color: "#000",
-  },
-  toggleButton: {
-    padding: 5,
+  formContainer: {
+    gap: 10,
   },
   footer: {
-    position: "absolute",
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
     paddingHorizontal: 20,
     paddingVertical: 20,
-    backgroundColor: "#fff",
     borderTopWidth: 1,
-    borderTopColor: "#f5f5f5",
+    borderTopColor: '#f5f5f5',
     ...Platform.select({
       ios: { paddingBottom: 35 },
       android: { paddingBottom: 20 },
     }),
   },
   saveButton: {
-    backgroundColor: "#cd6155",
+    backgroundColor: COLORS.red,
     paddingVertical: 15,
     borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 5,
-    elevation: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   saveButtonText: {
-    color: "#fff",
+    color: COLORS.white,
     fontSize: 18,
-    fontWeight: "700",
+    fontWeight: '700',
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 5,
   },
 });
 

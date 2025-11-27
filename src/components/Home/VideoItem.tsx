@@ -1,14 +1,13 @@
-import React, {FC, useEffect, useRef, useState} from "react";
+import React, {FC, useEffect, useState} from "react";
 import {ActivityIndicator, StyleSheet, View, Text, TouchableOpacity, Image, Share} from "react-native";
-import {ResizeMode, Video} from "expo-av";
 import {Feather} from "@expo/vector-icons";
 import GoogleLogo from "../icons/GoogleLogo";
 import {MenuItem} from "../../types";
 import {useNavigation} from "@react-navigation/native";
-import {NativeStackNavigationProp} from "@react-navigation/native-stack";
-import {RootStackParamList} from "./VideoWrappep";
 import {COLORS} from "../../constants/colors";
 import {BlurView} from "expo-blur";
+import {useVideoPlayer, VideoView} from "expo-video";
+import {HomeNavigationProp} from "../../navigations/app.types";
 
 const shareIcon = require("../../assets/Telegram.png");
 const saveIcon = require("../../assets/Save.png");
@@ -19,8 +18,7 @@ interface VideoItemProps {
   restaurant: {
     name: string;
     city: string;
-    trustpilotRating: string | null
-    googleRating: string | null
+    menuId: string | null
   };
   menuItem: MenuItem;
   isVisible: boolean;
@@ -28,12 +26,9 @@ interface VideoItemProps {
   width: number;
   height: number;
   isSaved: boolean;
+  rating: number | null;
+  distance: number | undefined;
 }
-
-export type HomePageNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "HomePageScreen"
->;
 
 const VideoItem: FC<VideoItemProps> = (
   {
@@ -43,14 +38,18 @@ const VideoItem: FC<VideoItemProps> = (
     width,
     height,
     restaurant,
-    isSaved
+    isSaved,
+    rating,
+    distance
   }
 ) => {
-  const navigation = useNavigation<HomePageNavigationProp>();
-
-  const videoRef = useRef<Video>(null);
+  const navigation = useNavigation<HomeNavigationProp>();
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const player = useVideoPlayer(menuItem.video, (player) => {
+    player.loop = true;
+    player.muted = false;
+  });
 
   useEffect(() => {
     setIsVideoReady(false);
@@ -59,15 +58,30 @@ const VideoItem: FC<VideoItemProps> = (
 
   useEffect(() => {
     (async () => {
-      if (isVisible && isVideoReady && videoRef.current && !videoError) {
-        try {
-          await videoRef.current.setPositionAsync(0);
-        } catch (error) {
-          console.log('Video setPosition error:', error);
-        }
+      if (isVisible && isScreenFocused && !videoError) {
+        player.play()
+      } else {
+        player.pause()
       }
     })();
-  }, [isVisible, isVideoReady, videoError]);
+  }, [isVisible, isScreenFocused, videoError, player]);
+
+  useEffect(() => {
+    const subscription = player.addListener('statusChange', (status) => {
+      if (status.status === 'readyToPlay') {
+        setIsVideoReady(true);
+        setVideoError(false);
+      } else if (status.status === 'error') {
+        console.error('Video loading error:', status.error);
+        setVideoError(true);
+        setIsVideoReady(false);
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
+  }, [player]);
 
   const onShare = () => {
     void Share.share({
@@ -77,23 +91,12 @@ const VideoItem: FC<VideoItemProps> = (
   }
 
   return (
-    <View style={{width, height}}>
-      <Video
-        ref={videoRef}
-        source={{uri: menuItem.video}}
+    <View style={{width, height, borderWidth: 2}}>
+      <VideoView
+        player={player}
         style={StyleSheet.absoluteFill}
-        resizeMode={ResizeMode.COVER}
-        isLooping
-        shouldPlay={isScreenFocused && isVisible && !videoError}
-        onReadyForDisplay={() => {
-          setIsVideoReady(true);
-          setVideoError(false);
-        }}
-        onError={(error) => {
-          console.error('Video loading error:', error);
-          setVideoError(true);
-          setIsVideoReady(false);
-        }}
+        contentFit="cover"
+        nativeControls={false}
       />
       <View style={styles.contentContainer}>
         <Text style={styles.title}>{menuItem.name}</Text>
@@ -103,33 +106,46 @@ const VideoItem: FC<VideoItemProps> = (
           <View style={styles.footerLocation}>
             <Feather name="map-pin" color={COLORS.white} size={16}/>
             <Text style={styles.locationText}>{restaurant.city}</Text>
-            <Text style={styles.distance}>3 miles</Text>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{distance} miles</Text>
+            </View>
           </View>
 
           <View style={styles.ratingRow}>
-            <View style={styles.ratingBox}>
-              <Feather name="star" size={14} color={COLORS.white}/>
-              <Text style={styles.ratingText}>{restaurant.trustpilotRating} Rating</Text>
-            </View>
-            <View style={styles.ratingBox}>
+            <View style={styles.badge}>
               <GoogleLogo width={14} height={14}/>
-              <Text style={styles.ratingText}>{restaurant.googleRating} Rating</Text>
+              <Text style={styles.badgeText}>{rating} Rating</Text>
             </View>
           </View>
 
           <View style={styles.buttonRow}>
             <TouchableOpacity
-              style={[styles.actionButton, styles.viewDishButton, { overflow: 'hidden' }]}
-              onPress={() => navigation.navigate("Order")}
+              style={[styles.actionButton, styles.viewDishButton, {overflow: 'hidden'}]}
+              onPress={() => navigation.navigate("Order", {
+                menuId: restaurant.menuId,
+                restaurant: {
+                  distance,
+                  googleRating: rating,
+                  name: restaurant.name,
+                  city: restaurant.city,
+                  description: '',
+                }
+              })}
             >
-              <BlurView intensity={10} tint="dark" style={StyleSheet.absoluteFill} />
+              <BlurView intensity={10} tint="dark" style={StyleSheet.absoluteFill}/>
 
               <Text style={styles.viewDishText}>View Menu</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.actionButton, styles.orderNowButton]}
-              onPress={() => navigation.navigate("DishDetailScreen")}
+              onPress={() => {
+                navigation.navigate("DishDetailScreen", {
+                  menuItemId: menuItem.id,
+                  googleRating: rating,
+                  restaurantName: restaurant.name
+                })
+              }}
             >
               <Text style={styles.orderNowText}>
                 Order Now | AED {menuItem.price}
@@ -214,16 +230,12 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontWeight: '600',
   },
-  distance: {
-    color: COLORS.white,
-    opacity: 0.8,
-  },
   ratingRow: {
     flexDirection: 'row',
     gap: 10,
     marginBottom: 16,
   },
-  ratingBox: {
+  badge: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -232,7 +244,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     gap: 6,
   },
-  ratingText: {
+  badgeText: {
     color: COLORS.white,
     fontWeight: 'bold',
     fontSize: 14,

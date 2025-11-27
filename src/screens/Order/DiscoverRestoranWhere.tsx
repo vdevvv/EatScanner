@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import {
   View,
   Text,
@@ -11,10 +11,11 @@ import {
   Platform,
   Alert,
 } from "react-native";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import {Ionicons, MaterialIcons} from "@expo/vector-icons";
+import {useNavigation} from "@react-navigation/native";
+import {COLORS} from "../../constants/colors";
 
-const { width } = Dimensions.get("window");
+const {width} = Dimensions.get("window");
 
 const DISH_IMAGE = require("../../assets/pasta.jpg");
 
@@ -60,9 +61,9 @@ const DELIVERY_OPTIONS: DeliveryOption[] = [
 const RestaurantHeader: React.FC<{
   restaurantName: string;
   restaurantSubtitle: string;
-}> = ({ restaurantName, restaurantSubtitle }) => (
+}> = ({restaurantName, restaurantSubtitle}) => (
   <View style={styles.restaurantHeaderContainer}>
-    <Image source={DISH_IMAGE} style={styles.restaurantHeaderImage} />
+    <Image source={DISH_IMAGE} style={styles.restaurantHeaderImage}/>
     <View style={styles.restaurantHeaderText}>
       <Text style={styles.restaurantHeaderTitle}>
         {restaurantName || "Grandma's Kettle"}
@@ -73,16 +74,16 @@ const RestaurantHeader: React.FC<{
 
       <View style={styles.ratingsContainer}>
         <View
-          style={[styles.ratingPillContainer, { backgroundColor: "#4CAF50" }]}
+          style={[styles.ratingPillContainer, {backgroundColor: "#4CAF50"}]}
         >
-          <MaterialIcons name="star" size={14} color="#fff" />
+          <MaterialIcons name="star" size={14} color="#fff"/>
           <Text style={styles.ratingPillText}>4.3</Text>
         </View>
 
         <View
-          style={[styles.ratingPillContainer, { backgroundColor: "#3f84f8" }]}
+          style={[styles.ratingPillContainer, {backgroundColor: "#3f84f8"}]}
         >
-          <MaterialIcons name="star" size={14} color="#fff" />
+          <MaterialIcons name="star" size={14} color="#fff"/>
           <Text style={styles.ratingPillText}>4.0</Text>
         </View>
       </View>
@@ -94,7 +95,7 @@ const DeliveryOptionCard: React.FC<{
   option: DeliveryOption;
   isSelected: boolean;
   onSelect: () => void;
-}> = ({ option, isSelected, onSelect }) => {
+}> = ({option, isSelected, onSelect}) => {
   const isWebsite = option.id === "website";
   return (
     <TouchableOpacity
@@ -106,7 +107,7 @@ const DeliveryOptionCard: React.FC<{
         <View
           style={[styles.radioButton, isSelected && styles.radioButtonSelected]}
         >
-          {isSelected && <View style={styles.radioDot} />}
+          {isSelected && <View style={styles.radioDot}/>}
         </View>
 
         <View style={styles.deliveryTextWrapper}>
@@ -171,14 +172,13 @@ const DiscoverRestoranWhere: React.FC = () => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Ionicons name="chevron-back" size={28} color="#333" />
+          <Ionicons name="chevron-back" size={28} color="#333"/>
         </TouchableOpacity>
 
         <Text style={styles.screenTitle}>Where to Order</Text>
-        <View style={{ width: 28 }} />
+        <View style={{width: 28}}/>
       </View>
 
-      {/* ---------- Content ---------- */}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.infoBlock}>
           <RestaurantHeader
@@ -207,7 +207,6 @@ const DiscoverRestoranWhere: React.FC = () => {
         </View>
       </ScrollView>
 
-      {/* ---------- Footer ---------- */}
       <View style={styles.footer}>
         <TouchableOpacity
           style={[
@@ -219,7 +218,12 @@ const DiscoverRestoranWhere: React.FC = () => {
           onPress={handleMakeOrder}
           disabled={!isButtonActive}
         >
-          <Text style={styles.makeOrderButtonText}>Make an order</Text>
+          <Text style={[styles.makeOrderButtonText, isButtonActive
+            ? styles.makeOrderButtonTextActive
+            : styles.makeOrderButtonTextInactive]}
+          >
+            Make an order
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -227,7 +231,7 @@ const DiscoverRestoranWhere: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: "#fff" },
+  safeArea: {flex: 1, backgroundColor: "#fff"},
   headerContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -239,7 +243,7 @@ const styles = StyleSheet.create({
     width: width,
     position: "relative",
   },
-  backButton: { padding: 10, zIndex: 10 },
+  backButton: {padding: 10, zIndex: 10},
   screenTitle: {
     position: "absolute",
     left: 0,
@@ -268,7 +272,7 @@ const styles = StyleSheet.create({
     marginRight: 15,
     resizeMode: "cover",
   },
-  restaurantHeaderText: { flex: 1 },
+  restaurantHeaderText: {flex: 1},
   restaurantHeaderTitle: {
     fontSize: 16,
     fontWeight: "700",
@@ -317,7 +321,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
   },
-  deliveryCardSelected: { borderColor: "#333" },
+  deliveryCardSelected: {borderColor: "#333"},
   deliveryCardContent: {
     flexDirection: "row",
     alignItems: "center",
@@ -332,25 +336,25 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 15,
   },
-  radioButtonSelected: { borderColor: "#333" },
+  radioButtonSelected: {borderColor: "#333"},
   radioDot: {
     height: 10,
     width: 10,
     borderRadius: 5,
     backgroundColor: "#333",
   },
-  deliveryTextWrapper: { flex: 1 },
-  deliveryName: { fontSize: 15, fontWeight: "500", color: "#333" },
-  deliveryNameSelected: { fontWeight: "600" },
-  deliveryDetails: { flexDirection: "row", flexWrap: "wrap", marginTop: 2 },
-  deliveryDescription: { fontSize: 13, color: "#888" },
+  deliveryTextWrapper: {flex: 1},
+  deliveryName: {fontSize: 15, fontWeight: "500", color: "#333"},
+  deliveryNameSelected: {fontWeight: "600"},
+  deliveryDetails: {flexDirection: "row", flexWrap: "wrap", marginTop: 2},
+  deliveryDescription: {fontSize: 13, color: "#888"},
   deliveryTime: {
     fontSize: 13,
     color: "#333",
     fontWeight: "500",
     marginLeft: 5,
   },
-  deliveryPrice: { fontSize: 13, color: "#333", fontWeight: "500" },
+  deliveryPrice: {fontSize: 13, color: "#333", fontWeight: "500"},
   footerNote: {
     fontSize: 12,
     color: "#888",
@@ -371,13 +375,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     height: 55,
   },
-  makeOrderButtonInactive: { backgroundColor: "#ccc" },
-  makeOrderButtonActive: { backgroundColor: "#E57373" },
-  makeOrderButtonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "700",
-  },
+  makeOrderButtonInactive: {backgroundColor: COLORS.stroke1},
+  makeOrderButtonActive: {backgroundColor: COLORS.red},
+  makeOrderButtonText: {fontWeight: "bold"},
+  makeOrderButtonTextInactive: {color: COLORS.grey30},
+  makeOrderButtonTextActive: {color: COLORS.white}
 });
 
 export default DiscoverRestoranWhere;

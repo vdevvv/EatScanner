@@ -1,10 +1,10 @@
 import React, {FC} from 'react';
 import {Modal, StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {Ionicons} from "@expo/vector-icons";
-import {FriendsNavigationProp} from "../../navigations/AppNavigator";
 import {useNavigation} from "@react-navigation/native";
 import {ModalProps} from "./modal.types";
 import {COLORS} from "../../constants/colors";
+import {FriendsNavigationProp} from "../../navigations/app.types";
 
 const BlockUserModal: FC<ModalProps> = ({isVisible, closeModal}) => {
   const navigation = useNavigation<FriendsNavigationProp>()

@@ -1,67 +1,54 @@
-import React, { useState } from "react";
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   FlatList,
-  SafeAreaView,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { RootStackParamList } from "../../../App";
-import {COLORS} from "../../constants/colors";
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../../App';
+import { COLORS } from '../../constants/colors';
+import { useFilters } from '../../hooks/restaurants';
+import { handleApiError } from '../../utils/handleApiError';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import PageLoader from '../../components/Loader/PageLoader';
+import { useAllergiesStore } from '../../stores/allergiesStore';
 
-type AllergiesScreenNavigationProp =
-  NativeStackNavigationProp<RootStackParamList>;
-
-interface Category {
-  id: string;
-  label: string;
-  emoji: string;
-}
-
-const categories: Category[] = [
-  { id: "1", label: "Vegetarian", emoji: "🥗" },
-  { id: "2", label: "Vegan", emoji: "🌱" },
-  { id: "3", label: "Gluten-Free", emoji: "🌾" },
-  { id: "4", label: "No Tree Nuts", emoji: "🌰" },
-  { id: "5", label: "Lactose-Free", emoji: "🥛" },
-  { id: "6", label: "No Pork", emoji: "🐷" },
-  { id: "7", label: "No Beef", emoji: "🐮" },
-  { id: "8", label: "No Shellfish", emoji: "🦐" },
-  { id: "9", label: "No Sweets", emoji: "🍰" },
-  { id: "10", label: "No Peanuts", emoji: "🥜" },
-];
+type AllergiesScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const AllergiesScreen = () => {
-  const [selected, setSelected] = useState<string[]>([]);
-  const navigation = useNavigation<AllergiesScreenNavigationProp>(); // 👈 підключення навігації
+  const { data, isError, error, isLoading } = useFilters(true);
+  const navigation = useNavigation<AllergiesScreenNavigationProp>();
+  const selected = useAllergiesStore((state) => state.selected);
+  const toggleSelected = useAllergiesStore((state) => state.toggleSelected);
 
-  const toggleSelect = (id: string) => {
-    setSelected((prev) =>
-      prev.includes(id)
-        ? prev.filter((i) => i !== id)
-        : prev.length < 8
-        ? [...prev, id]
-        : prev
-    );
-  };
+  useEffect(() => {
+    if (isError) {
+      handleApiError(error);
+    }
+  }, [isError, error]);
+
+  if (!data || isLoading) {
+    return <PageLoader />;
+  }
 
   const isContinueDisabled = selected.length === 0;
-
   const handleContinue = () => {
     if (!isContinueDisabled) {
-      navigation.navigate("OnBoarding5Screen");
+      navigation.navigate('OnBoarding5Screen');
     }
   };
+
+  const categories = data ? Object.values(data).flat() : [];
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
         <View style={styles.headerContainer}>
           <Text style={styles.title}>
-            Do you have any{"\n"}allergies or restrictions?
+            Do you have any{'\n'}allergies or restrictions?
           </Text>
           <Text style={styles.subtitle}>Choose up to 8 categories</Text>
         </View>
@@ -78,7 +65,7 @@ const AllergiesScreen = () => {
               <TouchableOpacity
                 activeOpacity={0.8}
                 style={[styles.option, isSelected && styles.optionSelected]}
-                onPress={() => toggleSelect(item.id)}
+                onPress={() => toggleSelected(item.id)}
               >
                 <Text
                   style={[
@@ -86,7 +73,7 @@ const AllergiesScreen = () => {
                     isSelected && styles.optionTextSelected,
                   ]}
                 >
-                  {item.emoji} {item.label}
+                  {item.icon} {item.name}
                 </Text>
               </TouchableOpacity>
             );
@@ -132,16 +119,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.white,
     paddingHorizontal: 16,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   headerContainer: {
     marginTop: 20,
   },
   title: {
     fontSize: 26,
-    fontWeight: "700",
+    fontWeight: '700',
     color: COLORS.black,
-    textAlign: "left",
+    textAlign: 'left',
     marginBottom: 4,
   },
   subtitle: {
@@ -153,7 +140,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   columnWrapper: {
-    justifyContent: "flex-start",
+    justifyContent: 'flex-start',
     gap: 12,
   },
   option: {
@@ -164,9 +151,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     marginBottom: 12,
-    alignItems: "center",
-    justifyContent: "center",
-    alignSelf: "flex-start",
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'flex-start',
   },
   optionSelected: {
     backgroundColor: `${COLORS.red}20`,
@@ -175,15 +162,15 @@ const styles = StyleSheet.create({
   optionText: {
     fontSize: 16,
     color: COLORS.black,
-    fontWeight: 'semibold'
+    fontWeight: 'semibold',
   },
   optionTextSelected: {
     color: COLORS.black,
   },
   progressContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 20,
   },
   progressDot: {
@@ -197,13 +184,13 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.red,
   },
   continueButton: {
-    alignSelf: "center",
-    width: "100%",
+    alignSelf: 'center',
+    width: '100%',
     maxWidth: 360,
     backgroundColor: COLORS.red,
     borderRadius: 12,
     paddingVertical: 16,
-    alignItems: "center",
+    alignItems: 'center',
     marginBottom: 20,
   },
   disabledButton: {
@@ -211,7 +198,7 @@ const styles = StyleSheet.create({
   },
   continueText: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
     color: COLORS.white,
   },
   continueTextDisabled: {

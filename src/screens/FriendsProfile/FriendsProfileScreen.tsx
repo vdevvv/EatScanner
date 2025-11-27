@@ -10,7 +10,6 @@ import {
 import {RouteProp, useNavigation, useRoute} from "@react-navigation/native";
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import {SafeAreaView} from "react-native-safe-area-context";
-import {FriendsStackParamList} from "../../navigations/AppNavigator";
 import {useUser} from "../../hooks/user";
 import RemoveFriendModal from "../../components/modals/RemoveFriendModal";
 import BlockUserModal from "../../components/modals/BlockUserModal";
@@ -19,6 +18,7 @@ import FriendsProfileMenu from "../../components/modals/FriendActionsModal";
 import {COLORS} from "../../constants/colors";
 import PastOrderItem from "../../components/Profile/PastOrderItem";
 import Header from "../../components/Profile/Header";
+import {FriendsStackParamList} from "../../navigations/app.types";
 
 const DISH_1_SOURCE =
   require("../../assets/sushi-dragons.jpg") as ImageSourcePropType;

@@ -2,7 +2,7 @@ import axios, {AxiosError} from "axios";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
 import * as SecureStore from "expo-secure-store";
 import {ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, useAuthStore} from "../stores/useAuthStore";
-import {authService} from "../services/auth.service";
+import {Tokens} from "../components/Auth/Login/types";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL
 
@@ -15,7 +15,7 @@ export const api = axios.create({
 
 api.interceptors.request.use(async (config) => {
   const token = await SecureStore.getItemAsync(ACCESS_TOKEN_KEY);
-  console.log(token)
+  // console.log(token)
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -33,8 +33,7 @@ export const apiPublic = axios.create({
 const refreshAuthLogin = async (failedRequest: AxiosError) => {
   try {
     const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY)
-    const tokens = await authService.refreshToken(refreshToken)
-    console.log(tokens, 'Token refreshed')
+    const {data: tokens} = await apiPublic.post<Tokens>('/auth/refresh-token', {refreshToken})
 
     await Promise.all([
       SecureStore.setItemAsync(ACCESS_TOKEN_KEY, tokens.accessToken),

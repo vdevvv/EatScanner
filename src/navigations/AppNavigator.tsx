@@ -5,13 +5,12 @@ import {Ionicons} from "@expo/vector-icons";
 import HomePageScreen from "../screens/HomePage/HomePageScreen";
 import MyProfileScreen from "../screens/MyProfile/MyProfileScreen";
 import Discovery from "../screens/Discovery/DiscoveryPage";
-import {createNativeStackNavigator, NativeStackNavigationProp} from "@react-navigation/native-stack";
+import {createNativeStackNavigator} from "@react-navigation/native-stack";
 import DishDetailScreen from "../screens/Order/DiscoveryRestoranOrderScreen";
 import Notifications from "../screens/Notifications/Notifications";
-import Order from "../screens/Order/DiscoveryRestoranScreen";
-
-import DiscoveryRestoranOrderScreen from "../screens/Order/DiscoveryRestoranOrderScreen";
+import Order from "../screens/Order/DishDetailScreen";
 import DiscoveryFiltersPage from "../screens/Discovery/DiscoveryFiltersPage";
+import DiscoverRestoranWhere from "../screens/Order/DiscoverRestoranWhere";
 
 // import FriendsProfileFriends from "../screens/FriendsProfile/FriendsProfileFriends";
 import FriendsProfileScreen from "../screens/FriendsProfile/FriendsProfileScreen";
@@ -26,6 +25,9 @@ import MyProfileChangePassword from "../screens/MyProfile/MyProfileChangePasswor
 import MyProfilePolicyScreen from "../screens/MyProfile/MyProfilePolicyScreen";
 import MyProfileTermsConditions from "../screens/MyProfile/MyProfileTermsConditions";
 import MyProfileHelpSuport from "../screens/MyProfile/MyProfileHelpSuport";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
+import { DiscoveryStackParamList, FriendsStackParamList, HomeStackParamList } from './app.types';
+import ViewAllScreen from '../screens/Discovery/ViewAllScreen';
 
 export type RootTabParamList = {
   Home: undefined;
@@ -34,36 +36,27 @@ export type RootTabParamList = {
   Profile: undefined;
 };
 
-export type FriendsStackParamList = {
-  FriendsScreen: undefined;
-  FriendsProfileScreen: {userId: string};
-  FriendsProfileScreenShare: undefined;
-  RemoveFriend: undefined;
-  FriendAlertBlockUser: undefined;
-  BlockUser: undefined;
-  FriendsReportUser: undefined;
-};
-export type FriendsNavigationProp = NativeStackNavigationProp<FriendsStackParamList>;
-
 const AppNavigator = () => {
+  const insets = useSafeAreaInsets()
   const Tab = createBottomTabNavigator<RootTabParamList>();
 
-  const HomeStack = createNativeStackNavigator();
+  const HomeStack = createNativeStackNavigator<HomeStackParamList>();
   const HomeStackNavigator = () => (
     <HomeStack.Navigator screenOptions={{headerShown: false}}>
       <HomeStack.Screen name="HomePageScreen" component={HomePageScreen}/>
-      <HomeStack.Screen name="DishDetailScreen" component={DishDetailScreen}/>
       <HomeStack.Screen name="Notifications" component={Notifications}/>
       <HomeStack.Screen name="Order" component={Order}/>
-      <HomeStack.Screen name="DiscoveryRestoranOrderScreen" component={DiscoveryRestoranOrderScreen}/>
+      <HomeStack.Screen name="DishDetailScreen" component={DishDetailScreen}/>
+      <HomeStack.Screen name='DiscoverRestoranWhere' component={DiscoverRestoranWhere} />
     </HomeStack.Navigator>
   );
 
-  const DiscoveryStack = createNativeStackNavigator();
+  const DiscoveryStack = createNativeStackNavigator<DiscoveryStackParamList>();
   const DiscoverStackNavigator = () => (
     <DiscoveryStack.Navigator screenOptions={{headerShown: false}}>
       <DiscoveryStack.Screen name="Discovery" component={Discovery}/>
       <DiscoveryStack.Screen name="DiscoveryFiltersPage" component={DiscoveryFiltersPage}/>
+      <DiscoveryStack.Screen name='ViewAll' component={ViewAllScreen} />
     </DiscoveryStack.Navigator>
   )
 
@@ -101,16 +94,7 @@ const AppNavigator = () => {
         tabBarShowLabel: true,
         tabBarActiveTintColor: "#E9725C",
         tabBarInactiveTintColor: "#999",
-        tabBarStyle: {
-          height: 80,
-          paddingBottom: 10,
-          paddingTop: 10,
-          borderTopLeftRadius: 20,
-          borderTopRightRadius: 20,
-          overflow: "hidden",
-          backgroundColor: "#fff",
-          borderTopWidth: 0,
-        },
+        tabBarStyle: {paddingBottom: insets.bottom},
         tabBarIcon: ({color}) => {
           let iconName: keyof typeof Ionicons.glyphMap = "home-outline";
 

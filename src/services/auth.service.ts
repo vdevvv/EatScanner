@@ -25,8 +25,8 @@ class AuthService {
       .then(({data}) => data)
   }
 
-  async setPassword(token?: string, password?: string) {
-    const payload = {token, password}
+  async setPassword(selectedAllergies: string[], token?: string, password?: string) {
+    const payload = {token, password, selectedAllergies}
     return apiPublic.post<UserActionResponse>('/auth/set-password', payload)
       .then(({data}) => data)
   }

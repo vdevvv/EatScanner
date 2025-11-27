@@ -16,9 +16,9 @@ import {handleApiError} from "../../utils/handleApiError";
 import FriendListItem from "../../components/Friends/FriendListItem";
 import {useDebounce} from "../../hooks/use-debounce";
 import {Friend} from "../../types";
-import {FriendsNavigationProp} from "../../navigations/AppNavigator";
 import {COLORS} from "../../constants/colors";
 import NoFriends from "../../components/Friends/NoFriends";
+import {FriendsNavigationProp} from "../../navigations/app.types";
 
 const {width} = Dimensions.get("window");
 

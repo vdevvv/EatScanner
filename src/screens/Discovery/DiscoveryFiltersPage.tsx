@@ -1,37 +1,40 @@
-import React, { useState } from "react";
+import React, { FC, useState } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   ScrollView,
-  StyleSheet,
-} from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { SafeAreaView } from "react-native-safe-area-context";
+  StyleSheet, ActivityIndicator,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { COLORS } from '../../constants/colors';
+import { useFilters } from '../../hooks/restaurants';
+import { DiscoveryNavigationProp } from '../../navigations/app.types';
 
-type RootStackParamList = {
-  MyProfileSaved: undefined;
-  FiltersScreen: undefined;
-};
+interface ChipProps {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}
 
-type FiltersNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "FiltersScreen"
->;
-
-const Chip = ({ label, active, onPress }: any) => (
+const Chip: FC<ChipProps> = ({ label, active, onPress }) => (
   <TouchableOpacity
     style={[styles.chip, active && styles.chipActive]}
     onPress={onPress}
   >
-    <Text style={[styles.chipText, active && styles.chipTextActive]}>
+    <Text style={styles.chipText}>
       {label}
     </Text>
   </TouchableOpacity>
 );
 
-const Section = ({ title, children }: any) => (
+interface SectionProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+const Section: FC<SectionProps> = ({ title, children }) => (
   <View style={styles.section}>
     <Text style={styles.sectionTitle}>{title}</Text>
     <View style={styles.chipContainer}>{children}</View>
@@ -39,28 +42,28 @@ const Section = ({ title, children }: any) => (
 );
 
 export default function FiltersScreen() {
-  const navigation = useNavigation<FiltersNavigationProp>();
+  const { data, isLoading } = useFilters();
+  const navigation = useNavigation<DiscoveryNavigationProp>();
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
-  const [selectedCuisine, setSelectedCuisine] = useState<string[]>([]);
-  const [selectedMeal, setSelectedMeal] = useState<string[]>([]);
-  const [selectedDiet, setSelectedDiet] = useState<string[]>([]);
-  const [selectedSpice, setSelectedSpice] = useState<string[]>([]);
-  const [selectedRating, setSelectedRating] = useState<string[]>([]);
+  if (!data || isLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
 
-  const toggleSelection = (
-    item: string,
-    setState: Function,
-    currentState: string[]
-  ) => {
-    if (currentState.includes(item)) {
-      setState(currentState.filter((i) => i !== item));
-    } else {
-      setState([...currentState, item]);
-    }
+  const toggleSelection = (slug: string) => {
+    setSelectedTags(prevState =>
+      prevState.includes(slug)
+        ? prevState.filter(i => i !== slug)
+        : [...prevState, slug],
+    );
   };
 
   const handleBack = () => navigation.goBack();
-  const handleApply = () => navigation.goBack(); // або navigate("MyProfileSaved")
+  const handleApply = () => navigation.navigate('Discovery', {selectedTags});
 
   return (
     <SafeAreaView style={styles.container}>
@@ -76,107 +79,18 @@ export default function FiltersScreen() {
         contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
-        <Section title="Cuisine:">
-          {[
-            "🍝 Italian",
-            "🍣 Japanese",
-            "🌮 Mexican",
-            "🥡 Chinese",
-            "🍔 American",
-            "🍛 Indian",
-            "🥟 Ukrainian",
-            "🍜 Thai",
-            "🥖 French",
-          ].map((item) => (
-            <Chip
-              key={item}
-              label={item}
-              active={selectedCuisine.includes(item)}
-              onPress={() =>
-                toggleSelection(item, setSelectedCuisine, selectedCuisine)
-              }
-            />
-          ))}
-        </Section>
-
-        <Section title="Meal Type:">
-          {[
-            "🍳 Breakfast",
-            "🥪 Lunch",
-            "🍽 Dinner",
-            "🍿 Snack",
-            "🍰 Dessert",
-            "🌮 Appetizer",
-            "🥤 Drink / Smoothie",
-            "🍲 Soup / Broth",
-          ].map((item) => (
-            <Chip
-              key={item}
-              label={item}
-              active={selectedMeal.includes(item)}
-              onPress={() =>
-                toggleSelection(item, setSelectedMeal, selectedMeal)
-              }
-            />
-          ))}
-        </Section>
-
-        <Section title="Dietary Restrictions:">
-          {[
-            "🥦 Vegetarian",
-            "🌱 Vegan",
-            "🌾 Gluten-Free",
-            "🥥 No Tree Nuts",
-            "🥛 Lactose-Free",
-            "🐷 No Pork",
-            "🐮 No Beef",
-            "🦐 No Shellfish",
-            "🍭 No Sweets",
-            "🥜 No Peanuts",
-          ].map((item) => (
-            <Chip
-              key={item}
-              label={item}
-              active={selectedDiet.includes(item)}
-              onPress={() =>
-                toggleSelection(item, setSelectedDiet, selectedDiet)
-              }
-            />
-          ))}
-        </Section>
-
-        <Section title="Spice Level:">
-          {["🥛 Mild", "🌶 Medium", "🌶🌶 Spicy", "🌶🌶🌶 Extra Spicy"].map(
-            (item) => (
+        {Object.entries(data).map(([groupName, items], index) => (
+          <Section key={index} title={groupName.replace(/_/g, ' ')}>
+            {items.map((item) => (
               <Chip
-                key={item}
-                label={item}
-                active={selectedSpice.includes(item)}
-                onPress={() =>
-                  toggleSelection(item, setSelectedSpice, selectedSpice)
-                }
+                key={item.id}
+                label={item.icon + ' ' + item.name}
+                active={selectedTags.includes(item.slug)}
+                onPress={() => toggleSelection(item.slug)}
               />
-            )
-          )}
-        </Section>
-
-        <Section title="Ratings:">
-          {[
-            "⭐ 4.5 & up",
-            "⭐ 4.0 – 4.4",
-            "⭐ 3.5 – 3.9",
-            "⭐ All ratings",
-          ].map((item) => (
-            <Chip
-              key={item}
-              label={item}
-              active={selectedRating.includes(item)}
-              onPress={() =>
-                toggleSelection(item, setSelectedRating, selectedRating)
-              }
-            />
-          ))}
-        </Section>
+            ))}
+          </Section>
+        ))}
       </ScrollView>
 
       <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
@@ -187,25 +101,31 @@ export default function FiltersScreen() {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: COLORS.background,
+  },
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
   },
   header: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
   backArrow: {
     fontSize: 26,
-    color: "#222",
+    color: '#222',
     marginRight: 10,
   },
   headerTitle: {
     fontSize: 22,
-    fontWeight: "600",
-    color: "#222",
+    fontWeight: '600',
+    color: '#222',
   },
   scrollView: {
     paddingHorizontal: 16,
@@ -215,49 +135,45 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
     marginBottom: 8,
-    color: "#333",
+    color: '#333',
   },
   chipContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   chip: {
     borderWidth: 1,
-    borderColor: "#eee",
-    backgroundColor: "#fff",
+    borderColor: COLORS.stroke1,
+    backgroundColor: COLORS.white,
     borderRadius: 10,
     paddingVertical: 8,
     paddingHorizontal: 14,
   },
   chipActive: {
-    backgroundColor: "#F5D0C8",
-    borderColor: "#D06B5C",
+    backgroundColor: `${COLORS.red}33`,
+    borderColor: COLORS.red,
   },
   chipText: {
     fontSize: 14,
-    color: "#333",
-  },
-  chipTextActive: {
-    color: "#B14434",
-    fontWeight: "600",
+    color: COLORS.black,
   },
   applyButton: {
-    backgroundColor: "#D06B5C",
+    backgroundColor: COLORS.red,
     paddingVertical: 16,
     borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-    position: "absolute",
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
     bottom: 20,
     left: 16,
     right: 16,
   },
   applyButtonText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: '600',
   },
 });

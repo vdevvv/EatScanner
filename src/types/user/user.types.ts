@@ -9,3 +9,14 @@ export type User = {
   createdAt: string
   updatedAt: string
 }
+
+export interface UpdateUserDto {
+  fullName?: string;
+  userName?: string;
+  phone?: string;
+}
+
+export interface UpdatePasswordDto {
+  oldPassword: string
+  newPassword: string
+}

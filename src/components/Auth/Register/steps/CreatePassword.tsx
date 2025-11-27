@@ -1,37 +1,48 @@
-import React, {FC, useState} from 'react';
-import {commonStyles} from "../../common.styles";
-import {StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
-import {Ionicons} from "@expo/vector-icons";
-import {Controller, useForm} from "react-hook-form";
-import {PasswordSchema, passwordSchema} from "../../../../schemas/auth/set-password.schema";
-import {zodResolver} from "@hookform/resolvers/zod";
-import {StepProps} from "./types";
-import {handleApiError} from "../../../../utils/handleApiError";
-import {getInputWrapperStyles} from "../../../../utils/helpers";
-import {useSetPassword} from "../../../../hooks/auth";
-import {COLORS} from "../../../../constants/colors";
+import React, { FC, useState } from 'react';
+import { commonStyles } from '../../common.styles';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { Controller, useForm } from 'react-hook-form';
+import { PasswordSchema, passwordSchema } from '../../../../schemas/auth/set-password.schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { StepProps } from './types';
+import { handleApiError } from '../../../../utils/handleApiError';
+import { getInputWrapperStyles } from '../../../../utils/helpers';
+import { useSetPassword } from '../../../../hooks/auth';
+import { COLORS } from '../../../../constants/colors';
+import { useAllergiesStore } from '../../../../stores/allergiesStore';
 
-const CreatePassword: FC<StepProps> = ({commonData, onNext}) => {
-  const {mutate, isPending} = useSetPassword()
+const CreatePassword: FC<StepProps> = ({ commonData, onNext }) => {
+  const { mutate, isPending } = useSetPassword();
   const [showPassword, setShowPassword] = useState(false);
   const [showRepeatPassword, setShowRepeatPassword] = useState(false);
+  const selected = useAllergiesStore((state) => state.selected);
+  const reset = useAllergiesStore((state) => state.reset);
   const [accepted, setAccepted] = useState(false);
+
   const {
     control,
     setValue,
     handleSubmit,
-    formState: {errors, isValid},
+    formState: { errors, isValid },
   } = useForm<PasswordSchema>({
     resolver: zodResolver(passwordSchema),
-    defaultValues: {accepted: false}
+    defaultValues: { accepted: false },
   });
 
   const onSubmit = async (payload: PasswordSchema) => {
-    mutate({token: commonData?.emailVerificationToken, password: payload.password}, {
-      onSuccess: () => onNext?.(),
+    mutate({
+      token: commonData?.emailVerificationToken,
+      password: payload.password,
+      selectedAllergies: selected,
+    }, {
+      onSuccess: () => {
+        reset();
+        onNext?.();
+      },
       onError: (error) => handleApiError(error),
-    })
-  }
+    });
+  };
 
   return (
     <>
@@ -43,8 +54,8 @@ const CreatePassword: FC<StepProps> = ({commonData, onNext}) => {
       </View>
       <Controller
         control={control}
-        name='password'
-        render={({field: {onChange, onBlur, value}}) => (
+        name="password"
+        render={({ field: { onChange, onBlur, value } }) => (
           <View style={[commonStyles.inputContainer, getInputWrapperStyles(value)]}>
             <TextInput
               style={commonStyles.input}
@@ -59,7 +70,7 @@ const CreatePassword: FC<StepProps> = ({commonData, onNext}) => {
               style={styles.eyeButton}
             >
               <Ionicons
-                name={showPassword ? "eye-off-outline" : "eye-outline"}
+                name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                 size={22}
                 color="#888"
               />
@@ -71,8 +82,8 @@ const CreatePassword: FC<StepProps> = ({commonData, onNext}) => {
 
       <Controller
         control={control}
-        name='confirmPassword'
-        render={({field: {onChange, onBlur, value}}) => (
+        name="confirmPassword"
+        render={({ field: { onChange, onBlur, value } }) => (
           <View style={[commonStyles.inputContainer, getInputWrapperStyles(value)]}>
             <TextInput
               style={commonStyles.input}
@@ -87,7 +98,7 @@ const CreatePassword: FC<StepProps> = ({commonData, onNext}) => {
               style={styles.eyeButton}
             >
               <Ionicons
-                name={showRepeatPassword ? "eye-off-outline" : "eye-outline"}
+                name={showRepeatPassword ? 'eye-off-outline' : 'eye-outline'}
                 size={22}
                 color="#888"
               />
@@ -100,13 +111,13 @@ const CreatePassword: FC<StepProps> = ({commonData, onNext}) => {
       <TouchableOpacity
         style={styles.checkboxContainer}
         onPress={() => {
-          const newVal = !accepted
-          setAccepted(newVal)
-          setValue('accepted', newVal)
+          const newVal = !accepted;
+          setAccepted(newVal);
+          setValue('accepted', newVal);
         }}
       >
         <View style={[styles.checkbox, accepted && styles.checkboxChecked]}>
-          {accepted && <View style={styles.checkboxInner}/>}
+          {accepted && <View style={styles.checkboxInner} />}
         </View>
         <Text style={styles.checkboxLabel}>
           I accept the terms and privacy policy
@@ -131,14 +142,14 @@ const CreatePassword: FC<StepProps> = ({commonData, onNext}) => {
 const styles = StyleSheet.create({
 
   eyeButton: {
-    position: "absolute",
+    position: 'absolute',
     right: 14,
     top: 13,
   },
   checkboxContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    width: "100%",
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
     marginTop: 10,
     marginBottom: 10,
   },
@@ -149,8 +160,8 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: COLORS.black,
     marginRight: 10,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   checkboxChecked: {
     borderColor: COLORS.black,
@@ -166,6 +177,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     flexShrink: 1,
   },
-})
+});
 
 export default CreatePassword;

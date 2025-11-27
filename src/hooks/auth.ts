@@ -24,8 +24,8 @@ export const useResendCode = () => {
 
 export const useSetPassword = () => {
   return useMutation({
-    mutationFn: (data: { token?: string, password: string }) =>
-      authService.setPassword(data.token, data.password)
+    mutationFn: (data: { token?: string, password: string, selectedAllergies: string[] }) =>
+      authService.setPassword(data.selectedAllergies, data.token, data.password)
   })
 }
 
