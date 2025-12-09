@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -6,19 +6,19 @@ import {
   ScrollView,
   TouchableOpacity,
   ImageBackground,
-  StatusBar, ActivityIndicator,
+  StatusBar, ActivityIndicator, FlatList,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { HomeNavigationProp, HomeStackParamList } from '../../navigations/app.types';
-import { useMenu } from '../../hooks/restaurants';
-import { MenuItem } from '../../types';
+import {Ionicons} from '@expo/vector-icons';
+import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {HomeNavigationProp, HomeStackParamList} from '../../navigations/app.types';
+import {useMenu} from '../../hooks/restaurants';
+import {MenuItem} from '../../types';
 import RatingPill from '../../components/Restaurant/RatingPill';
 import HighlightedCard from '../../components/Restaurant/HighlightedCard';
 import MenuFilterButton from '../../components/Restaurant/MenuFilterButton';
 import MenuItemCard from '../../components/Restaurant/MenuItemCard';
-import { COLORS } from '../../constants/colors';
+import {COLORS} from '../../constants/colors';
 import Toast from 'react-native-toast-message';
 
 const MAIN_IMAGE = require('../../assets/dumplings-top.jpg');
@@ -29,8 +29,9 @@ const DishDetailScreen = () => {
   const navigation = useNavigation<HomeNavigationProp>();
   const insets = useSafeAreaInsets();
   const route = useRoute<DishDetailRouteProp>();
-  const { menuId, restaurant } = route.params;
-  const { data, isLoading, isError, error } = useMenu(menuId);
+  const {restaurant} = route.params;
+  const {data, isLoading, isError, error} = useMenu(restaurant.id);
+  const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isError) {
@@ -45,7 +46,7 @@ const DishDetailScreen = () => {
   if (!data || isLoading) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" />
+        <ActivityIndicator size="large"/>
       </View>
     );
   }
@@ -53,12 +54,17 @@ const DishDetailScreen = () => {
   const handleMenuItemPress = (item: MenuItem) => {
     navigation.navigate('DishDetailScreen', {
       menuItemId: item.id,
-      googleRating: restaurant.googleRating,
-      restaurantName: restaurant.name,
     });
   };
 
+  const handleCategoryPress = (categoryId: string) => {
+    setActiveCategoryId(activeCategoryId === categoryId ? null : categoryId);
+  };
+
   const allItems = data?.categories?.flatMap(cat => cat.items);
+  const filteredItems = activeCategoryId
+    ? data.categories.find(cat => cat.id === activeCategoryId)?.items ?? []
+    : allItems;
 
   return (
     <View style={styles.container}>
@@ -67,75 +73,92 @@ const DishDetailScreen = () => {
         backgroundColor="transparent"
         translucent
       />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <ImageBackground source={MAIN_IMAGE} style={styles.headerImageBackground}>
-          <View style={[styles.headerContentOverlay, { paddingTop: insets.top }]}>
-            <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-              <Ionicons name="chevron-back" size={24} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        </ImageBackground>
-        <View style={styles.infoBlock}>
-          <Text style={styles.restaurantTitle}>{restaurant.name}</Text>
-          <Text style={styles.restaurantSubtitle}>{restaurant.description}</Text>
-          <View style={styles.ratingsContainer}>
-            <RatingPill
-              iconName="star"
-              text={`Google ${restaurant.googleRating}`}
-              color="#3f84f8"
-              isMaterial
+      <FlatList
+        data={filteredItems}
+        keyExtractor={item => item.id}
+        contentContainerStyle={styles.flatListContent}
+        ListHeaderComponent={(
+          <>
+            <ImageBackground source={MAIN_IMAGE} style={styles.headerImageBackground}>
+              <View style={[styles.headerContentOverlay, {paddingTop: insets.top}]}>
+                <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                  <Ionicons name="chevron-back" size={24} color="#fff"/>
+                </TouchableOpacity>
+              </View>
+            </ImageBackground>
+            <View style={styles.infoBlock}>
+              <Text style={styles.restaurantTitle}>{restaurant.name}</Text>
+              {restaurant.description && <Text style={styles.restaurantSubtitle}>{restaurant.description}</Text>}
+              <View style={styles.ratingsContainer}>
+                <RatingPill
+                  iconName="star"
+                  text={`Google ${restaurant.googleRating}`}
+                  color="#3f84f8"
+                  isMaterial
+                />
+              </View>
+
+              <View style={styles.locationContainer}>
+                <Ionicons name="location" size={16} color="#888"/>
+                <Text style={styles.locationText}>{restaurant.city}</Text>
+                <Text style={styles.distanceText}>{restaurant.distance} miles away</Text>
+              </View>
+            </View>
+
+            <View style={styles.highlightedSection}>
+              <View style={styles.highlightedHeader}>
+                <Text style={styles.sectionTitle}>Highlighted items:</Text>
+                <TouchableOpacity>
+                  <Text style={styles.viewAllText}>View All</Text>
+                </TouchableOpacity>
+              </View>
+
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.highlightedScroll}
+              >
+                {allItems.filter(item => item.highlighted).map(item => (
+                  <HighlightedCard
+                    key={item.id}
+                    item={item}
+                    restaurantName={restaurant.name}
+                    onPress={() => handleMenuItemPress(item)}
+                  />
+                ))}
+              </ScrollView>
+            </View>
+
+            <View style={styles.menuSection}>
+              <Text style={styles.sectionTitle}>Menu</Text>
+              <ScrollView
+                style={styles.filterContainer}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+              >
+                {data?.categories.map(item => (
+                  <MenuFilterButton
+                    icon=""
+                    label={item.name}
+                    key={item.id}
+                    isActive={activeCategoryId === item.id}
+                    onPress={() => handleCategoryPress(item.id)}
+                  />
+                ))}
+              </ScrollView>
+            </View>
+          </>
+        )}
+        renderItem={({item}) => (
+          <View style={styles.menuItemWrapper}>
+            <MenuItemCard
+              key={item.id}
+              item={item}
+              onPress={handleMenuItemPress}
             />
           </View>
-
-          <View style={styles.locationContainer}>
-            <Ionicons name="location" size={16} color="#888" />
-            <Text style={styles.locationText}>{restaurant.city}</Text>
-            <Text style={styles.distanceText}>{restaurant.distance} miles away</Text>
-          </View>
-        </View>
-
-        <View style={styles.highlightedSection}>
-          <View style={styles.highlightedHeader}>
-            <Text style={styles.sectionTitle}>Highlighted items:</Text>
-            <TouchableOpacity>
-              <Text style={styles.viewAllText}>View All</Text>
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.highlightedScroll}
-          >
-            {allItems?.filter(item => item.highlighted).map(item => (
-              <HighlightedCard key={item.id} item={item} restaurantName={restaurant.name} />
-            ))}
-          </ScrollView>
-        </View>
-
-        <View style={styles.menuSection}>
-          <Text style={styles.sectionTitle}>Menu</Text>
-          <ScrollView
-            style={styles.filterContainer}
-            horizontal
-            showsHorizontalScrollIndicator={false}
-          >
-            {data?.categories.map(item => (
-              <MenuFilterButton icon="" label={item.name} key={item.id} isActive={false} />
-            ))}
-          </ScrollView>
-
-          <View>
-            {allItems?.map((item) => (
-              <MenuItemCard
-                key={item.id}
-                item={item}
-                onPress={handleMenuItemPress}
-              />
-            ))}
-          </View>
-        </View>
-      </ScrollView>
+        )}
+      />
     </View>
   );
 };
@@ -147,7 +170,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: COLORS.background,
   },
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: {flex: 1, backgroundColor: '#fff'},
   headerImageBackground: {
     width: '100%',
     height: 250,
@@ -174,19 +197,19 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 25,
     elevation: 5,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.1,
     shadowRadius: 5,
   },
-  restaurantTitle: { fontSize: 24, fontWeight: '700', marginBottom: 4 },
-  restaurantSubtitle: { fontSize: 14, color: '#888', marginBottom: 10 },
-  ratingsContainer: { flexDirection: 'row', marginBottom: 8 },
+  restaurantTitle: {fontSize: 24, fontWeight: '700', marginBottom: 4},
+  restaurantSubtitle: {fontSize: 14, color: '#888', marginBottom: 10},
+  ratingsContainer: {flexDirection: 'row', marginBottom: 8},
   locationContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
   },
-  locationText: { fontSize: 14, color: '#333', marginLeft: 4 },
+  locationText: {fontSize: 14, color: '#333', marginLeft: 4},
   distanceText: {
     fontSize: 14,
     color: '#888',
@@ -207,11 +230,15 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     marginBottom: 15,
   },
-  sectionTitle: { fontSize: 18, fontWeight: '700', color: '#333' },
-  viewAllText: { fontSize: 14, color: '#E57373', fontWeight: '600' },
-  highlightedScroll: { paddingBottom: 20 },
-  menuSection: { paddingHorizontal: 20, paddingBottom: 80, marginTop: 10 },
-  filterContainer: { marginVertical: 15 },
+  sectionTitle: {fontSize: 18, fontWeight: '700', color: '#333'},
+  viewAllText: {fontSize: 14, color: '#E57373', fontWeight: '600'},
+  highlightedScroll: {paddingBottom: 20},
+  menuSection: {paddingHorizontal: 20, paddingBottom: 10},
+  filterContainer: {marginVertical: 15},
+  flatListContent: {},
+  menuItemWrapper: {
+    paddingHorizontal: 20,
+  },
 });
 
 export default DishDetailScreen;

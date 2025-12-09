@@ -1,101 +1,116 @@
-import React from 'react';
-import {FlatList, ImageSourcePropType, StatusBar, StyleSheet} from "react-native";
-import {SafeAreaView} from "react-native-safe-area-context";
-import PastOrderItem from "../../components/Profile/PastOrderItem";
-import {useNavigation} from "@react-navigation/native";
-import {NativeStackNavigationProp} from "@react-navigation/native-stack";
-import {RootStackParamList} from "../../../App";
-import Header from "../../components/Profile/Header";
-import {COLORS} from "../../constants/colors";
+import React, { useEffect, useMemo } from 'react';
+import { FlatList, StatusBar, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import PastOrderItem from '../../components/Profile/PastOrderItem';
+import { CompositeNavigationProp, NavigatorScreenParams, useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import Header from '../../components/Profile/Header';
+import { COLORS } from '../../constants/colors';
+import PageLoader from '../../components/Loader/PageLoader';
+import { handleApiError } from '../../utils/handleApiError';
+import { useGetMyStats, useMe } from '../../hooks/user';
+import { useGetMyOrders } from '../../hooks/orders';
+import NoPastOrders from '../../components/Profile/NoPastOrders';
+import { FriendsStackParamList, HomeStackParamList, MyProfileStackParamList } from '../../navigations/app.types';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
-const DISH_1_SOURCE =
-  require("../../assets/sushi-dragons.jpg") as ImageSourcePropType;
-const DISH_2_SOURCE =
-  require("../../assets/potatoes-square.jpg") as ImageSourcePropType;
-
-const PAST_ORDERS_DATA = [
-  {
-    id: "1",
-    image: DISH_1_SOURCE,
-    title: "Sushi Dragons",
-    restaurant: "Yoshi House",
-  },
-  {
-    id: "2",
-    image: DISH_2_SOURCE,
-    title: "Herbed Golden Potatoes",
-    restaurant: "A Mano",
-  },
-  {
-    id: "3",
-    image: DISH_1_SOURCE,
-    title: "Sushi Dragons",
-    restaurant: "Yoshi House",
-  },
-  {
-    id: "4",
-    image: DISH_2_SOURCE,
-    title: "Herbed Golden Potatoes",
-    restaurant: "A Mano",
-  },
-  {
-    id: "5",
-    image: DISH_1_SOURCE,
-    title: "Sushi Dragons",
-    restaurant: "Yoshi House",
-  },
-  {
-    id: "6",
-    image: DISH_2_SOURCE,
-    title: "Herbed Golden Potatoes",
-    restaurant: "A Mano",
-  },
-];
-
-type MyProfileNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "MyProfileScreen"
+type NavigationProp = CompositeNavigationProp<
+  NativeStackNavigationProp<MyProfileStackParamList, 'Profile'>,
+  BottomTabNavigationProp<{
+    Friends: NavigatorScreenParams<FriendsStackParamList>;
+    Home: NavigatorScreenParams<HomeStackParamList>;
+  }>
 >;
 
 const MyProfileScreen = () => {
-  const navigation = useNavigation<MyProfileNavigationProp>();
+  const { data, isLoading, isError, error } = useMe();
+  const navigation = useNavigation<NavigationProp>();
+  const { data: statsData } = useGetMyStats();
+  const {
+    data: ordersData,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading: ordersLoading,
+  } = useGetMyOrders(20);
 
-  const handleSettingsPress = () => navigation.navigate("MyProfileSettings");
-  const handleSavedPress = () => navigation.navigate("MyProfileSaved");
-  const handleFriendsListPress = () => navigation.navigate("FriendsScreen");
+  const orders = useMemo(() => {
+    return ordersData?.pages.flatMap(page => page.data) || [];
+  }, [ordersData]);
+
+  const loadMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      void fetchNextPage();
+    }
+  };
+
+  useEffect(() => {
+    if (isError) {
+      handleApiError(error);
+    }
+  }, []);
+
+  if (isLoading || ordersLoading || !data) {
+    return <PageLoader />;
+  }
+
+  const handleCardPress = (itemId: string) => {
+    navigation.navigate({
+      name: 'Home', params: {
+        screen: 'DishDetailScreen',
+        params: { menuItemId: itemId },
+      },
+    });
+  };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-      <StatusBar barStyle="dark-content"/>
+      <StatusBar barStyle="dark-content" />
       <FlatList
-        data={PAST_ORDERS_DATA}
+        data={orders}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         numColumns={2}
-        renderItem={({item}) => (
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
+        ListEmptyComponent={
+          <NoPastOrders subtitle="You haven't ordered anything yet" />
+        }
+        renderItem={({ item }) => (
           <PastOrderItem
-            image={item.image}
-            title={item.title}
-            restaurant={item.restaurant}
+            onPress={() => handleCardPress(item.menuItemId)}
+            image={item.menuItem.image}
+            title={item.menuItem.name}
+            restaurant={item.restaurant.name}
           />
         )}
         ListHeaderComponent={
           <Header
-            handleFriendsListPress={handleFriendsListPress}
-            handleSavedPress={handleSavedPress}
-            handleSettingsPress={handleSettingsPress}
+            statsData={statsData}
+            userInfo={{
+              avatar: data.avatar,
+              userName: data.userName,
+              fullName: data.fullName,
+              bio: data.bio,
+            }}
+            handleFriendsListPress={() => navigation.navigate('FriendsScreen')}
+            handleFavoritesPress={() => navigation.navigate('MyProfileFavorites')}
+            handleSavedPress={() => navigation.navigate('MyProfileSaved')}
+            handleSettingsPress={() => navigation.navigate('MyProfileSettings')}
           />
         }
-        contentContainerStyle={styles.listContentContainer}
-        columnWrapperStyle={{marginHorizontal: 13}}
+        columnWrapperStyle={styles.columnWrapper}
       />
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  listContentContainer: {
-    paddingBottom: 60,
+  columnWrapper: {
+    paddingHorizontal: 10,
+    justifyContent: 'space-between',
+    marginBottom: 10,
+    gap: 10,
   },
   safeArea: {
     flex: 1,

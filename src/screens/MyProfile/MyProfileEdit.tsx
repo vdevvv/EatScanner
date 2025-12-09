@@ -6,13 +6,13 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
-  Keyboard,
+  Keyboard, ActivityIndicator,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
-import { useMe, useUpdateMe } from '../../hooks/user';
+import { useDeleteAvatar, useMe, useUpdateMe, useUploadAvatar } from '../../hooks/user';
 import InputField from '../../components/common/InputField';
 import PageLoader from '../../components/Loader/PageLoader';
 import { handleApiError } from '../../utils/handleApiError';
@@ -26,9 +26,12 @@ import EditProfileBottomSheet from '../../components/Profile/EditProfileBottomSh
 const EditProfileScreen = () => {
   const { data, isLoading, isError, error } = useMe();
   const { mutate: updateMe, isPending } = useUpdateMe();
+  const { mutate: uploadAvatar, isPending: isUploadingAvatar } = useUploadAvatar();
+  const { mutate: deleteAvatar } = useDeleteAvatar();
   const navigation = useNavigation();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['1%', '35%'], []);
+
   const {
     selectedImage,
     pickImageFromGallery,
@@ -75,6 +78,20 @@ const EditProfileScreen = () => {
     updateMe(data);
   };
 
+  const handleUploadImage = async (asset: any) => {
+    if (!asset) return;
+
+    const fileExtension = asset.uri.split('.').pop() || 'jpg';
+    const fileName = `avatar_${Date.now()}.${fileExtension}`;
+    const mimeType = asset.mimeType || `image/${fileExtension}`;
+
+    uploadAvatar({
+      uri: asset.uri,
+      name: fileName,
+      type: mimeType,
+    });
+  };
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.headerContainer}>
@@ -88,10 +105,14 @@ const EditProfileScreen = () => {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.avatarSection}>
           <View style={styles.avatarContainer}>
-            <TouchableOpacity onPress={handleOpenSheet}>
+            <TouchableOpacity onPress={handleOpenSheet} disabled={isUploadingAvatar}>
               <Image source={{ uri: selectedImage }} style={styles.avatar} />
               <View style={styles.editIconContainer}>
-                <MaterialCommunityIcons name="pencil" size={18} color="#333" />
+                {isUploadingAvatar ? (
+                  <ActivityIndicator size="small" color="#333" />
+                ) : (
+                  <MaterialCommunityIcons name="pencil" size={18} color="#333" />
+                )}
               </View>
             </TouchableOpacity>
           </View>
@@ -156,16 +177,23 @@ const EditProfileScreen = () => {
         snapPoints={snapPoints}
         isDefaultImage={isDefaultImage}
         onPickGallery={async () => {
-          const success = await pickImageFromGallery();
-          if (success) handleCloseSheet();
+          const asset = await pickImageFromGallery();
+          if (asset) {
+            handleCloseSheet();
+            await handleUploadImage(asset);
+          }
         }}
         onRemovePhoto={async () => {
+          deleteAvatar();
           removePhoto();
           handleCloseSheet();
         }}
         onTakePhoto={async () => {
-          const success = await takePhoto();
-          if (success) handleCloseSheet();
+          const asset = await takePhoto();
+          if (asset) {
+            handleCloseSheet();
+            await handleUploadImage(asset);
+          }
         }}
       />
     </SafeAreaView>

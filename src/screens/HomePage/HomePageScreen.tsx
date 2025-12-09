@@ -13,29 +13,34 @@ import { StyleSheet } from 'react-native';
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import VideoWrapper from '../../components/Home/VideoWrappep';
 import { useRatings, useRestaurants } from '../../hooks/restaurants';
-import { RestaurantResponse, RestaurantReviewsResponse } from '../../types';
+import { RestaurantResponse2, RestaurantReviewsResponse } from '../../types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
 import { useLocationAlert } from '../../hooks/useLocationAlert';
 import { useLocationStore } from '../../stores/useLocationStore';
 import { HomeNavigationProp } from '../../navigations/app.types';
 import PageLoader from '../../components/Loader/PageLoader';
+import { handleApiError } from '../../utils/handleApiError';
 
 const HomePageScreen = () => {
   useLocationAlert();
   const { coords, fetchLocation } = useLocationStore();
-
   const [page, setPage] = useState(1);
-  const { data, isFetching } = useRestaurants(page);
+  const { data, isFetching, isError, error } = useRestaurants(page, coords?.latitude, coords?.longitude);
   const hasMore = data && page < data?.meta.pageCount;
   const [visibleIndex, setVisibleIndex] = useState<number>(0);
   const navigation = useNavigation<HomeNavigationProp>();
   const isScreenFocused = useIsFocused();
   const { height } = useWindowDimensions();
-  const [restaurants, setRestaurants] = useState<RestaurantResponse[]>([]);
-
+  const [restaurants, setRestaurants] = useState<RestaurantResponse2[]>([]);
   const { data: ratingsBatch } = useRatings(data?.data.map(r => r.placeId) ?? []);
   const [allRatings, setAllRatings] = useState<RestaurantReviewsResponse>({});
+
+  useEffect(() => {
+    if (isError) {
+      handleApiError(error);
+    }
+  }, [isError, error]);
 
   useEffect(() => {
     void fetchLocation();
@@ -84,6 +89,24 @@ const HomePageScreen = () => {
     index,
   });
 
+  const handleItemUpdate = (itemId: string, type: 'like' | 'save') => {
+    setRestaurants(prevRestaurants => {
+      return prevRestaurants.map(restaurant => ({
+        ...restaurant,
+        items: restaurant.items.map(item => {
+          if (item.id === itemId) {
+            return {
+              ...item,
+              isLiked: type === 'like' ? !item.isLiked : item.isLiked,
+              isSaved: type === 'save' ? !item.isSaved : item.isSaved,
+            };
+          }
+          return item;
+        }),
+      }));
+    });
+  };
+
   if (!coords) {
     return <PageLoader />;
   }
@@ -112,7 +135,7 @@ const HomePageScreen = () => {
         pagingEnabled
         onEndReached={onEndReached}
         showsVerticalScrollIndicator={false}
-        keyExtractor={(item, index) => `${item.id}-${index}`}
+        keyExtractor={(item) => item.id}
         initialNumToRender={1}
         maxToRenderPerBatch={2}
         windowSize={3}
@@ -125,13 +148,12 @@ const HomePageScreen = () => {
         viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
         renderItem={({ item, index }) => (
           <VideoWrapper
-            coords={coords}
-            isSaved={false}
             item={item}
-            rating={allRatings?.[item.placeId]?.rating ?? null}
             index={index}
+            rating={allRatings?.[item.placeId]?.rating ?? null}
             visibleIndex={visibleIndex}
             isScreenFocused={isScreenFocused}
+            onItemUpdate={handleItemUpdate}
           />
         )}
       />

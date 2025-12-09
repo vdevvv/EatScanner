@@ -5,7 +5,7 @@ import { COLORS } from '../../constants/colors';
 
 interface PasswordInputProps {
   label: string;
-  value: string;
+  value?: string;
   onChangeText: (text: string) => void;
 }
 

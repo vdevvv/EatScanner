@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect } from 'react';
+import { NavigatorScreenParams } from '@react-navigation/native';
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import {Ionicons} from "@expo/vector-icons";
-
 import HomePageScreen from "../screens/HomePage/HomePageScreen";
 import MyProfileScreen from "../screens/MyProfile/MyProfileScreen";
 import Discovery from "../screens/Discovery/DiscoveryPage";
@@ -26,17 +26,38 @@ import MyProfilePolicyScreen from "../screens/MyProfile/MyProfilePolicyScreen";
 import MyProfileTermsConditions from "../screens/MyProfile/MyProfileTermsConditions";
 import MyProfileHelpSuport from "../screens/MyProfile/MyProfileHelpSuport";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
-import { DiscoveryStackParamList, FriendsStackParamList, HomeStackParamList } from './app.types';
+import {
+  DiscoveryStackParamList,
+  FriendsStackParamList,
+  HomeStackParamList,
+  MyProfileStackParamList,
+} from './app.types';
 import ViewAllScreen from '../screens/Discovery/ViewAllScreen';
+import MyProfileFavorites from '../screens/MyProfile/MyProfileFavorites';
+import { usePushNotifications } from '../hooks/usePushNotifications';
+import { useSendPushToken } from '../hooks/notifications';
+import { useAuthStore } from '../stores/useAuthStore';
+import MyProfileNotificationSettings from "../screens/MyProfile/MyProfileNotificationSettings";
 
 export type RootTabParamList = {
-  Home: undefined;
-  Discovery: undefined;
-  Friends: undefined;
-  Profile: undefined;
+  Home: NavigatorScreenParams<HomeStackParamList>;
+  Discovery: NavigatorScreenParams<DiscoveryStackParamList>;
+  Friends: NavigatorScreenParams<FriendsStackParamList>;
+  Profile: NavigatorScreenParams<MyProfileStackParamList>;
 };
 
 const AppNavigator = () => {
+  const { expoPushToken } = usePushNotifications();
+  const { mutate: sendPushToken } = useSendPushToken();
+  const user = useAuthStore(state => state.user);
+
+  useEffect(() => {
+    if (!expoPushToken) return;
+    if (!user?.id) return;
+
+    sendPushToken(expoPushToken);
+  }, [expoPushToken, user?.id]);
+
   const insets = useSafeAreaInsets()
   const Tab = createBottomTabNavigator<RootTabParamList>();
 
@@ -71,19 +92,21 @@ const AppNavigator = () => {
     </FriendsStack.Navigator>
   )
 
-  const MyProfileStack = createNativeStackNavigator();
+  const MyProfileStack = createNativeStackNavigator<MyProfileStackParamList>();
   const MyProfileStackNavigator = () => (
     <MyProfileStack.Navigator screenOptions={{headerShown: false}}>
       <MyProfileStack.Screen name="Profile" component={MyProfileScreen}/>
+      <MyProfileStack.Screen name="FriendsProfileScreen" component={FriendsProfileScreen}/>
       <MyProfileStack.Screen name="FriendsScreen" component={FriendsScreen}/>
-      <FriendsStack.Screen name="FriendsProfileScreen" component={FriendsProfileScreen}/>
       <MyProfileStack.Screen name="MyProfileSettings" component={MyProfileSettings}/>
       <MyProfileStack.Screen name="MyProfileSaved" component={MyProfileSaved}/>
+      <MyProfileStack.Screen name="MyProfileFavorites" component={MyProfileFavorites}/>
       <MyProfileStack.Screen name="MyProfileEdit" component={MyProfileEdit}/>
       <MyProfileStack.Screen name="MyProfileChangePassword" component={MyProfileChangePassword}/>
       <MyProfileStack.Screen name="MyProfilePolicyScreen" component={MyProfilePolicyScreen}/>
       <MyProfileStack.Screen name="MyProfileTermsConditions" component={MyProfileTermsConditions}/>
       <MyProfileStack.Screen name="MyProfileHelpSuport" component={MyProfileHelpSuport}/>
+      <MyProfileStack.Screen name="MyProfileNotificationSettings" component={MyProfileNotificationSettings}/>
     </MyProfileStack.Navigator>
   )
 

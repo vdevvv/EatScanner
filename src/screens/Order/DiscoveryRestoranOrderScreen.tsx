@@ -11,11 +11,12 @@ import {
   StatusBar, ActivityIndicator,
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
+import { RouteProp, useIsFocused, useNavigation, useRoute } from '@react-navigation/native';
 import { COLORS } from '../../constants/colors';
 import { HomeNavigationProp, HomeStackParamList } from '../../navigations/app.types';
 import { useMenuItem } from '../../hooks/restaurants';
 import Toast from 'react-native-toast-message';
+import { useVideoPlayer, VideoView } from 'expo-video';
 
 const { width } = Dimensions.get('window');
 const IMAGE_HEIGHT = width * 0.85;
@@ -48,8 +49,15 @@ type DiscoverOrderRouteProp = RouteProp<HomeStackParamList, 'DishDetailScreen'>
 const DishDetailScreen = () => {
   const navigation = useNavigation<HomeNavigationProp>();
   const route = useRoute<DiscoverOrderRouteProp>();
-  const { menuItemId, googleRating, restaurantName } = route.params;
+  const { menuItemId } = route.params;
   const { data, isError, error, isLoading } = useMenuItem(menuItemId);
+  const isFocused = useIsFocused();
+  const videoSource = (isFocused && data?.video) ? data.video : null;
+  const player = useVideoPlayer(videoSource, (player) => {
+    player.loop = true;
+    player.muted = false;
+    player.play();
+  });
 
   useEffect(() => {
     if (isError) {
@@ -59,7 +67,7 @@ const DishDetailScreen = () => {
       });
       navigation.goBack();
     }
-  }, [isError, data, error, navigation]);
+  }, [isError, error, navigation]);
 
   if (!data || isLoading) {
     return (
@@ -69,10 +77,6 @@ const DishDetailScreen = () => {
     );
   }
 
-  const handleOrderPress = () => {
-    navigation.navigate('DiscoverRestoranWhere');
-  };
-
   return (
     <View style={styles.root}>
       <StatusBar
@@ -80,8 +84,17 @@ const DishDetailScreen = () => {
         backgroundColor="transparent"
         barStyle="dark-content"
       />
-      <View style={styles.imageContainer}>
-        <Image source={{ uri: data.image }} style={styles.dishImage} />
+      <View style={styles.mediaContainer}>
+        {videoSource && player ? (
+          <VideoView
+            player={player}
+            style={styles.dishMedia}
+            contentFit="cover"
+            nativeControls={false}
+          />
+        ) : (
+          <Image source={{ uri: data.image }} style={styles.dishMedia} />
+        )}
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={30} color={COLORS.black} />
         </TouchableOpacity>
@@ -96,7 +109,7 @@ const DishDetailScreen = () => {
                 size={20}
                 color="#333"
               />
-              <Text style={styles.restaurantName}>{restaurantName}</Text>
+              <Text style={styles.restaurantName}>{data.restaurant.name}</Text>
             </View>
 
             <Text style={styles.dishName}>{data.name}</Text>
@@ -105,7 +118,7 @@ const DishDetailScreen = () => {
             <View style={styles.ratingsContainer}>
               <RatingPill
                 platform="Google"
-                rating={googleRating}
+                rating={data.restaurant.rating}
                 color="#3f84f8"
                 iconName="google"
               />
@@ -115,7 +128,21 @@ const DishDetailScreen = () => {
       </View>
 
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.orderButton} onPress={handleOrderPress}>
+        <TouchableOpacity
+          style={styles.orderButton}
+          onPress={() => navigation.navigate('DiscoverRestoranWhere', {
+            itemId: menuItemId,
+            image: data.image,
+            name: data.name,
+            price: data.price,
+            restaurantName: data.restaurant.name,
+            rating: data.restaurant.rating,
+            careemUrl: data.restaurant.careemUrl,
+            talabatUrl: data.restaurant.talabatUrl,
+            deliverooUrl: data.restaurant.deliverooUrl,
+            noonFoodUrl: data.restaurant.noonFoodUrl,
+          })}
+        >
           <Text style={styles.orderButtonText}>
             Order Now | AED {data.price}
           </Text>
@@ -136,7 +163,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  imageContainer: {
+  mediaContainer: {
     position: 'absolute',
     top: 0,
     left: 0,
@@ -144,7 +171,7 @@ const styles = StyleSheet.create({
     height: IMAGE_HEIGHT,
     zIndex: 1,
   },
-  dishImage: {
+  dishMedia: {
     width: '100%',
     height: '100%',
     resizeMode: 'cover',

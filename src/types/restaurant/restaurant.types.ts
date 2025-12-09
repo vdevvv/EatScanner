@@ -50,6 +50,27 @@ export interface RestaurantResponse extends Restaurant {
   }) | null;
 }
 
+export interface RestaurantResponse2 {
+  id: string,
+  placeId: string,
+  name: string,
+  city: string,
+  latitude: number,
+  longitude: number,
+  distance: number,
+  items: Array<{
+    id: string,
+    name: string,
+    price: number,
+    description: string | null,
+    image: string,
+    video: string,
+    createdAt: string,
+    isLiked: boolean,
+    isSaved: boolean
+  }>
+}
+
 export type RestaurantReviewsResponse = Record<string, {
   name: string
   rating: number
@@ -79,4 +100,21 @@ export interface DiscoveryResponse extends MenuItem {
 export interface SearchMenuItemsParams extends PaginateOptions {
   query?: string;
   tags: string[];
+}
+
+export interface MenuItemResponse {
+  name: string;
+  description: string | null;
+  image: string;
+  video: string | null;
+  price: string;
+  restaurant: {
+    name: string
+    placeId: string
+    rating: number
+    talabatUrl: string | null,
+    careemUrl: string | null,
+    noonFoodUrl: string | null,
+    deliverooUrl: string | null
+  };
 }

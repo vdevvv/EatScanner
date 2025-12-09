@@ -15,14 +15,10 @@ export type FriendsNavigationProp = NativeStackNavigationProp<FriendsStackParamL
 export type HomeStackParamList = {
   HomePageScreen: undefined;
   Notifications: undefined;
-  DishDetailScreen: {
-    menuItemId: string,
-    googleRating: number | null,
-    restaurantName: string
-  };
+  DishDetailScreen: { menuItemId: string };
   Order: {
-    menuId: string | null
     restaurant: {
+      id: string,
       googleRating: number | null,
       name: string
       city: string
@@ -30,7 +26,18 @@ export type HomeStackParamList = {
       description: string
     }
   };
-  DiscoverRestoranWhere: undefined;
+  DiscoverRestoranWhere: {
+    itemId: string,
+    image: string
+    name: string
+    restaurantName: string
+    rating: number
+    price: string
+    talabatUrl: string | null,
+    careemUrl: string | null,
+    noonFoodUrl: string | null,
+    deliverooUrl: string | null
+  };
 }
 
 export type HomeNavigationProp = NativeStackNavigationProp<HomeStackParamList>;
@@ -41,8 +48,29 @@ export type DiscoveryStackParamList = {
   } | undefined;
   DiscoveryFiltersPage: undefined;
   ViewAll: {
-    tagSlug: string | undefined
+    tagSlug: string | undefined,
+    searchParams?: {
+      query?: string;
+      tags?: string[];
+    };
   }
 }
 
 export type DiscoveryNavigationProp = NativeStackNavigationProp<DiscoveryStackParamList>;
+
+export type MyProfileStackParamList = {
+  Profile: undefined
+  FriendsScreen: undefined
+  FriendsProfileScreen: { userId: string }
+  MyProfileSettings: undefined
+  MyProfileSaved: undefined
+  MyProfileFavorites: undefined
+  MyProfileEdit: undefined
+  MyProfileChangePassword: undefined
+  MyProfilePolicyScreen: undefined
+  MyProfileTermsConditions: undefined
+  MyProfileHelpSuport: undefined
+  MyProfileNotificationSettings: undefined
+}
+
+export type MyProfileNavigationProp = NativeStackNavigationProp<MyProfileStackParamList>;

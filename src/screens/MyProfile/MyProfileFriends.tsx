@@ -1,146 +1,49 @@
-import React, {useEffect, useState} from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  Dimensions,
-  Platform, FlatList, ActivityIndicator,
-} from "react-native";
-import {Ionicons} from "@expo/vector-icons";
-import {useNavigation} from "@react-navigation/native";
-import {SafeAreaView} from "react-native-safe-area-context";
-import {useMyFriends, useRemoveFriend} from "../../hooks/friends";
-import {handleApiError} from "../../utils/handleApiError";
-import FriendListItem from "../../components/Friends/FriendListItem";
-import {useDebounce} from "../../hooks/use-debounce";
-import {Friend} from "../../types";
-import {COLORS} from "../../constants/colors";
-import NoFriends from "../../components/Friends/NoFriends";
-import {FriendsNavigationProp} from "../../navigations/app.types";
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import RequestsTab from '../../components/Friends/RequestsTab';
+import FriendsTab from '../../components/Friends/FriendsTab';
+import { COLORS } from '../../constants/colors';
 
-const {width} = Dimensions.get("window");
+type TabType = 'friends' | 'received' | 'sent';
 
-const FriendsScreenFinal = () => {
-  const navigation = useNavigation<FriendsNavigationProp>();
-  const [page, setPage] = useState(1);
-  const [searchText, setSearchText] = useState("");
-  const [debounceSearchText, setDebounceSearchText] = useState("");
+const FriendsScreen = () => {
+  const navigation = useNavigation();
+  const [activeTab, setActiveTab] = useState<TabType>('friends');
 
-  const {data, isError, error, isFetching} = useMyFriends(debounceSearchText, page);
-  const {mutate} = useRemoveFriend();
-
-  const hasMore = data && page < data?.meta.pageCount;
-  const [friends, setFriends] = useState<Friend[]>([]);
-
-  useEffect(() => {
-    if (!data?.data || data.data.length === 0) return;
-
-    if (page === 1) {
-      setFriends([...data.data]);
-    } else {
-      const firstIdFromNewData = data.data[0].id;
-      const isAlreadyLoaded = friends.some(friend => friend.id === firstIdFromNewData);
-
-      if (!isAlreadyLoaded) {
-        setFriends(prev => [...prev, ...data.data]);
-      }
-    }
-  }, [data]);
-
-  const debouncedSearch = useDebounce((value: string) => {
-    setDebounceSearchText(value);
-    setPage(1);
-    setFriends([]);
-  }, 400);
-
-  if (isError) handleApiError(error);
-
-  const handlePressUser = (userId: string) => {
-    navigation.navigate('FriendsProfileScreen', {userId})
-  }
-
-  const shouldShowNoFriends = !searchText && data?.data.length === 0 && !isFetching;
+  const renderTabButton = (label: string, tab: TabType) => (
+    <TouchableOpacity
+      style={[styles.tabButton, activeTab === tab && styles.activeTabButton]}
+      onPress={() => setActiveTab(tab)}
+    >
+      <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
       <View style={styles.headerContainer}>
         <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={28} color="#333" style={{marginRight: 10}}/>
+          <Ionicons name="chevron-back" size={28} color="#333" style={{ marginRight: 10 }} />
           <Text style={styles.screenTitle}>Friends</Text>
         </TouchableOpacity>
       </View>
 
-      {!shouldShowNoFriends ? (
-        <>
-          <View style={styles.searchBarContainer}>
-            <Ionicons
-              name="search-outline"
-              size={20}
-              color={COLORS.black}
-              style={styles.searchIcon}
-            />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Search anyone..."
-              placeholderTextColor={COLORS.grey30}
-              value={searchText}
-              onChangeText={(value) => {
-                setSearchText(value);
-                debouncedSearch(value);
-              }}
-            />
-          </View>
+      <View style={styles.tabsContainer}>
+        {renderTabButton('My Friends', 'friends')}
+        {renderTabButton('Received', 'received')}
+        {renderTabButton('Sent', 'sent')}
+      </View>
 
-          <FlatList
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            data={friends}
-            keyExtractor={(item) => item.id}
-            onEndReached={() => {
-              if (hasMore && !isFetching) {
-                setPage(prev => prev + 1);
-              }
-            }}
-            onEndReachedThreshold={0.5}
-            ListFooterComponent={
-              isFetching && page > 1 ? <ActivityIndicator style={{marginVertical: 20}}/> : null
-            }
-            renderItem={({item}) => (
-              <FriendListItem
-                friend={item}
-                handlePressUser={handlePressUser}
-                onRemoveFriend={() => {
-                  mutate(item.id, {
-                    onSuccess: () => {
-                      setPage(1);
-                      setFriends([]);
-                    }
-                  });
-                }}
-              />
-            )}
-          />
-          {searchText.length > 0 && !isFetching && friends.length === 0 && (
-            <View style={styles.noResultsContainer}>
-              <Text style={styles.noResultsText}>
-                No users found matching "{searchText}"
-              </Text>
-            </View>
-          )}
-        </>
-      ) : (
-        <View style={styles.noFriendsWrapper}>
-          <NoFriends/>
-        </View>
-      )}
-
-      {isFetching && page === 1 && friends.length === 0 && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large"/>
-        </View>
-      )}
+      <View style={styles.contentContainer}>
+        {activeTab === 'friends' && <FriendsTab />}
+        {activeTab === 'received' && <RequestsTab type="received" />}
+        {activeTab === 'sent' && <RequestsTab type="sent" />}
+      </View>
     </SafeAreaView>
   );
 };
@@ -151,67 +54,48 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
   },
   headerContainer: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 16,
     paddingVertical: 10,
-    position: "relative",
-    width,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   backButton: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   screenTitle: {
     fontSize: 24,
-    fontWeight: "600",
-    color: "#333",
+    fontWeight: '700',
+    color: '#333',
   },
-  searchBarContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#f5f5f5",
-    borderRadius: 12,
-    marginHorizontal: 16,
-    marginVertical: 10,
-    paddingHorizontal: 10,
-    height: 48,
-  },
-  searchIcon: {
-    marginRight: 8,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 16,
-    color: "#333",
-    ...Platform.select({
-      android: {paddingVertical: 0},
-    }),
-  },
-  scrollContent: {
+  tabsContainer: {
+    flexDirection: 'row',
     paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 20,
-    flexGrow: 1,
+    marginBottom: 5,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
-  noResultsContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 50,
+  tabButton: {
+    paddingVertical: 12,
+    marginRight: 20,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
   },
-  noResultsText: {
-    color: "#999",
+  activeTabButton: {
+    borderBottomColor: COLORS.black,
+  },
+  tabText: {
     fontSize: 16,
+    fontWeight: '500',
+    color: '#999',
   },
-  loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 10,
+  activeTabText: {
+    color: COLORS.black,
+    fontWeight: '600',
   },
-  noFriendsWrapper: {
+  contentContainer: {
     flex: 1,
-    alignItems: "center",
-  }
+  },
 });
 
-export default FriendsScreenFinal;
+export default FriendsScreen;

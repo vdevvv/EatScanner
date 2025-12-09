@@ -8,3 +8,19 @@ export type Friend = {
   createdAt: string,
   updatedAt: string
 }
+
+export interface FriendRequestUser {
+  id: string;
+  userId: string;
+  userName: string | null;
+  fullName: string | null;
+  avatar: string;
+}
+
+export interface MutualFriend {
+  id: string
+  fullName: string | null
+  userName: string | null
+  avatar: string
+  bio: string | null
+}

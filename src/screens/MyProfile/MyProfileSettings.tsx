@@ -19,6 +19,7 @@ type RootStackParamList = {
   MyProfilePolicyScreen: undefined;
   MyProfileTermsConditions: undefined;
   MyProfileHelpSuport: undefined;
+  MyProfileNotificationSettings: undefined;
   SignIn: undefined;
 };
 
@@ -59,6 +60,7 @@ const MyProfileSettings = () => {
     navigation.navigate("MyProfileTermsConditions");
   const handleHelpAndSupport = () => navigation.navigate("MyProfileHelpSuport");
   const handleLogOut = () => logout();
+  const handleNotificationPress = () => navigation.navigate('MyProfileNotificationSettings')
 
   const SETTINGS_OPTIONS: SettingItem[] = [
     {
@@ -95,6 +97,13 @@ const MyProfileSettings = () => {
       iconName: "help-circle-outline",
       iconLibrary: "Ionicons",
       action: handleHelpAndSupport,
+    },
+    {
+      id: 'Notification',
+      title: 'Notifications',
+      iconName: 'notifications-outline',
+      iconLibrary: "Ionicons",
+      action: handleNotificationPress,
     },
     {
       id: "LogOut",

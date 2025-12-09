@@ -3,6 +3,7 @@ export type User = {
   email: string
   fullName: string | null
   userName: string | null
+  bio: string | null
   avatar: string
   phone: string | null
   isEmailVerified: boolean
@@ -17,6 +18,18 @@ export interface UpdateUserDto {
 }
 
 export interface UpdatePasswordDto {
-  oldPassword: string
-  newPassword: string
+  oldPassword: string;
+  newPassword: string;
+}
+
+export interface UserStatsResponse {
+  friendsCount: number;
+  savedCount: number;
+  favoritesCount: number;
+}
+
+export interface AvatarUploadParams {
+  uri: string;
+  type: string;
+  name: string;
 }

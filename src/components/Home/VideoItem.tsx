@@ -1,31 +1,43 @@
-import React, {FC, useEffect, useState} from "react";
-import {ActivityIndicator, StyleSheet, View, Text, TouchableOpacity, Image, Share} from "react-native";
-import {Feather} from "@expo/vector-icons";
-import GoogleLogo from "../icons/GoogleLogo";
-import {MenuItem} from "../../types";
-import {useNavigation} from "@react-navigation/native";
-import {COLORS} from "../../constants/colors";
-import {BlurView} from "expo-blur";
-import {useVideoPlayer, VideoView} from "expo-video";
-import {HomeNavigationProp} from "../../navigations/app.types";
-
-const shareIcon = require("../../assets/Telegram.png");
-const saveIcon = require("../../assets/Save.png");
-const saveIconRed = require("../../assets/Save-red.png");
-const heartIcon = require('../../assets/heart.png')
+import React, {FC, useEffect, useState} from 'react';
+import {ActivityIndicator, StyleSheet, View, Text, TouchableOpacity, Share, Platform} from 'react-native';
+import {Feather} from '@expo/vector-icons';
+import GoogleLogo from '../icons/GoogleLogo';
+import {useNavigation} from '@react-navigation/native';
+import {COLORS} from '../../constants/colors';
+import {BlurView} from 'expo-blur';
+import {useVideoPlayer, VideoView} from 'expo-video';
+import {HomeNavigationProp} from '../../navigations/app.types';
+import {useToggleSave} from '../../hooks/saved';
+import SaveIcon from '../icons/SaveIcon';
+import Heart from '../icons/Heart';
+import ShareIcon from '../icons/ShareIcon';
+import {useToggleLike} from '../../hooks/likes';
+import {useBottomTabBarHeight} from "@react-navigation/bottom-tabs";
+import {useSafeAreaInsets} from "react-native-safe-area-context";
+import {getOptimizedVideoUrl} from "../../utils/helpers";
 
 interface VideoItemProps {
   restaurant: {
     name: string;
     city: string;
-    menuId: string | null
+    restaurantId: string
   };
-  menuItem: MenuItem;
+  menuItem: {
+    id: string,
+    name: string,
+    price: number,
+    description: string | null,
+    image: string,
+    video: string,
+    createdAt: string,
+    isLiked: boolean,
+    isSaved: boolean
+  };
+  onItemUpdate: (itemId: string, type: 'like' | 'save') => void;
   isVisible: boolean;
   isScreenFocused: boolean;
   width: number;
   height: number;
-  isSaved: boolean;
   rating: number | null;
   distance: number | undefined;
 }
@@ -38,30 +50,49 @@ const VideoItem: FC<VideoItemProps> = (
     width,
     height,
     restaurant,
-    isSaved,
     rating,
-    distance
-  }
+    distance,
+    onItemUpdate
+  },
 ) => {
+  const {bottom} = useSafeAreaInsets()
+  const bottomTabHeight = useBottomTabBarHeight();
+  const containerPaddingBottom = Platform.OS === 'android' ? bottom : bottomTabHeight + 15
+  const BUTTON_HEIGHT = 56;
+  const ICONS_GAP = 20;
+  const iconsBottomPosition = containerPaddingBottom + BUTTON_HEIGHT + ICONS_GAP + 50;
+
   const navigation = useNavigation<HomeNavigationProp>();
   const [isVideoReady, setIsVideoReady] = useState(false);
   const [videoError, setVideoError] = useState(false);
-  const player = useVideoPlayer(menuItem.video, (player) => {
+  const [isSavedLocal, setIsSavedLocal] = useState(menuItem.isSaved);
+  const [isLikedLocal, setIsLikedLocal] = useState(menuItem.isLiked);
+  const {mutate: saveMutate} = useToggleSave();
+  const {mutate: likeMutate} = useToggleLike();
+  const player = useVideoPlayer(getOptimizedVideoUrl(menuItem.video, 'medium'), (player) => {
     player.loop = true;
     player.muted = false;
   });
 
   useEffect(() => {
+    setIsSavedLocal(menuItem.isSaved);
+  }, [menuItem.isSaved]);
+
+  useEffect(() => {
+    setIsLikedLocal(menuItem.isLiked);
+  }, [menuItem.isLiked]);
+
+  useEffect(() => {
     setIsVideoReady(false);
     setVideoError(false);
-  }, [menuItem]);
+  }, [menuItem.id, menuItem.video]);
 
   useEffect(() => {
     (async () => {
       if (isVisible && isScreenFocused && !videoError) {
-        player.play()
+        player.play();
       } else {
-        player.pause()
+        player.pause();
       }
     })();
   }, [isVisible, isScreenFocused, videoError, player]);
@@ -86,19 +117,41 @@ const VideoItem: FC<VideoItemProps> = (
   const onShare = () => {
     void Share.share({
       message: restaurant.name,
-      url: ''
+      url: '',
     });
-  }
+  };
+
+  const handleSavePress = () => {
+    setIsSavedLocal(prev => !prev);
+    onItemUpdate(menuItem.id, 'save');
+    saveMutate(menuItem.id, {
+      onError: () => {
+        setIsSavedLocal(prev => !prev);
+        onItemUpdate(menuItem.id, 'save');
+      },
+    });
+  };
+
+  const handleLikePress = () => {
+    setIsLikedLocal(prev => !prev);
+    onItemUpdate(menuItem.id, 'like');
+    likeMutate(menuItem.id, {
+      onError: () => {
+        setIsLikedLocal(prev => !prev);
+        onItemUpdate(menuItem.id, 'like');
+      },
+    });
+  };
 
   return (
-    <View style={{width, height, borderWidth: 2}}>
+    <View style={{width, height}}>
       <VideoView
         player={player}
         style={StyleSheet.absoluteFill}
         contentFit="cover"
         nativeControls={false}
       />
-      <View style={styles.contentContainer}>
+      <View style={[styles.contentContainer, {paddingBottom: containerPaddingBottom}]}>
         <Text style={styles.title}>{menuItem.name}</Text>
         <View>
           <Text style={styles.restaurantTitle}>{restaurant.name}</Text>
@@ -121,15 +174,15 @@ const VideoItem: FC<VideoItemProps> = (
           <View style={styles.buttonRow}>
             <TouchableOpacity
               style={[styles.actionButton, styles.viewDishButton, {overflow: 'hidden'}]}
-              onPress={() => navigation.navigate("Order", {
-                menuId: restaurant.menuId,
+              onPress={() => navigation.navigate('Order', {
                 restaurant: {
+                  id: restaurant.restaurantId,
                   distance,
                   googleRating: rating,
                   name: restaurant.name,
                   city: restaurant.city,
                   description: '',
-                }
+                },
               })}
             >
               <BlurView intensity={10} tint="dark" style={StyleSheet.absoluteFill}/>
@@ -140,11 +193,9 @@ const VideoItem: FC<VideoItemProps> = (
             <TouchableOpacity
               style={[styles.actionButton, styles.orderNowButton]}
               onPress={() => {
-                navigation.navigate("DishDetailScreen", {
+                navigation.navigate('DishDetailScreen', {
                   menuItemId: menuItem.id,
-                  googleRating: rating,
-                  restaurantName: restaurant.name
-                })
+                });
               }}
             >
               <Text style={styles.orderNowText}>
@@ -153,21 +204,20 @@ const VideoItem: FC<VideoItemProps> = (
             </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.sideIcons}>
+        <View style={[styles.sideIcons, {bottom: iconsBottomPosition}]}>
           <TouchableOpacity style={styles.sideIconItem} onPress={onShare}>
-            <Image source={shareIcon}/>
+            <ShareIcon/>
+            <Text style={styles.sideIconText}>Share</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.sideIconItem}
-          >
-            <Image source={isSaved ? saveIconRed : saveIcon}/>
+          <TouchableOpacity style={styles.sideIconItem} onPress={handleSavePress}>
+            {isSavedLocal ? <SaveIcon fill="red"/> : <SaveIcon/>}
+            <Text style={styles.sideIconText}>Save</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.sideIconItem}
-          >
-            <Image source={heartIcon}/>
+          <TouchableOpacity style={styles.sideIconItem} onPress={handleLikePress}>
+            {isLikedLocal ? <Heart fill={COLORS.red}/> : <Heart/>}
+            <Text style={styles.sideIconText}>Like</Text>
           </TouchableOpacity>
 
         </View>
@@ -205,19 +255,19 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'space-between',
     paddingTop: 100,
-    paddingBottom: 90,
     paddingHorizontal: 20,
     pointerEvents: 'box-none',
+    height: '100%',
   },
   title: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 24,
-    fontWeight: "bold",
+    fontWeight: 'bold',
   },
   restaurantTitle: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 20,
-    fontWeight: "bold",
+    fontWeight: 'bold',
     marginBottom: 8,
   },
   footerLocation: {
@@ -250,16 +300,16 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     gap: 12,
-    width: "100%",
+    width: '100%',
   },
   actionButton: {
     height: 56,
     borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   viewDishButton: {
     paddingHorizontal: 27,
@@ -268,22 +318,55 @@ const styles = StyleSheet.create({
     borderColor: COLORS.red,
     borderRadius: 12,
   },
-  viewDishText: {fontSize: 16, fontWeight: "bold", color: COLORS.white},
+  viewDishText: {fontSize: 16, fontWeight: 'bold', color: COLORS.white},
   orderNowButton: {flex: 1, backgroundColor: COLORS.red},
-  orderNowText: {fontSize: 16, fontWeight: "bold", color: COLORS.white},
+  orderNowText: {fontSize: 16, fontWeight: 'bold', color: COLORS.white},
   sideIcons: {
-
     position: 'absolute',
     right: 20,
-    top: 100,
-    bottom: 90,
     justifyContent: 'center',
     alignItems: 'center',
     pointerEvents: 'box-none',
   },
   sideIconItem: {
+    alignItems: 'center',
     marginBottom: 25,
   },
-})
+  sideIconText: {
+    color: COLORS.white,
+    marginTop: 5,
+  },
+});
 
 export default VideoItem;
+
+interface ActiveFeedPlayerProps {
+  videoUrl: string,
+  onError: () => void
+}
+
+const ActiveFeedPlayer: FC<ActiveFeedPlayerProps> = ({videoUrl, onError}) => {
+  const player = useVideoPlayer(videoUrl, (player) => {
+    player.loop = true;
+    player.muted = false;
+    player.play();
+  });
+
+  useEffect(() => {
+    const subscription = player.addListener('statusChange', (status) => {
+      if (status.status === 'error') {
+        onError();
+      }
+    });
+    return () => subscription.remove();
+  }, [player]);
+
+  return (
+    <VideoView
+      player={player}
+      style={StyleSheet.absoluteFill}
+      contentFit="cover"
+      nativeControls={false}
+    />
+  );
+};

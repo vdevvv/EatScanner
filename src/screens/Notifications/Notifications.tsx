@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,139 +6,100 @@ import {
   FlatList,
   TouchableOpacity,
   StatusBar,
-} from "react-native";
-import { Ionicons, Feather } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-type RootStackParamList = {
-  HomePageScreen: undefined;
-  Notifications: undefined;
-};
-
-type NotificationsNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  "Notifications"
->;
-
-const notifications = [
-  {
-    id: "1",
-    title: "Talia reacted to your video",
-    time: "Just Now",
-    icon: "heart-outline" as const,
-    isUnread: true,
-  },
-  {
-    id: "2",
-    title: "You’ve hit a 3-day streak!",
-    time: "2h ago",
-    icon: "notifications-outline" as const,
-    isUnread: true,
-  },
-  {
-    id: "3",
-    title: "Iryna sent a message",
-    time: "Yesterday",
-    icon: "mail-outline" as const,
-    isUnread: false,
-  },
-  {
-    id: "4",
-    title: "Talia shared a video",
-    time: "Yesterday",
-    icon: "arrow-up-outline" as const,
-    isUnread: false,
-  },
-  {
-    id: "5",
-    title: "Talia reacted to your dish",
-    time: "2 days ago",
-    icon: "heart-outline" as const,
-    isUnread: false,
-  },
-  {
-    id: "6",
-    title: "Talia sent a message",
-    time: "1 week ago",
-    icon: "mail-outline" as const,
-    isUnread: false,
-  },
-  {
-    id: "7",
-    title: "New comment from Iryna",
-    time: "1 week ago",
-    icon: "chatbubble-ellipses-outline" as const,
-    isUnread: false,
-  },
-  {
-    id: "8",
-    title: "Don’t lose your streak!",
-    time: "2 weeks ago",
-    icon: "notifications-outline" as const,
-    isUnread: false,
-  },
-];
+} from 'react-native';
+import { Ionicons, Feather } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { HomeNavigationProp } from '../../navigations/app.types';
+import {
+  useGetMyNotifications,
+  useMarkAllNotificationsRead, useMarkNotificationRead,
+} from '../../hooks/notifications';
+import PageLoader from '../../components/Loader/PageLoader';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import { capitalize } from '../../utils/helpers';
+import { COLORS } from '../../constants/colors';
 
 const NotificationsScreen = () => {
-  const navigation = useNavigation<NotificationsNavigationProp>();
+  const {mutate: markAllRead} = useMarkAllNotificationsRead()
+  const {mutate: markRead} = useMarkNotificationRead()
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+  } = useGetMyNotifications();
+  const navigation = useNavigation<HomeNavigationProp>();
+  const notifications = useMemo(() => {
+    return data?.pages.flatMap(page => page.data) || [];
+  }, [data]);
 
-  const handleBackPress = () => {
-    navigation.navigate("HomePageScreen");
+  if (isLoading || !data) {
+    return <PageLoader />;
+  }
+
+  dayjs.extend(relativeTime);
+
+  const loadMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      void fetchNextPage();
+    }
   };
 
-  const renderItem = ({
-    item,
-  }: {
-    item: {
-      id: string;
-      title: string;
-      time: string;
-      icon:
-        | "heart-outline"
-        | "notifications-outline"
-        | "mail-outline"
-        | "arrow-up-outline"
-        | "chatbubble-ellipses-outline";
-      isUnread?: boolean;
-    };
-  }) => (
-    <TouchableOpacity style={styles.item} activeOpacity={0.8}>
-      <View style={styles.iconWrapper}>
-        <View style={styles.iconBackground}>
-          <Ionicons name={item.icon} size={22} color="#fff" />
-          {item.isUnread && <View style={styles.redDot} />}
-        </View>
-      </View>
-
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.time}>{item.time}</Text>
-      </View>
-
-      <Feather name="chevron-right" size={20} color="#999" />
-    </TouchableOpacity>
-  );
+  const handlePress = (menuItemId: string, notificationId: string) => {
+    markRead(notificationId)
+    navigation.navigate('DishDetailScreen', {
+      menuItemId,
+    });
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
       <View style={styles.header}>
-        <TouchableOpacity style={styles.headerLeft} onPress={handleBackPress}>
+        <TouchableOpacity style={styles.headerLeft} onPress={() => navigation.navigate('HomePageScreen')}>
           <Ionicons name="chevron-back" size={24} color="#222" />
           <Text style={styles.headerTitle}>Notifications</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => markAllRead()}>
           <Text style={styles.markReadText}>Mark all as read</Text>
         </TouchableOpacity>
       </View>
 
       <FlatList
         data={notifications}
+        onEndReached={loadMore}
+        showsVerticalScrollIndicator={false}
+        onEndReachedThreshold={0.5}
         keyExtractor={(item) => item.id}
-        renderItem={renderItem}
+        renderItem={({ item }) => {
+          const menuItemId = item?.data?.menuItemId;
+
+          return (
+            <TouchableOpacity
+              style={styles.item}
+              activeOpacity={0.8}
+              onPress={menuItemId ? () => handlePress(String(menuItemId), item.id) : undefined}
+            >
+              <View style={styles.iconWrapper}>
+                <View style={styles.iconBackground}>
+                  <Ionicons name="notifications-outline" size={22} color="#fff" />
+                  {!item.isRead && <View style={styles.redDot} />}
+                </View>
+              </View>
+
+              <View style={styles.textContainer}>
+                <Text style={styles.title}>{item.title}</Text>
+                <Text style={styles.time}>{capitalize(dayjs(item.createdAt).fromNow())}</Text>
+              </View>
+
+              <Feather name="chevron-right" size={20} color="#999" />
+            </TouchableOpacity>
+          );
+        }}
         contentContainerStyle={styles.listContainer}
       />
     </SafeAreaView>
@@ -150,42 +111,38 @@ export default NotificationsScreen;
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: COLORS.background,
   },
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: "#eee",
   },
   headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   headerTitle: {
     fontSize: 22,
-    fontWeight: "700",
-    color: "#111",
+    fontWeight: '700',
+    color: COLORS.black,
     marginLeft: 8,
   },
   markReadText: {
     fontSize: 14,
-    color: "#A25C48",
-    fontWeight: "500",
+    color: COLORS.grey30,
+    fontWeight: '500',
   },
   listContainer: {
     paddingHorizontal: 20,
     paddingTop: 8,
   },
   item: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingVertical: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: "#F1F1F1",
   },
   iconWrapper: {
     marginRight: 14,
@@ -194,32 +151,30 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 10,
-    backgroundColor: "#C96F57",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: COLORS.red,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   redDot: {
-    position: "absolute",
+    position: 'absolute',
     top: 6,
     right: 6,
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#E53935",
-    borderWidth: 1,
-    borderColor: "#fff",
+    backgroundColor: '#FF9900',
   },
   textContainer: {
     flex: 1,
   },
   title: {
     fontSize: 15,
-    fontWeight: "500",
-    color: "#222",
+    fontWeight: '500',
+    color: COLORS.black,
   },
   time: {
     fontSize: 13,
-    color: "#888",
+    color: COLORS.grey30,
     marginTop: 2,
   },
 });

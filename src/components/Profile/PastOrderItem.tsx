@@ -1,20 +1,21 @@
 import React from "react";
-import {StyleSheet, Text, View, ImageSourcePropType, TouchableOpacity, ImageBackground} from "react-native";
+import { StyleSheet, Text, View, ImageBackground, Dimensions, TouchableOpacity } from 'react-native';
 import {LinearGradient} from "expo-linear-gradient";
 import {COLORS} from "../../constants/colors";
 import {Feather} from "@expo/vector-icons";
 
 type PastOrderItemProps = {
-  image: ImageSourcePropType;
+  image: string;
   title: string;
   restaurant: string;
+  onPress: () => void;
 };
 
-const PastOrderItem = ({image, title, restaurant}: PastOrderItemProps) => {
+const PastOrderItem = ({image, title, restaurant, onPress}: PastOrderItemProps) => {
   return (
-    <TouchableOpacity style={styles.card}>
+    <TouchableOpacity style={styles.card} onPress={onPress}>
       <ImageBackground
-        source={image}
+        source={{uri: image}}
         style={styles.image}
         resizeMode="cover"
       >
@@ -34,11 +35,13 @@ const PastOrderItem = ({image, title, restaurant}: PastOrderItemProps) => {
   );
 };
 
+const { width } = Dimensions.get("window");
+
 const styles = StyleSheet.create({
   card: {
-    flex: 1,
-    margin: 6,
-    borderRadius: 8,
+    width:  (width - 30) / 2,
+    aspectRatio: 1,
+    borderRadius: 12,
     backgroundColor: COLORS.white,
     overflow: "hidden",
   },

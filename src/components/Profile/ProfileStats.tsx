@@ -7,6 +7,7 @@ interface ProfileStatsProps {
   friends: number;
   handleSavedPress: () => void;
   handleFriendsListPress: () => void;
+  handleFavoritesPress: () => void;
 }
 
 const ProfileStats: FC<ProfileStatsProps> = (
@@ -15,12 +16,13 @@ const ProfileStats: FC<ProfileStatsProps> = (
     favorites,
     saved,
     handleSavedPress,
-    handleFriendsListPress
+    handleFriendsListPress,
+    handleFavoritesPress
   }
 ) => {
   return (
     <View style={styles.statsWrapper}>
-      <TouchableOpacity style={styles.statButton}>
+      <TouchableOpacity style={styles.statButton} onPress={handleFavoritesPress}>
         <Text style={styles.statTitle}>{favorites}</Text>
         <Text>Favorites</Text>
       </TouchableOpacity>

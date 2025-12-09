@@ -1,33 +1,51 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react';
 import {
   View,
   StyleSheet,
-  ActivityIndicator, FlatList,
+  ActivityIndicator, FlatList, ViewToken,
 } from 'react-native';
-import { RouteProp, useRoute } from '@react-navigation/native';
+import {
+  CompositeNavigationProp,
+  NavigatorScreenParams,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocationAlert } from '../../hooks/useLocationAlert';
 import { useLocationStore } from '../../stores/useLocationStore';
 import { COLORS } from '../../constants/colors';
 import { useDiscovery, useSearchMenuItems } from '../../hooks/restaurants';
 import MealSection from '../../components/Discovery/MealSection';
-import { DiscoveryStackParamList } from '../../navigations/app.types';
+import {
+  DiscoveryStackParamList,
+  HomeStackParamList,
+} from '../../navigations/app.types';
 import { handleApiError } from '../../utils/handleApiError';
 import { useDebounce } from '../../hooks/use-debounce';
 import DiscoveryHeader from '../../components/Discovery/DiscoveryHeader';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
 type DiscoveryRouteProp = RouteProp<DiscoveryStackParamList, 'Discovery'>;
+type NavigationProp = CompositeNavigationProp<
+  NativeStackNavigationProp<DiscoveryStackParamList, 'Discovery'>,
+  BottomTabNavigationProp<{
+    Home: NavigatorScreenParams<HomeStackParamList>;
+  }>
+>;
 
 const DiscoveryScreen = () => {
   useLocationAlert();
+  const navigation = useNavigation<NavigationProp>();
   const { data, isLoading } = useDiscovery();
-  const { address, fetchLocation, permissionDenied, loading } = useLocationStore();
+  const { address, fetchLocation, permissionDenied } = useLocationStore();
   const route = useRoute<DiscoveryRouteProp>();
   const tags = route.params?.selectedTags ?? [];
   const [searchQuery, setSearchQuery] = useState('');
   const [debounceSearchQuery, setDebounceSearchQuery] = useState('');
-
-  const { data: searchData, isError, error } = useSearchMenuItems({ tags, query: debounceSearchQuery });
+  const { data: searchData, isError, error } = useSearchMenuItems({ tags, query: debounceSearchQuery }, 5);
+  const [visibleSectionIndices, setVisibleSectionIndices] = useState<number[]>([]);
 
   useEffect(() => {
     if (isError) {
@@ -41,6 +59,10 @@ const DiscoveryScreen = () => {
     }
   }, []);
 
+  const searchResult = useMemo(() => {
+    return searchData?.pages.flatMap(page => page.data) || [];
+  }, [searchData]);
+
   const debouncedSearch = useDebounce((value: string) => {
     setDebounceSearchQuery(value);
   }, 400);
@@ -53,40 +75,72 @@ const DiscoveryScreen = () => {
     }));
   }, [data]);
 
-  if (loading || permissionDenied || isLoading || !data) {
+  const handleCardPress = (itemId: string) => {
+    navigation.navigate({
+      name: 'Home', params: {
+        screen: 'DishDetailScreen',
+        params: { menuItemId: itemId },
+      },
+    });
+  }
+
+  const onViewableItemsChanged = useRef(({ viewableItems }: { viewableItems: ViewToken[] }) => {
+    const indices = viewableItems
+      .filter(item => item.index !== null)
+      .map(item => item.index as number);
+    setVisibleSectionIndices(indices);
+  }).current;
+  const viewabilityConfig = useRef({
+    itemVisiblePercentThreshold: 60,
+    waitForInteraction: false,
+  }).current;
+
+  const renderItem = useCallback(({ item, index }: { item: any, index: number }) => {
+    const isVisible = visibleSectionIndices.includes(index);
+
+    return (
+      <MealSection
+        handleCardPress={handleCardPress}
+        title={item.groupName}
+        isSectionVisible={isVisible}
+        data={item.items.map((subItem: any) => ({
+          id: subItem.id,
+          video: subItem.video,
+          image: subItem.image,
+          restaurant: subItem.category.menu.restaurant.name,
+          title: subItem.name,
+        }))}
+      />
+    );
+  }, [visibleSectionIndices, handleCardPress]);
+
+  if (isLoading || !data) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
       </SafeAreaView>
     );
   }
-  const showSearchResults = searchData && searchData.data.length > 0;
+  const showSearchResults = searchData && searchResult.length > 0;
   const showNoResults =
-    (searchQuery.length > 0 || tags.length > 0) && searchData && searchData.data.length === 0;
+    (searchQuery.length > 0 || tags.length > 0) && searchData && searchResult.length === 0;
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['right', 'left', 'top']}>
       <FlatList
-        data={listData}
-        renderItem={({ item }) => (
-          <MealSection
-            title={item.groupName}
-            data={item.items.map((subItem: any) => ({
-              id: subItem.id,
-              video: subItem.video,
-              image: subItem.image,
-              restaurant: subItem.category.menu.restaurant.name,
-              title: subItem.name,
-            }))}
-          />
-        )}
+        data={listData.slice(0, 5)}
+        renderItem={renderItem}
         keyExtractor={(item, index) => item.groupName + index}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}
+
         initialNumToRender={2}
-        maxToRenderPerBatch={2}
+        maxToRenderPerBatch={1}
         windowSize={3}
         removeClippedSubviews
+        onViewableItemsChanged={onViewableItemsChanged}
+        viewabilityConfig={viewabilityConfig}
+
         ListFooterComponent={<View style={{ height: 100 }} />}
         ListHeaderComponent={
           <>
@@ -99,8 +153,14 @@ const DiscoveryScreen = () => {
             />
             {showSearchResults && (
               <MealSection
+                handleCardPress={handleCardPress}
                 title="Search result"
-                data={searchData.data.map(item => ({
+                isSectionVisible
+                searchParams={{
+                  query: searchQuery,
+                  tags: tags
+                }}
+                data={searchResult.slice(0,5).map(item => ({
                   id: item.id,
                   video: item.video,
                   image: item.image,

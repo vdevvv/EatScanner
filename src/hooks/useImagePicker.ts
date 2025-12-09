@@ -26,15 +26,14 @@ export const useImagePicker = (initialImage?: string | null) => {
   const processResult = (result: ImagePicker.ImagePickerResult) => {
     if (!result.canceled && result.assets && result.assets.length > 0) {
       setSelectedImage(result.assets[0].uri);
-      return true; // Успіх
+      return result.assets[0];
     }
-    return false; // Скасовано
+    return null;
   };
 
-  // Функції тепер повертають Promise<boolean>, щоб ми знали, чи закривати шторку
-  const pickImageFromGallery = async (): Promise<boolean> => {
+  const pickImageFromGallery = async () => {
     const hasPermission = await requestPermission('library');
-    if (!hasPermission) return false;
+    if (!hasPermission) return null;
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
@@ -46,9 +45,9 @@ export const useImagePicker = (initialImage?: string | null) => {
     return processResult(result);
   };
 
-  const takePhoto = async (): Promise<boolean> => {
+  const takePhoto = async () => {
     const hasPermission = await requestPermission('camera');
-    if (!hasPermission) return false;
+    if (!hasPermission) return null;
 
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,

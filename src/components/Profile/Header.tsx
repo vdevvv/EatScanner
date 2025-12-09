@@ -1,20 +1,31 @@
-import {LinearGradient} from "expo-linear-gradient";
-import {Image, ImageSourcePropType, StyleSheet, Text, TouchableOpacity, View} from "react-native";
-import {Feather} from "@expo/vector-icons";
-import {COLORS} from "../../constants/colors";
-import Badge from "./Badge";
-import React, {FC} from "react";
-import ProfileStats from "./ProfileStats";
-import Actions from "./Actions";
+import { LinearGradient } from 'expo-linear-gradient';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Feather } from '@expo/vector-icons';
+import { COLORS } from '../../constants/colors';
+import Badge from './Badge';
+import React, { FC } from 'react';
+import ProfileStats from './ProfileStats';
+import Actions from './Actions';
+import { MutualFriend, UserStatsResponse } from '../../types';
+import MutualFriendsSection from '../Friends/MutualFriendsSection';
+import { useNavigation } from '@react-navigation/native';
 
 interface HeaderProps {
   handleSettingsPress: () => void;
   handleSavedPress: () => void;
+  handleFavoritesPress: () => void;
   handleFriendsListPress: () => void;
-  isFriendProfilePage?: boolean
+  isFriendProfilePage?: boolean;
+  statsData: UserStatsResponse;
+  mutualFriends?: MutualFriend[];
+  handleMutualFriendPress?: (userId: string) => void;
+  userInfo: {
+    avatar: string
+    userName: string | null
+    fullName: string | null
+    bio: string | null
+  };
 }
-
-const AVATAR_SOURCE = require("../../assets/profile-avatar.jpg") as ImageSourcePropType;
 
 const badges = [
   {
@@ -37,55 +48,71 @@ const badges = [
     emoji: '🌶️',
     color: '#CF0000',
   },
-]
+];
 
 const Header: FC<HeaderProps> = (
   {
+    userInfo,
     handleSettingsPress,
+    handleFavoritesPress,
     handleSavedPress,
     handleFriendsListPress,
-    isFriendProfilePage = false
-  }
+    isFriendProfilePage = false,
+    statsData,
+    mutualFriends,
+    handleMutualFriendPress
+  },
 ) => {
+  const { userName, fullName, bio, avatar } = userInfo;
+
   return (
     <>
       <LinearGradient
-        colors={["#9F0B08", "#FF7F3F"]}
-        start={{x: 0, y: 0}}
-        end={{x: 1, y: 0}}
+        colors={['#9F0B08', '#FF7F3F']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 0 }}
         style={styles.gradient}
       >
-        <View/>
-        <Text style={styles.username}>@foodie_iryna</Text>
+        <View />
+        {userName && <Text style={styles.username}>@{userName}</Text>}
         <TouchableOpacity onPress={handleSettingsPress}>
-          <Feather name='settings' size={24} color={COLORS.white}/>
+          <Feather name="settings" size={24} color={COLORS.white} />
         </TouchableOpacity>
       </LinearGradient>
 
       <View style={styles.avatarWrapper}>
-        <Image source={AVATAR_SOURCE} style={styles.avatar}/>
+        <Image source={{ uri: avatar }} style={styles.avatar} />
       </View>
 
       <View style={styles.headerContent}>
-        <Text style={styles.name}>Iryna Hvozdetska</Text>
-        <Text style={styles.subtitle}>Always on the hunt for tasty food</Text>
+        {fullName && <Text style={styles.name}>{fullName}</Text>}
+        {bio && <Text style={styles.subtitle}>{bio}</Text>}
         <ProfileStats
+          handleFavoritesPress={handleFavoritesPress}
           handleSavedPress={handleSavedPress}
           handleFriendsListPress={handleFriendsListPress}
-          favorites={230}
-          saved={46}
-          friends={212}
+          favorites={statsData.favoritesCount}
+          saved={statsData.savedCount}
+          friends={statsData.friendsCount}
         />
         <View style={styles.badgesContainer}>
           {badges.map((badge, index) => (
-            <Badge badge={badge} key={index}/>
+            <Badge badge={badge} key={index} />
           ))}
         </View>
 
         {isFriendProfilePage && (
           <View style={styles.actionsWrapper}>
-            <Actions action='message'/>
+            <Actions action="message" />
           </View>
+        )}
+
+        {mutualFriends && (
+          <MutualFriendsSection
+            onPress={handleMutualFriendPress}
+            friends={mutualFriends}
+            totalCount={mutualFriends.length}
+          />
         )}
 
         <Text style={styles.h2}>Past Orders</Text>
@@ -103,7 +130,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingBottom: 120
+    paddingBottom: 120,
   },
   headerContent: {
     alignItems: 'center',
@@ -113,9 +140,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '600',
-    marginTop: 10
+    marginTop: 10,
   },
   avatar: {
+    backgroundColor: 'white',
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
     borderRadius: AVATAR_SIZE / 2,
@@ -123,7 +151,7 @@ const styles = StyleSheet.create({
     borderColor: COLORS.red,
     position: 'absolute',
     top: -(AVATAR_SIZE / 2),
-    marginBottom: 40
+    marginBottom: 40,
   },
   avatarWrapper: {
     marginTop: -40,
@@ -162,6 +190,6 @@ const styles = StyleSheet.create({
     marginTop: 20,
     fontWeight: 'semibold',
   },
-})
+});
 
 export default Header;

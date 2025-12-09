@@ -38,6 +38,7 @@ const Login = () => {
   });
 
   const onSubmit = async (payload: LoginSchema) => {
+    console.log(payload);
     mutate(payload, {
       onSuccess: async (data) => {
         await signIn(data.accessToken, data.refreshToken)
@@ -109,7 +110,9 @@ const Login = () => {
         onPress={handleSubmit(onSubmit)}
         activeOpacity={0.8}
       >
-        <Text style={[commonStyles.buttonText, isValid && commonStyles.buttonTextActive]}>Sign In</Text>
+        <Text style={[commonStyles.buttonText, isValid && commonStyles.buttonTextActive]}>
+          {isPending ? 'Loading...' : 'Sign In'}
+        </Text>
       </TouchableOpacity>
 
       <View style={commonStyles.resetContainer}>

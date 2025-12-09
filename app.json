@@ -15,12 +15,16 @@
       "bundleIdentifier": "com.r1020304050.EatScanner"
     },
     "android": {
+      "permissions": [
+        "ACCESS_FINE_LOCATION"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.r1020304050.EatScanner"
+      "package": "com.r1020304050.EatScanner",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {},
     "extra": {
@@ -29,6 +33,7 @@
       }
     },
     "plugins": [
+      "expo-notifications",
       "expo-secure-store",
       "expo-video"
     ]

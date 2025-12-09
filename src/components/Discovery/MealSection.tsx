@@ -1,12 +1,14 @@
-import React, { FC, useCallback, useRef, useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View, ViewToken } from 'react-native';
+import React, {FC, useCallback, useRef, useState, memo} from 'react';
+import {FlatList, StyleSheet, Text, TouchableOpacity, View, ViewToken} from 'react-native';
 import MealCard from './MealCard';
-import { camelToTitle } from '../../utils/helpers';
-import { useNavigation } from '@react-navigation/native';
-import { DiscoveryNavigationProp } from '../../navigations/app.types';
+import {camelToTitle} from '../../utils/helpers';
+import {useNavigation} from '@react-navigation/native';
+import {DiscoveryNavigationProp} from '../../navigations/app.types';
 
 interface MealSectionProps {
   title: string;
+  handleCardPress: (itemId: string) => void;
+  isSectionVisible: boolean;
   data: Array<{
     id: string;
     video: string | null
@@ -14,28 +16,35 @@ interface MealSectionProps {
     title: string
     restaurant: string
   }>;
+  searchParams?: {
+    query?: string;
+    tags?: string[];
+  };
 }
 
-const MealSection: FC<MealSectionProps> = ({ title, data }) => {
+const CARD_WIDTH = 150;
+const GAP = 15;
+
+const MealSection: FC<MealSectionProps> = ({title, data, handleCardPress, searchParams, isSectionVisible}) => {
   const navigation = useNavigation<DiscoveryNavigationProp>();
-  const [visibleItems, setVisibleItems] = useState<string[]>([]);
+  const [visibleIndices, setVisibleIndices] = useState<number[]>([]);
 
   const viewabilityConfig = useRef({
-    itemVisiblePercentThreshold: 50,
+    itemVisiblePercentThreshold: 60,
     waitForInteraction: false,
   }).current;
 
-  const onViewableItemsChanged = useCallback(({ viewableItems }: { viewableItems: ViewToken[] }) => {
-    const visibleIds = viewableItems.map((item) => item.item.id);
-    setVisibleItems(visibleIds);
+  const onViewableItemsChanged = useCallback(({viewableItems}: { viewableItems: ViewToken[] }) => {
+    const indices = viewableItems
+      .filter(item => item.index !== null)
+      .map((item) => item.index as number);
+    setVisibleIndices(indices);
   }, []);
-
-  if (data.length === 0) return null;
 
   const getSlug = (title: string) => {
     switch (title) {
       case 'Search result':
-        return 'search-result'
+        return 'search-result';
       case 'recommendedForYou':
         return 'recommended-for-you';
       case 'glutenFree':
@@ -44,35 +53,66 @@ const MealSection: FC<MealSectionProps> = ({ title, data }) => {
         return 'vegetarian';
       case 'vegan':
         return 'vegan';
+      default:
+        return '';
     }
   };
+
+  const handleViewAllPress = () => {
+    navigation.navigate('ViewAll', {
+      tagSlug: getSlug(title),
+      ...(searchParams && {searchParams}),
+    });
+  }
+
+  const renderItem = useCallback(({item, index}: { item: any, index: number }) => {
+    const shouldPlay = isSectionVisible && visibleIndices.includes(index);
+
+    return (
+      <MealCard
+        handleCardPress={() => handleCardPress(item.id)}
+        item={item}
+        shouldPlay={shouldPlay}
+      />
+    );
+  }, [isSectionVisible, visibleIndices, handleCardPress]);
+
+  if (data.length === 0) return null;
 
   return (
     <View style={styles.sectionContainer}>
       <View style={styles.sectionHeader}>
         <Text style={styles.sectionTitle}>{camelToTitle(title)}</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('ViewAll', { tagSlug: getSlug(title) })}>
+        <TouchableOpacity onPress={handleViewAllPress}>
           <Text style={styles.viewAllText}>View All</Text>
         </TouchableOpacity>
       </View>
       <FlatList
         data={data}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <MealCard item={item} shouldPlay={visibleItems.includes(item.id)} />
-        )}
+        renderItem={renderItem}
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingRight: 10 }}
+        contentContainerStyle={{gap: GAP}}
+
+        windowSize={3}
+        initialNumToRender={3}
+        maxToRenderPerBatch={2}
+        removeClippedSubviews={true}
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
+        getItemLayout={(_, index) => ({
+          length: CARD_WIDTH,
+          offset: (CARD_WIDTH + GAP) * index,
+          index,
+        })}
       />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  sectionContainer: { marginBottom: 30 },
+  sectionContainer: {marginBottom: 30},
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -91,4 +131,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MealSection;
+export default memo(MealSection);

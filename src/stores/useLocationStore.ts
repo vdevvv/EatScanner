@@ -1,4 +1,4 @@
-import {create} from "zustand";
+import { create } from "zustand";
 import * as Location from "expo-location";
 
 interface LocationState {
@@ -18,25 +18,61 @@ export const useLocationStore = create<LocationState>((set) => ({
   permissionDenied: false,
   fetchLocation: async () => {
     try {
-      set({loading: true, error: null});
-      const {status} = await Location.requestForegroundPermissionsAsync();
+      set({ loading: true, error: null });
+
+      const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        set({loading: false, permissionDenied: true, error: "Permission denied"});
+        set({ loading: false, permissionDenied: true, error: "Permission denied" });
         return;
       }
 
-      const location = await Location.getCurrentPositionAsync({});
-      const [geo] = await Location.reverseGeocodeAsync({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
       });
 
-      const district = geo.district || geo.name || geo.subregion || "";
-      const city = geo.city || geo.region || geo.country || "";
+      set({ coords: location.coords });
 
-      set({coords: location.coords, address: `${district} ${city}`, loading: false, error: null});
+      try {
+        const geoResult = await Location.reverseGeocodeAsync({
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+
+        if (geoResult && geoResult.length > 0) {
+          const geo = geoResult[0];
+          const street = geo.street || geo.name || "";
+          const city = geo.city || geo.subregion || geo.region || "";
+          set({ address: `${street}, ${city}`, loading: false });
+          return;
+        }
+      } catch (nativeError) {
+        console.warn("Android native geocoder failed, switching to fallback API...");
+      }
+
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${location.coords.latitude}&lon=${location.coords.longitude}`,
+        {
+          headers: {
+            'User-Agent': 'FoodDeliveryApp/1.0'
+          }
+        }
+      );
+
+      const data = await response.json();
+
+      if (data && data.address) {
+        const addr = data.address;
+        const street = addr.road || addr.pedestrian || addr.suburb || "";
+        const city = addr.city || addr.town || addr.village || "";
+
+        set({ address: `${street}, ${city}`, loading: false });
+      } else {
+        set({ loading: false, address: "Address not found" });
+      }
+
     } catch (e) {
-      set({error: "Failed to get location", loading: false});
+      console.error(e);
+      set({ error: "Unable to determine location", loading: false });
     }
   }
-}))
+}));
