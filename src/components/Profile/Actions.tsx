@@ -1,26 +1,46 @@
 import React, {FC} from 'react';
 import {StyleSheet, Text, TouchableOpacity} from "react-native";
 import {COLORS} from "../../constants/colors";
+import {ExtendedFriendshipStatus} from "../../types";
 
 interface ActionsProps {
   action: 'message'
+  friendshipStatus?: ExtendedFriendshipStatus
 }
 
-const Actions: FC<ActionsProps> = ({action}) => {
+const Actions: FC<ActionsProps> = ({action, friendshipStatus}) => {
   const getAction = () => {
-    switch (action) {
-      case 'message':
-        return 'Send message'
+    switch (friendshipStatus) {
+      case 'FRIEND':
+        return (
+          <TouchableOpacity style={styles.btn}>
+            <Text style={styles.text}>Send message</Text>
+          </TouchableOpacity>
+        )
+      case 'RECEIVED':
+        return (
+          <TouchableOpacity style={styles.btn}>
+            <Text style={styles.text}>Confirm request</Text>
+          </TouchableOpacity>
+        )
+      case 'SENT':
+        return (
+          <TouchableOpacity style={styles.btn}>
+            <Text style={styles.text}>Cancel request</Text>
+          </TouchableOpacity>
+        )
+      case 'NONE':
+        return (
+          <TouchableOpacity style={styles.btn}>
+            <Text style={styles.text}>Sent request</Text>
+          </TouchableOpacity>
+        )
       default:
         return null
     }
   }
 
-  return (
-    <TouchableOpacity style={styles.btn}>
-      <Text style={styles.text}>{getAction()}</Text>
-    </TouchableOpacity>
-  );
+  return getAction();
 };
 
 const styles = StyleSheet.create({

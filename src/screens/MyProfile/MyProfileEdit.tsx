@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, {useEffect, useMemo, useRef} from 'react';
 import {
   View,
   Text,
@@ -8,26 +8,26 @@ import {
   ScrollView,
   Keyboard, ActivityIndicator,
 } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { COLORS } from '../../constants/colors';
-import { useDeleteAvatar, useMe, useUpdateMe, useUploadAvatar } from '../../hooks/user';
+import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
+import {useNavigation} from '@react-navigation/native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {COLORS} from '../../constants/colors';
+import {useDeleteAvatar, useMe, useUpdateMe, useUploadAvatar} from '../../hooks/user';
 import InputField from '../../components/common/InputField';
 import PageLoader from '../../components/Loader/PageLoader';
-import { handleApiError } from '../../utils/handleApiError';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { EditProfileSchema, editProfileSchema } from '../../schemas/user/edit-profile.schema';
+import {handleApiError} from '../../utils/handleApiError';
+import {Controller, useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {EditProfileSchema, editProfileSchema} from '../../schemas/user/edit-profile.schema';
 import BottomSheet from '@gorhom/bottom-sheet';
-import { useImagePicker } from '../../hooks/useImagePicker';
+import {useImagePicker} from '../../hooks/useImagePicker';
 import EditProfileBottomSheet from '../../components/Profile/EditProfileBottomSheet';
 
-const EditProfileScreen = () => {
-  const { data, isLoading, isError, error } = useMe();
-  const { mutate: updateMe, isPending } = useUpdateMe();
-  const { mutate: uploadAvatar, isPending: isUploadingAvatar } = useUploadAvatar();
-  const { mutate: deleteAvatar } = useDeleteAvatar();
+const EditProfileScreen = ({shouldShowHeader = true}) => {
+  const {data, isLoading, isError, error} = useMe();
+  const {mutate: updateMe, isPending} = useUpdateMe();
+  const {mutate: uploadAvatar, isPending: isUploadingAvatar} = useUploadAvatar();
+  const {mutate: deleteAvatar} = useDeleteAvatar();
   const navigation = useNavigation();
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['1%', '35%'], []);
@@ -40,7 +40,7 @@ const EditProfileScreen = () => {
     isDefaultImage,
   } = useImagePicker(data?.avatar);
 
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<EditProfileSchema>({
+  const {control, handleSubmit, reset, formState: {errors}} = useForm<EditProfileSchema>({
     resolver: zodResolver(editProfileSchema),
   });
 
@@ -70,11 +70,10 @@ const EditProfileScreen = () => {
   }, [data]);
 
   if (isLoading || !data) {
-    return <PageLoader />;
+    return <PageLoader/>;
   }
 
   const handleSave = (data: EditProfileSchema) => {
-    console.log(data);
     updateMe(data);
   };
 
@@ -93,25 +92,27 @@ const EditProfileScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.headerContainer}>
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-          <Ionicons name="chevron-back" size={28} color="#333" />
-        </TouchableOpacity>
-        <Text style={styles.screenTitle}>Edit Profile</Text>
-        <View style={{ width: 48 }} />
-      </View>
+    <SafeAreaView style={[styles.safeArea, {marginBottom: shouldShowHeader ? 0 : 25}]}>
+      {shouldShowHeader && (
+        <View style={styles.headerContainer}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+            <Ionicons name="chevron-back" size={28} color="#333"/>
+          </TouchableOpacity>
+          <Text style={styles.screenTitle}>Edit Profile</Text>
+          <View style={{width: 48}}/>
+        </View>
+      )}
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.avatarSection}>
           <View style={styles.avatarContainer}>
             <TouchableOpacity onPress={handleOpenSheet} disabled={isUploadingAvatar}>
-              <Image source={{ uri: selectedImage }} style={styles.avatar} />
+              <Image source={{uri: selectedImage}} style={styles.avatar}/>
               <View style={styles.editIconContainer}>
                 {isUploadingAvatar ? (
-                  <ActivityIndicator size="small" color="#333" />
+                  <ActivityIndicator size="small" color="#333"/>
                 ) : (
-                  <MaterialCommunityIcons name="pencil" size={18} color="#333" />
+                  <MaterialCommunityIcons name="pencil" size={18} color="#333"/>
                 )}
               </View>
             </TouchableOpacity>
@@ -123,7 +124,7 @@ const EditProfileScreen = () => {
             <Controller
               control={control}
               name="fullName"
-              render={({ field: { onChange, value } }) => (
+              render={({field: {onChange, value}}) => (
                 <InputField
                   label="Full name"
                   value={value}
@@ -138,7 +139,7 @@ const EditProfileScreen = () => {
             <Controller
               control={control}
               name="userName"
-              render={({ field: { onChange, value } }) => (
+              render={({field: {onChange, value}}) => (
                 <InputField
                   label="User name"
                   value={value}
@@ -153,7 +154,7 @@ const EditProfileScreen = () => {
             <Controller
               control={control}
               name="phone"
-              render={({ field: { onChange, value } }) => (
+              render={({field: {onChange, value}}) => (
                 <InputField
                   label="Phone number"
                   value={value}
@@ -203,7 +204,7 @@ const EditProfileScreen = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: COLORS.background,
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -246,7 +247,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 6,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.2,
     shadowRadius: 3,
     elevation: 5,

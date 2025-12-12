@@ -1,12 +1,13 @@
-import React, { useEffect } from 'react';
-import { useAuthStore } from './src/stores/useAuthStore';
-import { NavigationContainer } from '@react-navigation/native';
+import React, {useEffect} from 'react';
+import {useAuthStore} from './src/stores/useAuthStore';
+import {NavigationContainer} from '@react-navigation/native';
 import AuthNavigator from './src/navigations/AuthNavigator';
 import AppNavigator from './src/navigations/AppNavigator';
 import Toast from 'react-native-toast-message';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import {SafeAreaProvider, useSafeAreaInsets} from 'react-native-safe-area-context';
+import {GestureHandlerRootView} from 'react-native-gesture-handler';
+import EditProfileScreen from "./src/screens/MyProfile/MyProfileEdit";
 
 export type RootStackParamList = {
   Auth: undefined
@@ -59,7 +60,7 @@ export type RootStackParamList = {
 
 const App = () => {
   const queryClient = new QueryClient();
-  const { loadUserOnStartup, isAuth } = useAuthStore(state => state);
+  const {loadUserOnStartup} = useAuthStore(state => state);
 
   useEffect(() => {
     void loadUserOnStartup();
@@ -68,23 +69,38 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
-          <AppContent isAuth={isAuth} />
+        <GestureHandlerRootView style={{flex: 1}}>
+          <AppContent/>
         </GestureHandlerRootView>
       </SafeAreaProvider>
     </QueryClientProvider>
   );
 };
 
-function AppContent({ isAuth }: { isAuth: boolean }) {
-  const { top } = useSafeAreaInsets();
+function AppContent() {
+  const {user, isAuth} = useAuthStore(state => state);
+  const {top} = useSafeAreaInsets();
+  console.log(user)
+
+  const renderContent = () => {
+    if (!isAuth) {
+      return <AuthNavigator/>;
+    }
+
+    const isProfileComplete = isAuth && user?.userName && user?.fullName;
+    if (!isProfileComplete) {
+      return <EditProfileScreen shouldShowHeader={false}/>;
+    }
+
+    return <AppNavigator/>;
+  };
 
   return (
     <>
       <NavigationContainer>
-        {isAuth ? <AppNavigator /> : <AuthNavigator />}
+        {renderContent()}
       </NavigationContainer>
-      <Toast topOffset={top} />
+      <Toast topOffset={top}/>
     </>
   );
 }

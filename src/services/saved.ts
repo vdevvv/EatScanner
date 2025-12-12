@@ -12,6 +12,11 @@ class SavedService {
     return api.get<PaginatedResponse<Saved>>('/saved', { params: paginateOptions })
       .then(({ data }) => data);
   }
+
+  async getUserSaved(userId: string, paginateOptions: PaginateOptions) {
+    return api.get<PaginatedResponse<Saved>>(`/saved/${userId}`, { params: paginateOptions })
+      .then(({ data }) => data);
+  }
 }
 
 export const savedService = new SavedService();

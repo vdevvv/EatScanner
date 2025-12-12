@@ -8,7 +8,7 @@ import Header from '../../components/Profile/Header';
 import { COLORS } from '../../constants/colors';
 import PageLoader from '../../components/Loader/PageLoader';
 import { handleApiError } from '../../utils/handleApiError';
-import { useGetMyStats, useMe } from '../../hooks/user';
+import {useGetMyBadges, useGetMyStats, useMe} from '../../hooks/user';
 import { useGetMyOrders } from '../../hooks/orders';
 import NoPastOrders from '../../components/Profile/NoPastOrders';
 import { FriendsStackParamList, HomeStackParamList, MyProfileStackParamList } from '../../navigations/app.types';
@@ -26,6 +26,7 @@ const MyProfileScreen = () => {
   const { data, isLoading, isError, error } = useMe();
   const navigation = useNavigation<NavigationProp>();
   const { data: statsData } = useGetMyStats();
+  const {data: badgesData} = useGetMyBadges()
   const {
     data: ordersData,
     fetchNextPage,
@@ -86,6 +87,7 @@ const MyProfileScreen = () => {
         )}
         ListHeaderComponent={
           <Header
+            badges={badgesData}
             statsData={statsData}
             userInfo={{
               avatar: data.avatar,

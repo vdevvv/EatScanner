@@ -1,5 +1,5 @@
 import React, {FC, useEffect, useState} from 'react';
-import {ActivityIndicator, StyleSheet, View, Text, TouchableOpacity, Share, Platform} from 'react-native';
+import {StyleSheet, View, Text, TouchableOpacity, Share, Platform, Image} from 'react-native';
 import {Feather} from '@expo/vector-icons';
 import GoogleLogo from '../icons/GoogleLogo';
 import {useNavigation} from '@react-navigation/native';
@@ -14,7 +14,7 @@ import ShareIcon from '../icons/ShareIcon';
 import {useToggleLike} from '../../hooks/likes';
 import {useBottomTabBarHeight} from "@react-navigation/bottom-tabs";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
-import {getOptimizedVideoUrl} from "../../utils/helpers";
+import {getOptimizedVideoUrl, getVideoThumbnail} from "../../utils/helpers";
 
 interface VideoItemProps {
   restaurant: {
@@ -63,56 +63,17 @@ const VideoItem: FC<VideoItemProps> = (
   const iconsBottomPosition = containerPaddingBottom + BUTTON_HEIGHT + ICONS_GAP + 50;
 
   const navigation = useNavigation<HomeNavigationProp>();
-  const [isVideoReady, setIsVideoReady] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [isSavedLocal, setIsSavedLocal] = useState(menuItem.isSaved);
   const [isLikedLocal, setIsLikedLocal] = useState(menuItem.isLiked);
+
   const {mutate: saveMutate} = useToggleSave();
   const {mutate: likeMutate} = useToggleLike();
-  const player = useVideoPlayer(getOptimizedVideoUrl(menuItem.video, 'medium'), (player) => {
-    player.loop = true;
-    player.muted = false;
-  });
 
-  useEffect(() => {
-    setIsSavedLocal(menuItem.isSaved);
-  }, [menuItem.isSaved]);
+  useEffect(() => setIsSavedLocal(menuItem.isSaved), [menuItem.isSaved]);
+  useEffect(() => setIsLikedLocal(menuItem.isLiked), [menuItem.isLiked]);
 
-  useEffect(() => {
-    setIsLikedLocal(menuItem.isLiked);
-  }, [menuItem.isLiked]);
-
-  useEffect(() => {
-    setIsVideoReady(false);
-    setVideoError(false);
-  }, [menuItem.id, menuItem.video]);
-
-  useEffect(() => {
-    (async () => {
-      if (isVisible && isScreenFocused && !videoError) {
-        player.play();
-      } else {
-        player.pause();
-      }
-    })();
-  }, [isVisible, isScreenFocused, videoError, player]);
-
-  useEffect(() => {
-    const subscription = player.addListener('statusChange', (status) => {
-      if (status.status === 'readyToPlay') {
-        setIsVideoReady(true);
-        setVideoError(false);
-      } else if (status.status === 'error') {
-        console.error('Video loading error:', status.error);
-        setVideoError(true);
-        setIsVideoReady(false);
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, [player]);
+  const shouldMountVideo = isVisible && isScreenFocused && !videoError;
 
   const onShare = () => {
     void Share.share({
@@ -145,12 +106,17 @@ const VideoItem: FC<VideoItemProps> = (
 
   return (
     <View style={{width, height}}>
-      <VideoView
-        player={player}
+      <Image
+        source={{uri: getVideoThumbnail(menuItem.video) || menuItem.image}}
         style={StyleSheet.absoluteFill}
-        contentFit="cover"
-        nativeControls={false}
+        resizeMode="cover"
       />
+      {shouldMountVideo && (
+        <ActiveFeedPlayer
+          videoUrl={getOptimizedVideoUrl(menuItem.video, 'medium')}
+          onError={() => setVideoError(true)}
+        />
+      )}
       <View style={[styles.contentContainer, {paddingBottom: containerPaddingBottom}]}>
         <Text style={styles.title}>{menuItem.name}</Text>
         <View>
@@ -222,14 +188,6 @@ const VideoItem: FC<VideoItemProps> = (
 
         </View>
       </View>
-
-      {!isVideoReady && !videoError && (
-        <ActivityIndicator
-          size="large"
-          color={COLORS.white}
-          style={StyleSheet.absoluteFill}
-        />
-      )}
 
       {videoError && (
         <View

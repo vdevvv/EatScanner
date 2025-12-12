@@ -38,6 +38,9 @@ import { usePushNotifications } from '../hooks/usePushNotifications';
 import { useSendPushToken } from '../hooks/notifications';
 import { useAuthStore } from '../stores/useAuthStore';
 import MyProfileNotificationSettings from "../screens/MyProfile/MyProfileNotificationSettings";
+import FriendsProfileSaved from "../screens/FriendsProfile/FriendsProfileSaved";
+import FriendsProfileFavorites from "../screens/FriendsProfile/FriendsProfileFavorites";
+import UserFriendsList from "../screens/FriendsProfile/UserFriendsList";
 
 export type RootTabParamList = {
   Home: NavigatorScreenParams<HomeStackParamList>;
@@ -85,6 +88,10 @@ const AppNavigator = () => {
   const FriendsStackNavigator = () => (
     <FriendsStack.Navigator screenOptions={{headerShown: false}}>
       <FriendsStack.Screen name="FriendsScreen" component={FriendsScreen}/>
+      <FriendsStack.Screen name="MyProfile" component={MyProfileScreen}/>
+      <FriendsStack.Screen name="FriendsProfileSaved" component={FriendsProfileSaved}/>
+      <FriendsStack.Screen name="FriendsProfileFavorites" component={FriendsProfileFavorites}/>
+      <FriendsStack.Screen name="UserFriendsList" component={UserFriendsList}/>
       {/*<FriendsStack.Screen name="FriendsProfileFriends" component={FriendsProfileFriends}/>*/}
       <FriendsStack.Screen name="FriendsProfileScreen" component={FriendsProfileScreen}/>
       <FriendsStack.Screen name="FriendsProfileScreenShare" component={FriendsProfileScreenShare}/>
@@ -96,6 +103,7 @@ const AppNavigator = () => {
   const MyProfileStackNavigator = () => (
     <MyProfileStack.Navigator screenOptions={{headerShown: false}}>
       <MyProfileStack.Screen name="Profile" component={MyProfileScreen}/>
+      <MyProfileStack.Screen name="UserFriendsList" component={UserFriendsList}/>
       <MyProfileStack.Screen name="FriendsProfileScreen" component={FriendsProfileScreen}/>
       <MyProfileStack.Screen name="FriendsScreen" component={FriendsScreen}/>
       <MyProfileStack.Screen name="MyProfileSettings" component={MyProfileSettings}/>

@@ -1,8 +1,13 @@
 import {NativeStackNavigationProp} from "@react-navigation/native-stack";
+import {ExtendedFriendshipStatus} from "../types";
 
 export type FriendsStackParamList = {
+  MyProfile: undefined
   FriendsScreen: undefined;
-  FriendsProfileScreen: { userId: string };
+  FriendsProfileScreen: { userId: string, friendshipStatus: ExtendedFriendshipStatus };
+  FriendsProfileSaved: { userId: string }
+  UserFriendsList: { userId: string, fullName: string | null }
+  FriendsProfileFavorites: { userId: string }
   FriendsProfileScreenShare: undefined;
   RemoveFriend: undefined;
   FriendAlertBlockUser: undefined;
@@ -61,7 +66,8 @@ export type DiscoveryNavigationProp = NativeStackNavigationProp<DiscoveryStackPa
 export type MyProfileStackParamList = {
   Profile: undefined
   FriendsScreen: undefined
-  FriendsProfileScreen: { userId: string }
+  FriendsProfileScreen: { userId: string, friendshipStatus: ExtendedFriendshipStatus }
+  UserFriendsList: { userId: string, fullName: string | null }
   MyProfileSettings: undefined
   MyProfileSaved: undefined
   MyProfileFavorites: undefined

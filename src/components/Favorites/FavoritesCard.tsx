@@ -1,12 +1,12 @@
-import React, { FC, useState } from 'react';
-import { Dimensions, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import React, {FC, useState} from 'react';
+import {Dimensions, ImageBackground, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {COLORS} from '../../constants/colors';
 import Heart from '../icons/Heart';
-import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import {Ionicons} from '@expo/vector-icons';
+import {LinearGradient} from 'expo-linear-gradient';
 
 interface FavoritesCardProps {
-  handleBookmarkPress: () => void;
+  handleBookmarkPress?: () => void;
   handleCardPress: () => void;
   dishName: string;
   restaurant: string;
@@ -31,15 +31,17 @@ const FavoritesCard: FC<FavoritesCardProps> = (
       onPress={handleCardPress}
     >
       <ImageBackground
-        source={{ uri: image }}
+        source={{uri: image}}
         style={styles.image}
         resizeMode="cover"
       >
         <TouchableOpacity
           style={styles.likedContainer}
           onPress={() => {
-            setLiked(prev => !prev);
-            handleBookmarkPress();
+            if (handleBookmarkPress) {
+              setLiked(prev => !prev);
+              handleBookmarkPress();
+            }
           }}
         >
           {liked
@@ -50,7 +52,7 @@ const FavoritesCard: FC<FavoritesCardProps> = (
                 stroke="none"
               />
             )
-            : <Heart stroke={COLORS.red} />
+            : <Heart stroke={COLORS.red}/>
           }
         </TouchableOpacity>
         <LinearGradient
@@ -60,7 +62,7 @@ const FavoritesCard: FC<FavoritesCardProps> = (
         <View style={styles.textOverlay}>
           <Text style={styles.dishName}>{dishName}</Text>
           <View style={styles.restaurantContainer}>
-            <Ionicons name="home-outline" size={12} color="#fff" />
+            <Ionicons name="home-outline" size={12} color="#fff"/>
             <Text style={styles.videoRestaurantName}>{restaurant}</Text>
           </View>
         </View>
@@ -69,11 +71,11 @@ const FavoritesCard: FC<FavoritesCardProps> = (
   );
 };
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
-    width:  (width - 30) / 2,
+    width: (width - 30) / 2,
     aspectRatio: 1,
     borderRadius: 12,
     overflow: 'hidden',

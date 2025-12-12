@@ -1,14 +1,19 @@
-import React from 'react';
-import {Image, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import React, {FC} from 'react';
+import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import {COLORS} from "../../constants/colors";
+import NoFriendsIcon from '../icons/NoFriends'
 
-const NoFriends = () => {
+interface NoFriendsProps {
+  handleExploreProfiles?: () => void
+}
+
+const NoFriends: FC<NoFriendsProps> = ({handleExploreProfiles}) => {
   return (
     <View style={styles.container}>
-      <Image source={require('../../assets/not-found.png')}/>
+      <NoFriendsIcon/>
       <Text style={styles.title}>No Friends Yet</Text>
       <Text style={styles.subTitle}>Start connecting with food lovers like you!</Text>
-      <TouchableOpacity style={styles.btn}>
+      <TouchableOpacity style={styles.btn} onPress={handleExploreProfiles}>
         <Text style={styles.btnText}>Explore Profiles</Text>
       </TouchableOpacity>
     </View>

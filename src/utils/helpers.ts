@@ -49,9 +49,14 @@ export const getOptimizedVideoUrl = (
       transformations = 'c_scale,w_350,f_auto,q_auto:eco,ac_none,br_500k';
       break;
     case 'medium':
-      transformations = 'c_scale,w_720,f_auto,q_auto:good,br_2m';
+      transformations = 'c_scale,w_720,f_auto,q_auto:good,br_2m,fl_progressive:steep';
       break;
   }
 
   return url.replace('/upload/', `/upload/${transformations}/`);
 };
+
+export const shortenName = (name: string, length = 7) => {
+  if (!name) return "";
+  return name.length > 3 ? name.slice(0, length) + "..." : name;
+}

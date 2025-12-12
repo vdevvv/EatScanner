@@ -1,8 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { userService } from '../services/user.service';
-import { AvatarUploadParams, UpdatePasswordDto, UpdateUserDto } from '../types';
-import { handleApiError } from '../utils/handleApiError';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {userService} from '../services/user.service';
+import {AvatarUploadParams, UpdatePasswordDto, UpdateUserDto} from '../types';
+import {handleApiError} from '../utils/handleApiError';
 import Toast from 'react-native-toast-message';
+import {useAuthStore} from "../stores/useAuthStore";
 
 export const useUser = (id: string) => {
   return useQuery({
@@ -20,16 +21,18 @@ export const useMe = () => {
 };
 
 export const useUpdateMe = () => {
+  const {setUser} = useAuthStore(state => state);
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (data: UpdateUserDto) => userService.updateMe(data),
-    onSuccess: () => {
+    onSuccess: (data) => {
       Toast.show({
         type: 'success',
         text1: 'Data successfully updated',
       });
-      void queryClient.invalidateQueries({ queryKey: ['me'] });
+      void queryClient.invalidateQueries({queryKey: ['me']});
+      setUser(data);
     },
     onError: (err) => handleApiError(err),
   });
@@ -49,32 +52,36 @@ export const useUpdatePassword = () => {
 };
 
 export const useUploadAvatar = () => {
+  const {setUser} = useAuthStore(state => state);
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: (asset: AvatarUploadParams) => userService.uploadAvatar(asset),
-    onSuccess: () => {
+    onSuccess: (data) => {
       Toast.show({
         type: 'success',
         text1: 'Avatar successfully uploaded',
       })
-      void queryClient.invalidateQueries({ queryKey: ['me'] });
+      void queryClient.invalidateQueries({queryKey: ['me']});
+      setUser(data);
     },
     onError: (err) => handleApiError(err),
   })
 }
 
 export const useDeleteAvatar = () => {
+  const {setUser} = useAuthStore(state => state);
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: () => userService.deleteAvatar(),
-    onSuccess: () => {
+    onSuccess: (data) => {
       Toast.show({
         type: 'success',
         text1: 'Avatar successfully deleted',
       })
-      void queryClient.invalidateQueries({ queryKey: ['me'] });
+      void queryClient.invalidateQueries({queryKey: ['me']});
+      setUser(data);
     },
     onError: (err) => handleApiError(err),
   })
@@ -103,3 +110,19 @@ export const useGetMyStats = () => {
     },
   });
 };
+
+export const useGetMyBadges = () => {
+  return useQuery({
+    queryKey: ['my-badges'],
+    queryFn: () => userService.getMyBadges(),
+    initialData: []
+  })
+}
+
+export const useGetUserBadges = (userId: string) => {
+  return useQuery({
+    queryKey: ['user-badges', userId],
+    queryFn: () => userService.getUserBadges(userId),
+    initialData: []
+  })
+}

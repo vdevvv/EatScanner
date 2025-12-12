@@ -1,25 +1,22 @@
 import React, {FC} from 'react';
 import {StyleSheet, Text, View} from "react-native";
+import {Badge as IBadge} from "../../types";
 
 interface BadgeProps {
-  badge: {
-    emoji: string;
-    title: string;
-    color: string;
-  }
+  badge: IBadge
 }
 
 const Badge: FC<BadgeProps> = ({badge}) => {
   return (
     <View style={[styles.container,
       {
-        backgroundColor: `${badge.color}20`,
+        backgroundColor: badge.color2,
         borderWidth: 1,
-        borderColor: badge.color,
+        borderColor: badge.color1,
       }
     ]}>
       <Text>{badge.emoji}</Text>
-      <Text>{badge.title}</Text>
+      <Text>{badge.text}</Text>
     </View>
   );
 };

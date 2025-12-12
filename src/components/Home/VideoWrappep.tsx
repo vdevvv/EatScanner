@@ -5,11 +5,11 @@ import {
   FlatList,
   ViewToken,
 } from 'react-native';
-import React, { FC, useEffect, useRef, useState } from 'react';
-import { RestaurantResponse2 } from '../../types';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, {FC, useEffect, useMemo, useRef, useState} from 'react';
+import {RestaurantResponse2} from '../../types';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import VideoItem from './VideoItem';
-import { COLORS } from '../../constants/colors';
+import {COLORS} from '../../constants/colors';
 
 interface VideoWrapperProps {
   item: RestaurantResponse2;
@@ -32,41 +32,30 @@ const VideoWrapper: FC<VideoWrapperProps> = (
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const isVisible = index === visibleIndex;
 
-  const { width, height } = useWindowDimensions();
-  const { top } = useSafeAreaInsets();
+  const {width, height} = useWindowDimensions();
+  const {top} = useSafeAreaInsets();
 
-  useEffect(() => {
-    setCurrentVideoIndex(0);
-  }, [item.id]);
+  useEffect(() => setCurrentVideoIndex(0), [item.id]);
 
-  const viewabilityConfigVideo = useRef({
-    itemVisiblePercentThreshold: 80,
-  }).current;
+  const viewabilityConfigVideo = useRef({itemVisiblePercentThreshold: 80}).current;
 
   const onViewableItemsChangedVideo = useRef((
-    { viewableItems }: { viewableItems: ViewToken[] },
+    {viewableItems}: { viewableItems: ViewToken[] },
   ) => {
     if (viewableItems.length > 0 && viewableItems[0].index !== null) {
       setCurrentVideoIndex(viewableItems[0].index);
     }
   }).current;
 
-  const videos = item.items
-    .map(i => i.video)
-    .filter((v): v is string => !!v) || [];
-
-  const getMenuItems = (restaurant: RestaurantResponse2) => {
-    return restaurant.items
-      .filter(item => item.video && item.video !== '') || [];
-  };
-
-  const menuItems = getMenuItems(item);
+  const menuItems = useMemo(() =>
+      item.items.filter(i => !!i.video)
+    , [item.items]);
 
   return (
     <View style={styles.container}>
-      <View style={[styles.topProgressWrapper, { top }]}>
+      <View style={[styles.topProgressWrapper, {top}]}>
         <View style={styles.topProgressContainer}>
-          {videos.length > 1 && videos.map((_, i) => (
+          {menuItems.length > 1 && menuItems.map((_, i) => (
             <View
               key={i}
               style={[
@@ -82,11 +71,21 @@ const VideoWrapper: FC<VideoWrapperProps> = (
         pagingEnabled
         horizontal
         showsHorizontalScrollIndicator={false}
+
+        initialNumToRender={1}
+        maxToRenderPerBatch={1}
+        windowSize={2}
+        removeClippedSubviews
+
         onViewableItemsChanged={onViewableItemsChangedVideo}
         viewabilityConfig={viewabilityConfigVideo}
-        scrollEnabled={videos.length > 1}
-        keyExtractor={(_, idx) => `${item.id}-video-${idx}`}
-        renderItem={({ item: menuItem, index }) => (
+        scrollEnabled={menuItems.length > 1}
+        keyExtractor={(item, idx) => `${item.id}-video-${idx}`}
+        getItemLayout={(_, index) => ({
+          length: width, offset: width * index, index
+        })}
+
+        renderItem={({item: menuItem, index}) => (
           <VideoItem
             distance={+item.distance.toFixed(2)}
             rating={rating}
@@ -111,7 +110,7 @@ const VideoWrapper: FC<VideoWrapperProps> = (
 export default VideoWrapper;
 
 const styles = StyleSheet.create({
-  container: { backgroundColor: '#000' },
+  container: {backgroundColor: '#000'},
   topProgressWrapper: {
     marginTop: 5,
     position: 'absolute',
@@ -132,5 +131,5 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     marginHorizontal: 3,
   },
-  topActiveBar: { backgroundColor: COLORS.red },
+  topActiveBar: {backgroundColor: COLORS.red},
 });

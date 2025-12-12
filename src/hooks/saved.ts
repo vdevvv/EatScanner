@@ -31,3 +31,21 @@ export const getMySaved = (take = 20) => {
     },
   });
 };
+
+export const useGetUserSaved = (userId: string, take = 20) => {
+  return useInfiniteQuery({
+    queryKey: ['user-saved', take, userId],
+    initialPageParam: 1,
+    queryFn: ({ pageParam = 1 }) => savedService.getUserSaved(userId, {
+      take,
+      page: pageParam,
+    }),
+    getNextPageParam: (lastPage) => {
+      const { page, pageCount } = lastPage.meta;
+      if (page < pageCount) {
+        return page + 1;
+      }
+      return undefined;
+    },
+  });
+};

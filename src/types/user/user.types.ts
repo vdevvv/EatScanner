@@ -33,3 +33,10 @@ export interface AvatarUploadParams {
   type: string;
   name: string;
 }
+
+export interface Badge {
+  text: string;
+  emoji: string;
+  color1: string;
+  color2: string;
+}

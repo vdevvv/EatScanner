@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
   StyleSheet,
   StatusBar,
@@ -6,22 +6,22 @@ import {
   Animated,
   Share,
 } from 'react-native';
-import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useGetUserStats, useUser } from '../../hooks/user';
+import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
+import {SafeAreaView} from 'react-native-safe-area-context';
+import {useGetUserBadges, useGetUserStats, useUser} from '../../hooks/user';
 import RemoveFriendModal from '../../components/modals/RemoveFriendModal';
 import BlockUserModal from '../../components/modals/BlockUserModal';
 import ReportUserModal from '../../components/modals/ReportUserModal';
 import FriendsProfileMenu from '../../components/modals/FriendActionsModal';
-import { COLORS } from '../../constants/colors';
+import {COLORS} from '../../constants/colors';
 import PastOrderItem from '../../components/Profile/PastOrderItem';
 import Header from '../../components/Profile/Header';
-import { FriendsNavigationProp, FriendsStackParamList } from '../../navigations/app.types';
-import { useGetUserOrders } from '../../hooks/orders';
+import {FriendsNavigationProp, FriendsStackParamList} from '../../navigations/app.types';
+import {useGetUserOrders} from '../../hooks/orders';
 import PageLoader from '../../components/Loader/PageLoader';
-import { handleApiError } from '../../utils/handleApiError';
+import {handleApiError} from '../../utils/handleApiError';
 import NoPastOrders from '../../components/Profile/NoPastOrders';
-import { useGetMutationFriends } from '../../hooks/friends';
+import {useGetMutationFriends} from '../../hooks/friends';
 
 type FriendsProfileScreenRouteProp = RouteProp<FriendsStackParamList, 'FriendsProfileScreen'>;
 
@@ -36,10 +36,12 @@ type ModalState =
 const UserProfileScreen = () => {
   const route = useRoute<FriendsProfileScreenRouteProp>();
   const navigation = useNavigation<FriendsNavigationProp>();
-  const { userId } = route.params;
-  const { data: user, isLoading, isError, error } = useUser(userId);
-  const { data: mutationFriendsData } = useGetMutationFriends(userId);
-  const { data: statsData } = useGetUserStats(userId);
+  const {userId, friendshipStatus} = route.params;
+  const {data: user, isLoading, isError, error} = useUser(userId);
+  const {data: mutationFriendsData} = useGetMutationFriends(userId);
+  const {data: statsData} = useGetUserStats(userId);
+  const {data: badgesData} = useGetUserBadges(userId)
+
   const {
     data: ordersData,
     fetchNextPage,
@@ -62,7 +64,7 @@ const UserProfileScreen = () => {
   }, []);
 
   if (isLoading || ordersLoading || !user) {
-    return <PageLoader />;
+    return <PageLoader/>;
   }
 
   const toggleMenu = () => {
@@ -122,12 +124,12 @@ const UserProfileScreen = () => {
   };
 
   const handleMutualFriendPress = (userId: string) => {
-    navigation.navigate('FriendsProfileScreen', { userId });
+    navigation.navigate('FriendsProfileScreen', {userId, friendshipStatus: 'FRIEND'});
   };
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="dark-content"/>
       <FlatList
         data={orders}
         keyExtractor={(item) => item.id}
@@ -136,11 +138,12 @@ const UserProfileScreen = () => {
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
         ListEmptyComponent={
-          <NoPastOrders subtitle="User haven't ordered anything yet" />
+          <NoPastOrders subtitle="User haven't ordered anything yet"/>
         }
         columnWrapperStyle={styles.columnWrapper}
         ListHeaderComponent={
           <Header
+            badges={badgesData}
             handleMutualFriendPress={handleMutualFriendPress}
             mutualFriends={mutationFriendsData}
             statsData={statsData}
@@ -150,17 +153,18 @@ const UserProfileScreen = () => {
               userName: user.userName,
               bio: user.bio,
             }}
-            handleFriendsListPress={() => {
-            }}
-            handleSavedPress={() => {
-            }}
-            handleFavoritesPress={() => {
-            }}
+            handleFriendsListPress={() => navigation.navigate('UserFriendsList', {
+              userId,
+              fullName: user.fullName
+            })}
+            handleSavedPress={() => navigation.navigate('FriendsProfileSaved', {userId})}
+            handleFavoritesPress={() => navigation.navigate('FriendsProfileFavorites', {userId})}
             handleSettingsPress={toggleMenu}
             isFriendProfilePage
+            friendshipStatus={friendshipStatus}
           />
         }
-        renderItem={({ item }) => (
+        renderItem={({item}) => (
           <PastOrderItem
             onPress={() => {
             }}
@@ -176,9 +180,9 @@ const UserProfileScreen = () => {
         closeModal={toggleMenu}
         onPressOption={handleMenuOption}
       />
-      <RemoveFriendModal isVisible={modalState === 'removeFriend'} closeModal={closeModal} />
-      <BlockUserModal isVisible={modalState === 'blockUser'} closeModal={closeModal} />
-      <ReportUserModal isVisible={modalState === 'report'} closeModal={closeModal} />
+      <RemoveFriendModal isVisible={modalState === 'removeFriend'} closeModal={closeModal}/>
+      <BlockUserModal isVisible={modalState === 'blockUser'} closeModal={closeModal}/>
+      <ReportUserModal isVisible={modalState === 'report'} closeModal={closeModal}/>
     </SafeAreaView>
   );
 };

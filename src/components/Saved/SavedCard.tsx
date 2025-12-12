@@ -6,18 +6,18 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import React, { FC, useState } from 'react';
-import { COLORS } from '../../constants/colors';
+import {Ionicons} from '@expo/vector-icons';
+import React, {FC, useState} from 'react';
+import {COLORS} from '../../constants/colors';
 import SaveIcon from '../icons/SaveIcon';
-import { LinearGradient } from 'expo-linear-gradient';
+import {LinearGradient} from 'expo-linear-gradient';
 
 interface SavedCardProps {
   dishName: string;
   restaurant: string;
   image: string;
   handleCardPress: () => void;
-  handleBookmarkPress: () => void;
+  handleBookmarkPress?: () => void;
 }
 
 const SavedCard: FC<SavedCardProps> = (
@@ -37,15 +37,17 @@ const SavedCard: FC<SavedCardProps> = (
       onPress={handleCardPress}
     >
       <ImageBackground
-        source={{ uri: image }}
+        source={{uri: image}}
         style={styles.image}
         resizeMode="cover"
       >
         <TouchableOpacity
           style={styles.bookmarkContainer}
           onPress={() => {
-            setSaved(prev => !prev);
-            handleBookmarkPress();
+            if (handleBookmarkPress) {
+              setSaved(prev => !prev);
+              handleBookmarkPress();
+            }
           }}
         >
           {saved
@@ -56,7 +58,7 @@ const SavedCard: FC<SavedCardProps> = (
                 stroke="none"
               />
             )
-            : <SaveIcon stroke={COLORS.red} />
+            : <SaveIcon stroke={COLORS.red}/>
           }
         </TouchableOpacity>
         <LinearGradient
@@ -66,7 +68,7 @@ const SavedCard: FC<SavedCardProps> = (
         <View style={styles.textOverlay}>
           <Text style={styles.dishName}>{dishName}</Text>
           <View style={styles.restaurantContainer}>
-            <Ionicons name="home-outline" size={12} color="#fff" />
+            <Ionicons name="home-outline" size={12} color="#fff"/>
             <Text style={styles.videoRestaurantName}>{restaurant}</Text>
           </View>
         </View>
@@ -75,11 +77,11 @@ const SavedCard: FC<SavedCardProps> = (
   );
 };
 
-const { width } = Dimensions.get('window');
+const {width} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
-    width:  (width - 30) / 2,
+    width: (width - 30) / 2,
     aspectRatio: 1,
     borderRadius: 12,
     overflow: 'hidden',

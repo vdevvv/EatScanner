@@ -1,26 +1,26 @@
-import React, { FC, useEffect, useMemo } from 'react';
-import { View, Text, StyleSheet, FlatList, ActivityIndicator } from 'react-native';
+import React, {FC, useEffect, useMemo} from 'react';
+import {View, Text, StyleSheet, FlatList, ActivityIndicator} from 'react-native';
 import {
   useGetSentRequests,
   useGetReceivedRequests,
   useAcceptFriendRequest,
   useCancelFriendRequest,
 } from '../../hooks/friends';
-import { handleApiError } from '../../utils/handleApiError';
+import {handleApiError} from '../../utils/handleApiError';
 import RequestItem from './RequestItem';
 import PageLoader from '../Loader/PageLoader';
-import { useNavigation } from '@react-navigation/native';
-import { FriendsNavigationProp } from '../../navigations/app.types';
+import {useNavigation} from '@react-navigation/native';
+import {FriendsNavigationProp} from '../../navigations/app.types';
 
 interface RequestsTabProps {
   type: 'sent' | 'received';
 }
 
-const RequestsTab: FC<RequestsTabProps> = ({ type }) => {
+const RequestsTab: FC<RequestsTabProps> = ({type}) => {
   const navigation = useNavigation<FriendsNavigationProp>();
   const hook = type === 'sent' ? useGetSentRequests : useGetReceivedRequests;
-  const { mutate: acceptRequest } = useAcceptFriendRequest();
-  const { mutate: cancelRequest } = useCancelFriendRequest();
+  const {mutate: acceptRequest} = useAcceptFriendRequest();
+  const {mutate: cancelRequest} = useCancelFriendRequest();
   const {
     data,
     isError,
@@ -46,7 +46,7 @@ const RequestsTab: FC<RequestsTabProps> = ({ type }) => {
   };
 
   if (isLoading) {
-    return <PageLoader />;
+    return <PageLoader/>;
   }
 
   if (requests.length === 0) {
@@ -59,11 +59,11 @@ const RequestsTab: FC<RequestsTabProps> = ({ type }) => {
     );
   }
 
-  const handleAction = (requestId: string) => {
+  const handleAction = (userId: string) => {
     if (type === 'received') {
-      acceptRequest(requestId);
+      acceptRequest(userId);
     } else {
-      cancelRequest(requestId);
+      cancelRequest(userId);
     }
   };
 
@@ -75,13 +75,16 @@ const RequestsTab: FC<RequestsTabProps> = ({ type }) => {
       keyExtractor={(item) => item.id}
       onEndReached={loadMore}
       onEndReachedThreshold={0.5}
-      ListFooterComponent={isFetchingNextPage ? <ActivityIndicator style={{ marginVertical: 20 }} /> : null}
-      renderItem={({ item }) => (
+      ListFooterComponent={isFetchingNextPage ? <ActivityIndicator style={{marginVertical: 20}}/> : null}
+      renderItem={({item}) => (
         <RequestItem
           item={item}
           type={type}
-          onPress={() => navigation.navigate('FriendsProfileScreen', { userId: item.userId })}
-          onAction={() => handleAction(item.id)}
+          onPress={() => navigation.navigate('FriendsProfileScreen', {
+            userId: item.userId,
+            friendshipStatus: type === 'sent' ? 'SENT' : 'RECEIVED'
+          })}
+          onAction={() => handleAction(item.userId)}
         />
       )}
     />

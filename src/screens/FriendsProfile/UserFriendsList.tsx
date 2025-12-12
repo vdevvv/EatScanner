@@ -1,35 +1,33 @@
-import React, {FC, useEffect, useMemo, useState} from 'react';
-import {View, Text, StyleSheet, TextInput, Platform, FlatList, ActivityIndicator} from 'react-native';
-import {Ionicons} from '@expo/vector-icons';
-import {useNavigation} from '@react-navigation/native';
-import {useMyFriends, useRemoveFriend} from '../../hooks/friends';
-import {handleApiError} from '../../utils/handleApiError';
-import {useDebounce} from '../../hooks/use-debounce';
-import {COLORS} from '../../constants/colors';
-import NoFriends from './NoFriends';
-import FriendListItem from './FriendListItem';
-import {MyProfileNavigationProp} from '../../navigations/app.types';
+import React, {useEffect, useMemo, useState} from 'react';
+import {SafeAreaView} from "react-native-safe-area-context";
+import {ActivityIndicator, FlatList, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View} from "react-native";
+import {COLORS} from "../../constants/colors";
+import {Ionicons} from "@expo/vector-icons";
+import {RouteProp, useNavigation, useRoute} from "@react-navigation/native";
+import {useUserFriends} from "../../hooks/friends";
+import {FriendsNavigationProp, FriendsStackParamList} from "../../navigations/app.types";
+import {useDebounce} from "../../hooks/use-debounce";
+import {handleApiError} from "../../utils/handleApiError";
+import UserFriendListCard from "../../components/Friends/UserFriendListCard";
+import {FriendsAnotherUser} from "../../types";
 
-interface FriendsTabProps {
-  handleExploreProfiles: () => void
-}
+type UserFriendsListRouteProp = RouteProp<FriendsStackParamList, 'UserFriendsList'>;
 
-const FriendsTab: FC<FriendsTabProps> = ({handleExploreProfiles}) => {
-  const navigation = useNavigation<MyProfileNavigationProp>();
+const UserFriendsList = () => {
+  const route = useRoute<UserFriendsListRouteProp>();
+  const {userId, fullName} = route.params
+  const navigation = useNavigation<FriendsNavigationProp>();
   const [searchText, setSearchText] = useState('');
   const [debounceSearchText, setDebounceSearchText] = useState('');
   const {
     data,
     isError,
     error,
-    isFetching,
     isFetchingNextPage,
     fetchNextPage,
     hasNextPage,
-    refetch,
     isLoading,
-  } = useMyFriends(debounceSearchText);
-  const {mutate} = useRemoveFriend();
+  } = useUserFriends(userId, debounceSearchText)
 
   const friends = useMemo(() => {
     return data?.pages.flatMap((page) => page.data) || [];
@@ -40,12 +38,11 @@ const FriendsTab: FC<FriendsTabProps> = ({handleExploreProfiles}) => {
   }, 400);
 
   useEffect(() => {
-    if (isError) handleApiError(error);
+    if (isError) {
+      handleApiError(error)
+      console.log(error)
+    }
   }, [isError, error]);
-
-  const handlePressUser = (userId: string) => {
-    navigation.navigate('FriendsProfileScreen', {userId, friendshipStatus: 'FRIEND'});
-  };
 
   const loadMore = () => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -53,18 +50,23 @@ const FriendsTab: FC<FriendsTabProps> = ({handleExploreProfiles}) => {
     }
   };
 
-  const shouldShowNoFriends = !searchText && friends.length === 0 && !isFetching && !isLoading;
-
-  if (shouldShowNoFriends) {
-    return (
-      <View style={styles.centerContainer}>
-        <NoFriends handleExploreProfiles={handleExploreProfiles}/>
-      </View>
-    );
+  const handlePressUser = (user: FriendsAnotherUser) => {
+    if (user.friendshipStatus === 'ME') {
+      navigation.navigate('MyProfile')
+    } else {
+      navigation.navigate('FriendsProfileScreen', {userId: user.id, friendshipStatus: user.friendshipStatus})
+    }
   }
 
   return (
-    <>
+    <SafeAreaView style={styles.safeArea} edges={['right', 'top', 'left']}>
+      <View style={styles.headerContainer}>
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back" size={28} color="#333" style={{marginRight: 10}}/>
+          <Text style={styles.screenTitle}>{fullName} Friends ({data?.pages[0].meta.itemsCount})</Text>
+        </TouchableOpacity>
+      </View>
+
       <View style={styles.searchBarContainer}>
         <Ionicons name="search-outline" size={20} color={COLORS.black} style={styles.searchIcon}/>
         <TextInput
@@ -90,12 +92,9 @@ const FriendsTab: FC<FriendsTabProps> = ({handleExploreProfiles}) => {
           isFetchingNextPage ? <ActivityIndicator style={{marginVertical: 20}}/> : null
         }
         renderItem={({item}) => (
-          <FriendListItem
+          <UserFriendListCard
             friend={item}
-            handlePressUser={handlePressUser}
-            onRemoveFriend={() => {
-              mutate(item.id, {onSuccess: async () => await refetch()});
-            }}
+            handlePressUser={() => handlePressUser(item)}
           />
         )}
         ListEmptyComponent={
@@ -109,11 +108,33 @@ const FriendsTab: FC<FriendsTabProps> = ({handleExploreProfiles}) => {
           <ActivityIndicator size="large"/>
         </View>
       )}
-    </>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {flex: 1, backgroundColor: COLORS.white},
+  headerContainer: {
+    paddingHorizontal: 26,
+    paddingVertical: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  screenTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#333',
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   searchBarContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -131,16 +152,12 @@ const styles = StyleSheet.create({
     color: '#333',
     ...Platform.select({android: {paddingVertical: 0}}),
   },
+
   scrollContent: {
     paddingHorizontal: 16,
     paddingTop: 8,
     paddingBottom: 20,
     flexGrow: 1,
-  },
-  centerContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   noResultsText: {
     color: '#999',
@@ -155,6 +172,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     zIndex: 10,
   },
-});
+})
 
-export default FriendsTab;
+export default UserFriendsList;

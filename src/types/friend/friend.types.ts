@@ -24,3 +24,24 @@ export interface MutualFriend {
   avatar: string
   bio: string | null
 }
+
+export enum FriendshipStatus {
+  NONE = 'NONE',
+  FRIEND = 'FRIEND',
+  SENT = 'SENT',
+  RECEIVED = 'RECEIVED',
+}
+
+export interface SearchUser {
+  id: string;
+  fullName: string | null;
+  userName: string | null;
+  avatar: string;
+  friendshipStatus: FriendshipStatus;
+  friendshipId: string | null;
+}
+
+export type ExtendedFriendshipStatus = 'ME' | 'FRIEND' | 'SENT' | 'RECEIVED' | 'NONE'
+export type FriendsAnotherUser = Omit<SearchUser, 'friendshipId' | 'friendshipStatus'> & {
+  friendshipStatus: ExtendedFriendshipStatus
+};

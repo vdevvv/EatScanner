@@ -6,15 +6,26 @@ import {userService} from "../services/user.service";
 export const ACCESS_TOKEN_KEY = "accessToken";
 export const REFRESH_TOKEN_KEY = "refreshToken";
 
-type AuthState = {
-  user: User | null;
-  isAuth: boolean;
+type AuthenticatedState = {
+  isAuth: true;
+  user: User;
+};
+
+type UnauthenticatedState = {
+  isAuth: false;
+  user: null;
+};
+
+type AuthActions = {
   signIn: (accessToken: string, refreshToken: string) => Promise<void>;
   signOut: () => Promise<void>;
   loadUserOnStartup: () => Promise<void>;
+  setUser: (user: User) => void;
 };
 
-export const useAuthStore = create<AuthState>((set) => ({
+type AuthStore = (AuthenticatedState | UnauthenticatedState) & AuthActions;
+
+export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
   isAuth: false,
 
@@ -51,5 +62,9 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (e) {
       set({user: null, isAuth: false})
     }
+  },
+
+  setUser: (user: User) => {
+    set({user})
   }
 }))

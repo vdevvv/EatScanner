@@ -1,32 +1,32 @@
-import { api } from '../utils/api';
-import { AvatarUploadParams, UpdatePasswordDto, UpdateUserDto, User, UserStatsResponse } from '../types';
+import {api} from '../utils/api';
+import {AvatarUploadParams, Badge, UpdatePasswordDto, UpdateUserDto, User, UserStatsResponse} from '../types';
 
 class UserService {
   async getMe() {
-    return api.get<User>('/users/me').then(({ data }) => data);
+    return api.get<User>('/users/me').then(({data}) => data);
   }
 
   async getById(id: string) {
-    return api.get<User>(`/users/${id}`).then(({ data }) => data);
+    return api.get<User>(`/users/${id}`).then(({data}) => data);
   }
 
   async updateMe(data: UpdateUserDto) {
-    return api.patch<User>('/users/me', data).then(({ data }) => data);
+    return api.patch<User>('/users/me', data).then(({data}) => data);
   }
 
   async updatePassword(data: UpdatePasswordDto) {
     return api.patch<{ message: string }>('/users/password', data)
-      .then(({ data }) => data);
+      .then(({data}) => data);
   }
 
   async getUserStats(id: string) {
     return api.get<UserStatsResponse>(`/users/${id}/stats`)
-      .then(({ data }) => data);
+      .then(({data}) => data);
   }
 
   async getMyStats() {
     return api.get<UserStatsResponse>('/users/my-stats')
-      .then(({ data }) => data);
+      .then(({data}) => data);
   }
 
   async uploadAvatar(asset: AvatarUploadParams) {
@@ -38,13 +38,23 @@ class UserService {
       type: asset.type,
     });
 
-    await api.patch('users/avatar', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-    })
+    return api.patch<User>('users/avatar', formData, {
+      headers: {'Content-Type': 'multipart/form-data'},
+    }).then(({data}) => data);
   }
 
   async deleteAvatar() {
-    await api.delete('users/avatar');
+    return api.delete<User>('users/avatar').then(({data}) => data);
+  }
+
+  async getMyBadges() {
+    return api.get<Badge[]>('/users/badges/my')
+      .then(({data}) => data);
+  }
+
+  async getUserBadges(userId: string) {
+    return api.get<Badge[]>(`/users/badges/${userId}`)
+      .then(({data}) => data);
   }
 }
 

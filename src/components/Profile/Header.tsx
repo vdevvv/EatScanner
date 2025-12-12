@@ -6,9 +6,8 @@ import Badge from './Badge';
 import React, { FC } from 'react';
 import ProfileStats from './ProfileStats';
 import Actions from './Actions';
-import { MutualFriend, UserStatsResponse } from '../../types';
+import {MutualFriend, UserStatsResponse, Badge as IBadge, ExtendedFriendshipStatus} from '../../types';
 import MutualFriendsSection from '../Friends/MutualFriendsSection';
-import { useNavigation } from '@react-navigation/native';
 
 interface HeaderProps {
   handleSettingsPress: () => void;
@@ -18,7 +17,9 @@ interface HeaderProps {
   isFriendProfilePage?: boolean;
   statsData: UserStatsResponse;
   mutualFriends?: MutualFriend[];
+  badges: IBadge[];
   handleMutualFriendPress?: (userId: string) => void;
+  friendshipStatus?: ExtendedFriendshipStatus;
   userInfo: {
     avatar: string
     userName: string | null
@@ -26,29 +27,6 @@ interface HeaderProps {
     bio: string | null
   };
 }
-
-const badges = [
-  {
-    title: 'Sweet Tooth',
-    emoji: '🍰',
-    color: '#F31994',
-  },
-  {
-    title: 'Café Connoisseur',
-    emoji: '☕️',
-    color: '#E17C00',
-  },
-  {
-    title: 'Healthy Hustler',
-    emoji: '🥬',
-    color: '#08DE00',
-  },
-  {
-    title: 'Spice Lord',
-    emoji: '🌶️',
-    color: '#CF0000',
-  },
-];
 
 const Header: FC<HeaderProps> = (
   {
@@ -60,7 +38,9 @@ const Header: FC<HeaderProps> = (
     isFriendProfilePage = false,
     statsData,
     mutualFriends,
-    handleMutualFriendPress
+    handleMutualFriendPress,
+    badges,
+    friendshipStatus
   },
 ) => {
   const { userName, fullName, bio, avatar } = userInfo;
@@ -103,7 +83,7 @@ const Header: FC<HeaderProps> = (
 
         {isFriendProfilePage && (
           <View style={styles.actionsWrapper}>
-            <Actions action="message" />
+            <Actions friendshipStatus={friendshipStatus} action="message" />
           </View>
         )}
 
