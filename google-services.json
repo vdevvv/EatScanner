@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "437511422954",
+    "project_id": "eatscanner-3a150",
+    "storage_bucket": "eatscanner-3a150.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:437511422954:android:70c46445bcdeae1788e893",
+        "android_client_info": {
+          "package_name": "com.r1020304050.EatScanner"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAsOi33JuUx3Yq7YFMvvW67Ko0XcwqEVoQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

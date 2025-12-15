@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "EatScanner",
-    "slug": "EatScanner",
+    "name": "Taal Eat",
+    "slug": "taal-eat",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
@@ -21,7 +21,7 @@
       ],
       "adaptiveIcon": {
         "backgroundColor": "#9F0B08",
-        "foregroundImage": "./assets/icon.png"
+        "foregroundImage": "./assets/adaptive-icon.png"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,

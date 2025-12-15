@@ -7,7 +7,7 @@ import {NativeStackNavigationProp} from "@react-navigation/native-stack";
 import {AuthStackParamList} from "../../navigations/AuthNavigator";
 import Register from "../../components/Auth/Register/Register";
 import {COLORS} from "../../constants/colors";
-import TaalEatsLogo from "../../components/icons/TaalEatsLogo";
+import TaalEatLogo from "../../components/icons/TaalEatLogo";
 
 type AuthNavigationProp = NativeStackNavigationProp<
   AuthStackParamList,
@@ -27,7 +27,7 @@ const Auth = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.logoContainer}>
-          <TaalEatsLogo style={styles.logo} />
+          <TaalEatLogo style={styles.logo} />
         </View>
 
         <View style={styles.tabContainer}>

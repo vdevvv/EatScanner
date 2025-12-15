@@ -13,23 +13,21 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-// --- КОНФІГУРАЦІЯ ТА ДАНІ ---
 const { width } = Dimensions.get("window");
 
 const COLORS = {
-  primary: "#E9725C", // Червоно-помаранчевий (Активний)
-  disabled: "#D1D5DB", // Світло-сірий (Неактивний)
+  primary: "#E9725C",
+  disabled: "#D1D5DB",
   background: "#FFFFFF",
-  textDark: "#1F2937", // Темний текст
-  textGrey: "#6B7280", // Сірий текст
-  divider: "#E5E7EB", // Світло-сірий розділювач
+  textDark: "#1F2937",
+  textGrey: "#6B7280",
+  divider: "#E5E7EB",
   white: "#FFFFFF",
   iconGreen: "#10B981",
   iconRed: "#EF4444",
   googleColor: "#4285F4",
 };
 
-// Дані для картки ресторану
 const RESTAURANT_DATA = {
   name: "Grandma's Kettle",
   subtitle: "Chefs Hall",
@@ -38,7 +36,6 @@ const RESTAURANT_DATA = {
   imageSource: require("../../assets/dumplings-top.jpg") as ImageSourcePropType, // Placeholder
 };
 
-// Дані для варіантів замовлення
 const ORDER_OPTIONS = [
   {
     id: "website",
@@ -67,15 +64,12 @@ const ORDER_OPTIONS = [
   },
 ];
 
-// --- ДОПОМІЖНІ КОМПОНЕНТИ ---
-
 interface RadioItemProps {
   item: (typeof ORDER_OPTIONS)[0];
   isSelected: boolean;
   onSelect: (id: string) => void;
 }
 
-// Компонент однієї опції замовлення з радіокнопкою
 const RadioItem: React.FC<RadioItemProps> = ({
   item,
   isSelected,

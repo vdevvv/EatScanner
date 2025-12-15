@@ -24,7 +24,7 @@ const WelcomeScreen = () => {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
       <ImageBackground
-        source={require('../../assets/splash-screen.jpg')}
+        source={require('../../assets/SplashScreen.jpg')}
         style={styles.background}
         resizeMode="cover"
       />

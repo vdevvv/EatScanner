@@ -9,28 +9,20 @@ import {
   Platform,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-// Примітка: для роботи вам потрібна бібліотека react-native-svg для відтворення складної ілюстрації
-// Оскільки ми не можемо використовувати SVG-бібліотеки, я замінюю ілюстрацію на простий компонент
-// з іконками, що імітує "порожній" стан, та додаю велику лупу (magnifying glass)
-// відповідно до зображення.
 
 const { width } = Dimensions.get("window");
 
-// Імітація ілюстрації "No Data"
 const NoDataIllustration: React.FC = () => (
   <View style={illustrationStyles.container}>
-    {/* Імітація папки з помилкою */}
     <Ionicons
       name="folder-open-outline"
       size={80}
       color="#ccc"
       style={illustrationStyles.folder}
     />
-    {/* Імітація знаку питання/лупи */}
     <View style={illustrationStyles.magnifyingGlass}>
       <Ionicons name="search-outline" size={40} color="#888" />
     </View>
-    {/* Імітація сумного обличчя на папці */}
     <View style={illustrationStyles.sadFace}>
       <Text style={illustrationStyles.sadFaceText}>:(</Text>
     </View>
