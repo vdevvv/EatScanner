@@ -1,4 +1,6 @@
 import {COLORS} from '../constants/colors';
+import {Contact} from "expo-contacts";
+import {ContactPayload} from "../types";
 
 export const getInputWrapperStyles = (value?: string) => ({
   borderColor: value ? COLORS.black : COLORS.stroke2,
@@ -56,7 +58,16 @@ export const getOptimizedVideoUrl = (
   return url.replace('/upload/', `/upload/${transformations}/`);
 };
 
-export const shortenName = (name: string, length = 7) => {
-  if (!name) return "";
-  return name.length > 3 ? name.slice(0, length) + "..." : name;
+export const prepareContactsForSync = (contactsRaw: Contact[]): ContactPayload[] => {
+  return contactsRaw.flatMap(contact =>
+    contact.phoneNumbers?.flatMap(ph => {
+      const phone = ph.digits || ph.number;
+      if (!phone) return [];
+
+      return [{
+        phone,
+        countryCode: ph.countryCode?.toUpperCase(),
+      }];
+    }) ?? []
+  );
 }

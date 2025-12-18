@@ -56,6 +56,13 @@ class UserService {
     return api.get<Badge[]>(`/users/badges/${userId}`)
       .then(({data}) => data);
   }
+  async initiatePhoneUpdate(phone: string ) {
+    return api.post<{message: string}>('/users/phone/initiate', { phone })
+  }
+
+  async confirmPhoneUpdate(code: string ) {
+    return api.post<User>('/users/phone/confirm', { code }).then(res => res.data)
+  }
 }
 
 export const userService = new UserService();

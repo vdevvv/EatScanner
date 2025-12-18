@@ -1,6 +1,7 @@
 import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {friendsService} from '../services/friends.service';
 import {handleApiError} from '../utils/handleApiError';
+import {ContactPayload} from "../types";
 
 export const useMyFriends = (search: string, take = 20) => {
   return useInfiniteQuery({
@@ -81,6 +82,7 @@ export const useAcceptFriendRequest = () => {
       await queryClient.invalidateQueries({queryKey: ['user-stats']});
       await queryClient.invalidateQueries({queryKey: ['search-friends']});
       await queryClient.invalidateQueries({queryKey: ['user-friends']});
+      await queryClient.invalidateQueries({queryKey: ['sync-contacts']});
     },
     onError: (error) => handleApiError(error),
   });
@@ -146,6 +148,7 @@ export const useSendFriendRequest = () => {
       await queryClient.invalidateQueries({queryKey: ['sent-requests']});
       await queryClient.invalidateQueries({queryKey: ['search-friends']});
       await queryClient.invalidateQueries({queryKey: ['user-friends']});
+      await queryClient.invalidateQueries({queryKey: ['sync-contacts']});
     }
   })
 }
@@ -166,5 +169,14 @@ export const useUserFriends = (userId: string, queryTerm: string, take = 20) => 
       }
       return undefined;
     },
+  })
+}
+
+export const useSyncContacts = (payload:  ContactPayload[], enabled: boolean) => {
+  return useQuery({
+    queryKey: ['sync-contacts'],
+    queryFn: () => friendsService.syncContacts(payload),
+    enabled,
+    initialData: []
   })
 }

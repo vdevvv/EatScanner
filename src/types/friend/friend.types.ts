@@ -36,6 +36,7 @@ export interface SearchUser {
   id: string;
   fullName: string | null;
   userName: string | null;
+  phone: string | null,
   avatar: string;
   friendshipStatus: FriendshipStatus;
   friendshipId: string | null;
@@ -45,3 +46,8 @@ export type ExtendedFriendshipStatus = 'ME' | 'FRIEND' | 'SENT' | 'RECEIVED' | '
 export type FriendsAnotherUser = Omit<SearchUser, 'friendshipId' | 'friendshipStatus'> & {
   friendshipStatus: ExtendedFriendshipStatus
 };
+
+export interface ContactPayload {
+  phone: string;
+  countryCode?: string;
+}

@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { NavigatorScreenParams } from '@react-navigation/native';
+import React, {useEffect} from 'react';
+import {NavigatorScreenParams} from '@react-navigation/native';
 import {createBottomTabNavigator} from "@react-navigation/bottom-tabs";
 import {Ionicons} from "@expo/vector-icons";
 import HomePageScreen from "../screens/HomePage/HomePageScreen";
@@ -34,13 +34,14 @@ import {
 } from './app.types';
 import ViewAllScreen from '../screens/Discovery/ViewAllScreen';
 import MyProfileFavorites from '../screens/MyProfile/MyProfileFavorites';
-import { usePushNotifications } from '../hooks/usePushNotifications';
-import { useSendPushToken } from '../hooks/notifications';
-import { useAuthStore } from '../stores/useAuthStore';
+import {usePushNotifications} from '../hooks/usePushNotifications';
+import {useSendPushToken} from '../hooks/notifications';
+import {useAuthStore} from '../stores/useAuthStore';
 import MyProfileNotificationSettings from "../screens/MyProfile/MyProfileNotificationSettings";
 import FriendsProfileSaved from "../screens/FriendsProfile/FriendsProfileSaved";
 import FriendsProfileFavorites from "../screens/FriendsProfile/FriendsProfileFavorites";
 import UserFriendsList from "../screens/FriendsProfile/UserFriendsList";
+import ContactFriends from "../screens/MyProfile/ContactFriends";
 
 export type RootTabParamList = {
   Home: NavigatorScreenParams<HomeStackParamList>;
@@ -50,8 +51,8 @@ export type RootTabParamList = {
 };
 
 const AppNavigator = () => {
-  const { expoPushToken } = usePushNotifications();
-  const { mutate: sendPushToken } = useSendPushToken();
+  const {expoPushToken} = usePushNotifications();
+  const {mutate: sendPushToken} = useSendPushToken();
   const user = useAuthStore(state => state.user);
 
   useEffect(() => {
@@ -71,7 +72,7 @@ const AppNavigator = () => {
       <HomeStack.Screen name="Notifications" component={Notifications}/>
       <HomeStack.Screen name="Order" component={Order}/>
       <HomeStack.Screen name="DishDetailScreen" component={DishDetailScreen}/>
-      <HomeStack.Screen name='DiscoverRestoranWhere' component={DiscoverRestoranWhere} />
+      <HomeStack.Screen name='DiscoverRestoranWhere' component={DiscoverRestoranWhere}/>
     </HomeStack.Navigator>
   );
 
@@ -80,7 +81,7 @@ const AppNavigator = () => {
     <DiscoveryStack.Navigator screenOptions={{headerShown: false}}>
       <DiscoveryStack.Screen name="Discovery" component={Discovery}/>
       <DiscoveryStack.Screen name="DiscoveryFiltersPage" component={DiscoveryFiltersPage}/>
-      <DiscoveryStack.Screen name='ViewAll' component={ViewAllScreen} />
+      <DiscoveryStack.Screen name='ViewAll' component={ViewAllScreen}/>
     </DiscoveryStack.Navigator>
   )
 
@@ -88,6 +89,7 @@ const AppNavigator = () => {
   const FriendsStackNavigator = () => (
     <FriendsStack.Navigator screenOptions={{headerShown: false}}>
       <FriendsStack.Screen name="FriendsScreen" component={FriendsScreen}/>
+      <FriendsStack.Screen name='ContactFriends' component={ContactFriends}/>
       <FriendsStack.Screen name="MyProfile" component={MyProfileScreen}/>
       <FriendsStack.Screen name="FriendsProfileSaved" component={FriendsProfileSaved}/>
       <FriendsStack.Screen name="FriendsProfileFavorites" component={FriendsProfileFavorites}/>
@@ -104,6 +106,7 @@ const AppNavigator = () => {
     <MyProfileStack.Navigator screenOptions={{headerShown: false}}>
       <MyProfileStack.Screen name="Profile" component={MyProfileScreen}/>
       <MyProfileStack.Screen name="UserFriendsList" component={UserFriendsList}/>
+      <MyProfileStack.Screen name='ContactFriends' component={ContactFriends}/>
       <MyProfileStack.Screen name="FriendsProfileScreen" component={FriendsProfileScreen}/>
       <MyProfileStack.Screen name="FriendsScreen" component={FriendsScreen}/>
       <MyProfileStack.Screen name="MyProfileSettings" component={MyProfileSettings}/>

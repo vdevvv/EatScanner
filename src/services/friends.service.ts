@@ -1,5 +1,6 @@
 import {api} from '../utils/api';
 import {
+  ContactPayload,
   Friend,
   FriendRequestUser,
   FriendsAnotherUser,
@@ -63,6 +64,11 @@ class FriendsService {
 
   async getUserFriends(userId: string, paginateOptions: PaginateOptions) {
     return api.get<PaginatedResponse<FriendsAnotherUser>>(`/friends/user-friends/${userId}`, {params: paginateOptions})
+      .then(({data}) => data);
+  }
+
+  async syncContacts(payload: ContactPayload[]) {
+    return api.post<SearchUser[]>('friends/sync-contacts', {contacts: payload})
       .then(({data}) => data);
   }
 }

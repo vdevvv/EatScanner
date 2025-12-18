@@ -1,5 +1,5 @@
 import React, {FC, RefObject, useCallback, useMemo, useState} from 'react';
-import {View, Text, StyleSheet, Keyboard, FlatListProps} from 'react-native';
+import {View, Text, StyleSheet, Keyboard, FlatListProps, TouchableOpacity} from 'react-native';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetBackdropProps,
@@ -15,6 +15,7 @@ import AddFriendListItem from "./AddFriendListItem";
 import PageLoader from "../Loader/PageLoader";
 import {useNavigation} from "@react-navigation/native";
 import {MyProfileNavigationProp} from "../../navigations/app.types";
+import {useContactsAccess} from "../../hooks/useContactsAccess";
 
 interface AddFriendSheetProps {
   bottomSheetRef: RefObject<BottomSheet | null>;
@@ -28,6 +29,7 @@ const AddFriendSheet: FC<AddFriendSheetProps> = ({bottomSheetRef, snapPoints}) =
   const {mutate: acceptFriendRequest} = useAcceptFriendRequest()
   const [searchText, setSearchText] = useState('');
   const [debounceSearchText, setDebounceSearchText] = useState('');
+  const {requestContactsPermission} = useContactsAccess();
   const {
     data,
     isFetchingNextPage,
@@ -88,6 +90,14 @@ const AddFriendSheet: FC<AddFriendSheetProps> = ({bottomSheetRef, snapPoints}) =
     return null;
   };
 
+  const handleSyncContacts = async () => {
+    const hasPermission = await requestContactsPermission();
+    if (hasPermission) {
+      bottomSheetRef.current?.close();
+      navigation.navigate('ContactFriends');
+    }
+  };
+
   return (
     <BottomSheet
       ref={bottomSheetRef}
@@ -119,6 +129,24 @@ const AddFriendSheet: FC<AddFriendSheetProps> = ({bottomSheetRef, snapPoints}) =
             returnKeyType="search"
           />
         </View>
+
+        {debounceSearchText.length === 0 && (
+          <TouchableOpacity
+            style={styles.contactsRow}
+            onPress={handleSyncContacts}
+            activeOpacity={0.7}
+          >
+            <View style={styles.contactsIconContainer}>
+              <Feather name="users" size={22} color={COLORS.white}/>
+            </View>
+            <View style={styles.contactsTextContainer}>
+              <Text style={styles.contactsTitle}>Friends from contacts</Text>
+              <Text style={styles.contactsSubtitle}>Find people you know</Text>
+            </View>
+            <Feather name="chevron-right" size={20} color="#ccc"/>
+          </TouchableOpacity>
+        )}
+
         <View style={styles.divider}/>
       </View>
       <TypedBottomSheetFlatList
@@ -234,6 +262,37 @@ const styles = StyleSheet.create({
   emptyText: {
     color: '#999',
     fontSize: 16,
+  },
+
+  contactsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    marginHorizontal: 15,
+    marginBottom: 10,
+  },
+  contactsIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.black,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  contactsTextContainer: {
+    flex: 1,
+  },
+  contactsTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.black,
+  },
+  contactsSubtitle: {
+    fontSize: 13,
+    color: '#888',
+    marginTop: 2,
   }
 });
 

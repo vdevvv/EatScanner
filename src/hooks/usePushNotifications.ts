@@ -49,7 +49,7 @@ async function registerForPushNotificationsAsync() {
       const pushTokenString = await Notifications.getExpoPushTokenAsync({ projectId });
       token = pushTokenString.data;
     } catch (e) {
-      console.error(e);
+      console.warn(e);
     }
   } else {
     console.log('Simulator detected - no push token');

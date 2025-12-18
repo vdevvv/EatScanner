@@ -17,7 +17,7 @@
     },
     "android": {
       "permissions": [
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_FINE_LOCATION", "READ_CONTACTS"
       ],
       "adaptiveIcon": {
         "backgroundColor": "#9F0B08",
@@ -37,7 +37,13 @@
     "plugins": [
       "expo-notifications",
       "expo-secure-store",
-      "expo-video"
+      "expo-video",
+      [
+        "expo-contacts",
+        {
+          "contactsPermission": "The app needs access to your contacts so you can find friends"
+        }
+      ]
     ]
   }
 }

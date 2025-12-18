@@ -1,4 +1,4 @@
-import React, {useEffect, useMemo, useRef} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
   View,
   Text,
@@ -12,7 +12,14 @@ import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
 import {useNavigation} from '@react-navigation/native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {COLORS} from '../../constants/colors';
-import {useDeleteAvatar, useMe, useUpdateMe, useUploadAvatar} from '../../hooks/user';
+import {
+  useConfirmPhoneUpdate,
+  useDeleteAvatar,
+  useInitiatePhoneUpdate,
+  useMe,
+  useUpdateMe,
+  useUploadAvatar
+} from '../../hooks/user';
 import InputField from '../../components/common/InputField';
 import PageLoader from '../../components/Loader/PageLoader';
 import {handleApiError} from '../../utils/handleApiError';
@@ -22,15 +29,21 @@ import {EditProfileSchema, editProfileSchema} from '../../schemas/user/edit-prof
 import BottomSheet from '@gorhom/bottom-sheet';
 import {useImagePicker} from '../../hooks/useImagePicker';
 import EditProfileBottomSheet from '../../components/Profile/EditProfileBottomSheet';
+import PhoneVerificationSheet from "../../components/Profile/PhoneVerificationSheet";
 
 const EditProfileScreen = ({shouldShowHeader = true}) => {
   const {data, isLoading, isError, error} = useMe();
   const {mutate: updateMe, isPending} = useUpdateMe();
   const {mutate: uploadAvatar, isPending: isUploadingAvatar} = useUploadAvatar();
   const {mutate: deleteAvatar} = useDeleteAvatar();
+  const {mutate: initiatePhoneUpdate, isPending: isSendingSms} = useInitiatePhoneUpdate();
+  const {mutate: confirmPhoneUpdate, isPending: isVerifyingCode} = useConfirmPhoneUpdate();
+
   const navigation = useNavigation();
   const bottomSheetRef = useRef<BottomSheet>(null);
+  const verificationSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ['1%', '35%'], []);
+  const [pendingPhone, setPendingPhone] = useState<string | null>(null);
 
   const {
     selectedImage,
@@ -73,8 +86,33 @@ const EditProfileScreen = ({shouldShowHeader = true}) => {
     return <PageLoader/>;
   }
 
-  const handleSave = (data: EditProfileSchema) => {
-    updateMe(data);
+  const handleSave = (formData: EditProfileSchema) => {
+    const currentPhone = data.phone;
+    const newPhone = formData.phone;
+
+    const isPhoneChanged = newPhone && newPhone !== currentPhone;
+
+    if (isPhoneChanged) {
+      // const {phone, ...otherData} = formData;
+      // updateMe(otherData);
+      setPendingPhone(newPhone);
+      initiatePhoneUpdate(newPhone, {
+        onSuccess: () => {
+          verificationSheetRef.current?.expand();
+        }
+      });
+    } else {
+      updateMe(formData);
+    }
+  };
+
+  const handleVerifyCode = (code: string) => {
+    confirmPhoneUpdate(code, {
+      onSuccess: () => {
+        verificationSheetRef.current?.close();
+        setPendingPhone(null);
+      }
+    });
   };
 
   const handleUploadImage = async (asset: any) => {
@@ -170,7 +208,9 @@ const EditProfileScreen = ({shouldShowHeader = true}) => {
 
       <View style={styles.footer}>
         <TouchableOpacity style={styles.saveButton} disabled={isPending} onPress={handleSubmit(handleSave)}>
-          <Text style={styles.saveButtonText}>{isPending ? 'Loading...' : 'Save changes'}</Text>
+          <Text style={styles.saveButtonText}>
+            {isPending ? 'Saving...' : isSendingSms ? 'Sending SMS...' : 'Save changes'}
+          </Text>
         </TouchableOpacity>
       </View>
       <EditProfileBottomSheet
@@ -196,6 +236,14 @@ const EditProfileScreen = ({shouldShowHeader = true}) => {
             await handleUploadImage(asset);
           }
         }}
+      />
+      <PhoneVerificationSheet
+        bottomSheetRef={verificationSheetRef}
+        snapPoints={['1%', '40%']}
+        phoneNumber={pendingPhone}
+        isLoading={isVerifyingCode}
+        onSubmitCode={handleVerifyCode}
+        onResendCode={() => pendingPhone && initiatePhoneUpdate(pendingPhone)}
       />
     </SafeAreaView>
   );

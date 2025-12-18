@@ -4,6 +4,7 @@ import {ExtendedFriendshipStatus} from "../types";
 export type FriendsStackParamList = {
   MyProfile: undefined
   FriendsScreen: undefined;
+  ContactFriends: undefined;
   FriendsProfileScreen: { userId: string, friendshipStatus: ExtendedFriendshipStatus };
   FriendsProfileSaved: { userId: string }
   UserFriendsList: { userId: string, fullName: string | null }
@@ -66,6 +67,7 @@ export type DiscoveryNavigationProp = NativeStackNavigationProp<DiscoveryStackPa
 export type MyProfileStackParamList = {
   Profile: undefined
   FriendsScreen: undefined
+  ContactFriends: undefined
   FriendsProfileScreen: { userId: string, friendshipStatus: ExtendedFriendshipStatus }
   UserFriendsList: { userId: string, fullName: string | null }
   MyProfileSettings: undefined

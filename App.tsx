@@ -80,7 +80,6 @@ const App = () => {
 function AppContent() {
   const {user, isAuth} = useAuthStore(state => state);
   const {top} = useSafeAreaInsets();
-  console.log(user)
 
   const renderContent = () => {
     if (!isAuth) {
