@@ -136,15 +136,30 @@ export const useInitiatePhoneUpdate = () => {
 
 export const useConfirmPhoneUpdate = () => {
   const queryClient = useQueryClient();
-  const { setUser } = useAuthStore(state => state);
+  const {setUser} = useAuthStore(state => state);
 
   return useMutation({
     mutationFn: (code: string) => userService.confirmPhoneUpdate(code),
     onSuccess: async (updatedUser) => {
       setUser(updatedUser);
-      await queryClient.invalidateQueries({ queryKey: ['me'] });
-      Toast.show({ type: 'success', text1: 'Phone number updated successfully' });
+      await queryClient.invalidateQueries({queryKey: ['me']});
+      Toast.show({type: 'success', text1: 'Phone number updated successfully'});
     },
     onError: (err) => handleApiError(err),
+  });
+};
+
+export const useToggleNotifications = () => {
+  const queryClient = useQueryClient();
+
+  const {setUser} = useAuthStore();
+
+  return useMutation({
+    mutationFn: (enabled: boolean) =>
+      userService.toggleNotifications(enabled),
+
+    onSuccess: (updatedUser) => {
+      setUser(updatedUser);
+    },
   });
 };

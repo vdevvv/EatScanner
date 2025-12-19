@@ -63,6 +63,11 @@ class UserService {
   async confirmPhoneUpdate(code: string ) {
     return api.post<User>('/users/phone/confirm', { code }).then(res => res.data)
   }
+
+  async toggleNotifications(notificationsEnabled: boolean) {
+    return api.patch<User>('/users/notifications', {notificationsEnabled})
+      .then(({data}) => data);
+  }
 }
 
 export const userService = new UserService();

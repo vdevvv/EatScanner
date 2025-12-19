@@ -7,6 +7,7 @@ export type User = {
   avatar: string
   phone: string | null
   isEmailVerified: boolean
+  notificationsEnabled: boolean
   createdAt: string
   updatedAt: string
 }
