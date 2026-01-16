@@ -18,6 +18,8 @@ interface VideoWrapperProps {
   visibleIndex: number;
   isScreenFocused: boolean;
   onItemUpdate: (itemId: string, type: 'like' | 'save') => void;
+
+  height: number
 }
 
 const VideoWrapper: FC<VideoWrapperProps> = (
@@ -27,12 +29,13 @@ const VideoWrapper: FC<VideoWrapperProps> = (
     visibleIndex,
     isScreenFocused,
     rating,
-    onItemUpdate
+    onItemUpdate,
+    height,
   }) => {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const isVisible = index === visibleIndex;
 
-  const {width, height} = useWindowDimensions();
+  const {width} = useWindowDimensions();
   const {top} = useSafeAreaInsets();
 
   useEffect(() => setCurrentVideoIndex(0), [item.id]);

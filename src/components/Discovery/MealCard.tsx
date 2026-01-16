@@ -25,7 +25,7 @@ const MealCard: FC<MealCardProps> = ({item, shouldPlay, handleCardPress, cardSty
     if (shouldPlay) {
       timer = setTimeout(() => {
         setAllowVideoPlay(true);
-      }, 250);
+      }, 300);
     } else {
       setAllowVideoPlay(false);
     }
@@ -36,21 +36,30 @@ const MealCard: FC<MealCardProps> = ({item, shouldPlay, handleCardPress, cardSty
   const showVideo = allowVideoPlay && item.video;
 
   return (
-    <TouchableOpacity style={[styles.cardContainer, cardStyles]} onPress={handleCardPress}>
+    <TouchableOpacity
+      style={[styles.cardContainer, cardStyles]}
+      onPress={handleCardPress}
+      activeOpacity={0.8}
+    >
       <Image
         source={{uri: item.image}}
         style={styles.media}
         resizeMode="cover"
       />
 
-      {showVideo && <ActiveVideo videoSource={item.video!}/>}
+      {showVideo && (
+        <View style={StyleSheet.absoluteFill} pointerEvents="none">
+          <ActiveVideo videoSource={item.video!}/>
+        </View>
+      )}
 
       <LinearGradient
         colors={['transparent', 'rgba(0,0,0,.6)']}
         style={styles.gradient}
+        pointerEvents='none'
       />
 
-      <View style={styles.cardOverlay}>
+      <View style={styles.cardOverlay} pointerEvents="none">
         <Text style={styles.cardTitle} numberOfLines={2}>{item.title}</Text>
         <View style={styles.cardRestaurant}>
           <Ionicons name="home-outline" size={14} color="#fff"/>
@@ -68,6 +77,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     overflow: 'hidden',
     backgroundColor: '#ddd',
+    position: 'relative'
   },
   media: {width: '100%', height: '100%', borderRadius: 15},
   gradient: {
@@ -110,6 +120,8 @@ const ActiveVideo = ({videoSource}: { videoSource: string }) => {
       style={StyleSheet.absoluteFill}
       contentFit="cover"
       nativeControls={false}
+      allowsFullscreen={false}
+      allowsPictureInPicture={false}
     />
   );
 };

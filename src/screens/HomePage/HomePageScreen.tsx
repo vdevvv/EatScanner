@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   View,
   ViewToken,
-  useWindowDimensions,
 } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -31,10 +30,10 @@ const HomePageScreen = () => {
   const [visibleIndex, setVisibleIndex] = useState<number>(0);
   const navigation = useNavigation<HomeNavigationProp>();
   const isScreenFocused = useIsFocused();
-  const { height } = useWindowDimensions();
   const [restaurants, setRestaurants] = useState<RestaurantResponse2[]>([]);
   const { data: ratingsBatch } = useRatings(data?.data.map(r => r.placeId) ?? []);
   const [allRatings, setAllRatings] = useState<RestaurantReviewsResponse>({});
+  const [containerHeight, setContainerHeight] = useState(0);
 
   useEffect(() => {
     if (isError) {
@@ -84,8 +83,8 @@ const HomePageScreen = () => {
   }).current;
 
   const getItemLayout = (_data: any, index: number) => ({
-    length: height,
-    offset: height * index,
+    length: containerHeight,
+    offset: containerHeight * index,
     index,
   });
 
@@ -112,7 +111,15 @@ const HomePageScreen = () => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#000' }}>
+    <View
+      style={{ flex: 1, backgroundColor: '#000' }}
+      onLayout={(e) => {
+        const {height} = e.nativeEvent.layout;
+        if (height !== containerHeight) {
+          setContainerHeight(height);
+        }
+      }}
+    >
       <StatusBar
         translucent
         backgroundColor="transparent"
@@ -130,33 +137,35 @@ const HomePageScreen = () => {
           />
         </TouchableOpacity>
       </SafeAreaView>
-      <FlatList
-        data={restaurants}
-        pagingEnabled
-        onEndReached={onEndReached}
-        showsVerticalScrollIndicator={false}
-        keyExtractor={(item) => item.id}
-        initialNumToRender={1}
-        maxToRenderPerBatch={2}
-        windowSize={3}
-        removeClippedSubviews={Platform.OS === 'android'}
-        getItemLayout={getItemLayout}
-        snapToInterval={height}
-        snapToAlignment="start"
-        decelerationRate="fast"
-        onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={{ itemVisiblePercentThreshold: 80 }}
-        renderItem={({ item, index }) => (
-          <VideoWrapper
-            item={item}
-            index={index}
-            rating={allRatings?.[item.placeId]?.rating ?? null}
-            visibleIndex={visibleIndex}
-            isScreenFocused={isScreenFocused}
-            onItemUpdate={handleItemUpdate}
-          />
-        )}
-      />
+      {containerHeight > 0 && <FlatList
+          data={restaurants}
+          pagingEnabled
+          onEndReached={onEndReached}
+          onEndReachedThreshold={2}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={(item) => item.id}
+          initialNumToRender={1}
+          maxToRenderPerBatch={2}
+          windowSize={3}
+          removeClippedSubviews={Platform.OS === 'android'}
+          getItemLayout={getItemLayout}
+          snapToInterval={containerHeight}
+          snapToAlignment="start"
+          decelerationRate="fast"
+          onViewableItemsChanged={onViewableItemsChanged}
+          viewabilityConfig={{itemVisiblePercentThreshold: 80}}
+          renderItem={({item, index}) => (
+            <VideoWrapper
+              item={item}
+              index={index}
+              rating={allRatings?.[item.placeId]?.rating ?? null}
+              visibleIndex={visibleIndex}
+              isScreenFocused={isScreenFocused}
+              onItemUpdate={handleItemUpdate}
+              height={containerHeight}
+            />
+          )}
+      />}
     </View>
   );
 };

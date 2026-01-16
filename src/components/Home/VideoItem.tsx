@@ -56,8 +56,8 @@ const VideoItem: FC<VideoItemProps> = (
   },
 ) => {
   const {bottom} = useSafeAreaInsets()
-  const bottomTabHeight = useBottomTabBarHeight();
-  const containerPaddingBottom = Platform.OS === 'android' ? bottom : bottomTabHeight + 15
+  // const bottomTabHeight = useBottomTabBarHeight();
+  const containerPaddingBottom = Platform.OS === 'android' ? 20 : bottom
   const BUTTON_HEIGHT = 56;
   const ICONS_GAP = 20;
   const iconsBottomPosition = containerPaddingBottom + BUTTON_HEIGHT + ICONS_GAP + 50;

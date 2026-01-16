@@ -7,7 +7,7 @@ import {
 import {
   CompositeNavigationProp,
   NavigatorScreenParams,
-  RouteProp,
+  RouteProp, useIsFocused,
   useNavigation,
   useRoute,
 } from '@react-navigation/native';
@@ -37,6 +37,7 @@ type NavigationProp = CompositeNavigationProp<
 
 const DiscoveryScreen = () => {
   useLocationAlert();
+  const isFocused = useIsFocused();
   const navigation = useNavigation<NavigationProp>();
   const { data, isLoading } = useDiscovery();
   const { address, fetchLocation, permissionDenied } = useLocationStore();
@@ -96,7 +97,7 @@ const DiscoveryScreen = () => {
   }).current;
 
   const renderItem = useCallback(({ item, index }: { item: any, index: number }) => {
-    const isVisible = visibleSectionIndices.includes(index);
+    const isVisible = visibleSectionIndices.includes(index) && isFocused;
 
     return (
       <MealSection
@@ -112,7 +113,7 @@ const DiscoveryScreen = () => {
         }))}
       />
     );
-  }, [visibleSectionIndices, handleCardPress]);
+  }, [visibleSectionIndices, handleCardPress, isFocused]);
 
   if (isLoading || !data) {
     return (

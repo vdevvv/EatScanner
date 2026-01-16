@@ -17,7 +17,10 @@
     },
     "android": {
       "permissions": [
-        "ACCESS_FINE_LOCATION", "READ_CONTACTS"
+        "ACCESS_FINE_LOCATION",
+        "READ_CONTACTS",
+        "android.permission.READ_CONTACTS",
+        "android.permission.WRITE_CONTACTS"
       ],
       "adaptiveIcon": {
         "backgroundColor": "#9F0B08",
@@ -29,11 +32,6 @@
       "googleServicesFile": "./google-services.json"
     },
     "web": {},
-    "extra": {
-      "eas": {
-        "projectId": "f9786be3-521c-4096-99c3-e702ee9008e0"
-      }
-    },
     "plugins": [
       "expo-notifications",
       "expo-secure-store",
@@ -44,6 +42,12 @@
           "contactsPermission": "The app needs access to your contacts so you can find friends"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "947c44db-dbbe-46b2-9966-1e3b72d9996b"
+      }
+    },
+    "owner": "r1020304050"
   }
 }
