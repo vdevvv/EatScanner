@@ -7,46 +7,53 @@ import {
   RestaurantResponse, RestaurantResponse2,
   RestaurantReviewsResponse, SearchMenuItemsParams,
 } from '../types';
-import {api} from '../utils/api';
+import {api, getReadOnlyApiClient} from '../utils/api';
 import {AxiosRequestConfig} from 'axios';
 
 class RestaurantService {
   async getRestaurants(coords: { latitude: number, longitude: number }, paginateOptions?: PaginateOptions) {
     const params = {...paginateOptions, ...coords};
+    const client = getReadOnlyApiClient();
 
-    return api.get<PaginatedResponse<RestaurantResponse2>>('/restaurants', {params})
+    return client.get<PaginatedResponse<RestaurantResponse2>>('/restaurants', {params})
       .then(({data}) => data);
   }
 
   async getRatings(placeIds: string[]) {
-    return api.post<RestaurantReviewsResponse>('/place/reviews', {placeIds})
+    const client = getReadOnlyApiClient();
+    return client.post<RestaurantReviewsResponse>('/place/reviews', {placeIds})
       .then(({data}) => data);
   }
 
   async getMenuItem(id: string) {
-    return api.get<MenuItemResponse>(`menu/item/${id}`)
+    const client = getReadOnlyApiClient();
+    return client.get<MenuItemResponse>(`menu/item/${id}`)
       .then(({data}) => data);
   }
 
   async getMenu(restaurantId: string) {
-    return api.get<RestaurantResponse['menu']>(`/restaurants/${restaurantId}/menu`)
+    const client = getReadOnlyApiClient();
+    return client.get<RestaurantResponse['menu']>(`/restaurants/${restaurantId}/menu`)
       .then(({data}) => data);
   }
 
   async getFilters(isSelectable?: boolean) {
-    return api.get<Record<string, FilterTag[]>>('/menu/filters', {
+    const client = getReadOnlyApiClient();
+    return client.get<Record<string, FilterTag[]>>('/menu/filters', {
       params: isSelectable !== undefined ? {'is-selectable': isSelectable} : undefined,
     })
       .then(({data}) => data);
   }
 
   async getDiscovery() {
-    return api.get<Record<string, DiscoveryResponse[]>>('/menu/discovery')
+    const client = getReadOnlyApiClient();
+    return client.get<Record<string, DiscoveryResponse[]>>('/menu/discovery')
       .then(({data}) => data);
   }
 
   async searchMenuItems(requestConfig: AxiosRequestConfig<SearchMenuItemsParams>, paginateOptions: PaginateOptions) {
-    const {data} = await api.get<PaginatedResponse<DiscoveryResponse>>('/menu/search', {
+    const client = getReadOnlyApiClient();
+    const {data} = await client.get<PaginatedResponse<DiscoveryResponse>>('/menu/search', {
       ...requestConfig, params: {
         ...requestConfig.params ?? {},
         ...paginateOptions
@@ -57,7 +64,8 @@ class RestaurantService {
   }
 
   async getRecommendations(paginateOptions?: PaginateOptions) {
-    return api.get<PaginatedResponse<DiscoveryResponse>>('/menu/recommendations', {params: paginateOptions})
+    const client = getReadOnlyApiClient();
+    return client.get<PaginatedResponse<DiscoveryResponse>>('/menu/recommendations', {params: paginateOptions})
       .then(({data}) => data);
   }
 }

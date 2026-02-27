@@ -30,9 +30,17 @@ export const apiPublic = axios.create({
   }
 })
 
+export const getReadOnlyApiClient = () => {
+  const {isAuth} = useAuthStore.getState();
+  return isAuth ? api : apiPublic;
+}
+
 const refreshAuthLogin = async (failedRequest: AxiosError) => {
   try {
     const refreshToken = await SecureStore.getItemAsync(REFRESH_TOKEN_KEY)
+    if (!refreshToken) {
+      return Promise.reject(new Error('No refresh token available'));
+    }
     const {data: tokens} = await apiPublic.post<Tokens>('/auth/refresh-token', {refreshToken})
 
     await Promise.all([
@@ -46,8 +54,10 @@ const refreshAuthLogin = async (failedRequest: AxiosError) => {
 
     return Promise.resolve()
   } catch (e) {
-    const signOut = useAuthStore.getState().signOut;
-    await signOut()
+    const {isAuth, signOut} = useAuthStore.getState();
+    if (isAuth) {
+      await signOut();
+    }
     return Promise.reject(e);
   }
 }

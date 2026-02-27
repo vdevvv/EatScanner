@@ -19,15 +19,20 @@ type UnauthenticatedState = {
 type AuthActions = {
   signIn: (accessToken: string, refreshToken: string) => Promise<void>;
   signOut: () => Promise<void>;
+  continueAsGuest: () => void;
+  exitGuestMode: () => void;
   loadUserOnStartup: () => Promise<void>;
   setUser: (user: User) => void;
 };
 
-type AuthStore = (AuthenticatedState | UnauthenticatedState) & AuthActions;
+type AuthStore = (AuthenticatedState | UnauthenticatedState) & AuthActions & {
+  isGuest: boolean;
+};
 
 export const useAuthStore = create<AuthStore>((set) => ({
   user: null,
   isAuth: false,
+  isGuest: false,
 
   signIn: async (accessToken, refreshToken) => {
     try {
@@ -36,7 +41,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
         SecureStore.setItemAsync(REFRESH_TOKEN_KEY, refreshToken),
       ]);
       const user = await userService.getMe()
-      set({user, isAuth: true});
+      set({user, isAuth: true, isGuest: false});
     } catch (e) {
       console.error("Error saving tokens:", e);
     }
@@ -51,16 +56,24 @@ export const useAuthStore = create<AuthStore>((set) => ({
     } catch (e) {
       console.error("Failed to sign out", e);
     } finally {
-      set({user: null, isAuth: false});
+      set({user: null, isAuth: false, isGuest: false});
     }
+  },
+
+  continueAsGuest: () => {
+    set({user: null, isAuth: false, isGuest: true});
+  },
+
+  exitGuestMode: () => {
+    set({user: null, isAuth: false, isGuest: false});
   },
 
   loadUserOnStartup: async () => {
     try {
       const user = await userService.getMe()
-      set({user, isAuth: true});
+      set({user, isAuth: true, isGuest: false});
     } catch (e) {
-      set({user: null, isAuth: false})
+      set({user: null, isAuth: false, isGuest: false})
     }
   },
 

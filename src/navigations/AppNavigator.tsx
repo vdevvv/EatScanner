@@ -54,6 +54,7 @@ const AppNavigator = () => {
   const {expoPushToken} = usePushNotifications();
   const {mutate: sendPushToken} = useSendPushToken();
   const user = useAuthStore(state => state.user);
+  const isGuest = useAuthStore(state => state.isGuest);
 
   useEffect(() => {
     if (!expoPushToken) return;
@@ -153,8 +154,8 @@ const AppNavigator = () => {
     >
       <Tab.Screen name="Home" component={HomeStackNavigator}/>
       <Tab.Screen name="Discovery" component={DiscoverStackNavigator}/>
-      <Tab.Screen name="Friends" component={FriendsStackNavigator}/>
-      <Tab.Screen name="Profile" component={MyProfileStackNavigator}/>
+      {!isGuest && <Tab.Screen name="Friends" component={FriendsStackNavigator}/>}
+      {!isGuest && <Tab.Screen name="Profile" component={MyProfileStackNavigator}/>}
     </Tab.Navigator>
   );
 };

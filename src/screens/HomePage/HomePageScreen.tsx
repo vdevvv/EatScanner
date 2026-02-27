@@ -1,7 +1,10 @@
 import {
+  Alert,
+  Button,
   FlatList,
   Platform,
   StatusBar,
+  Text,
   TouchableOpacity,
   View,
   ViewToken,
@@ -17,19 +20,22 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
 import { useLocationAlert } from '../../hooks/useLocationAlert';
 import { useLocationStore } from '../../stores/useLocationStore';
+import {useAuthStore} from '../../stores/useAuthStore';
 import { HomeNavigationProp } from '../../navigations/app.types';
 import PageLoader from '../../components/Loader/PageLoader';
 import { handleApiError } from '../../utils/handleApiError';
 
 const HomePageScreen = () => {
   useLocationAlert();
-  const { coords, fetchLocation } = useLocationStore();
+  const { coords, fetchLocation, loading: isLocationLoading, permissionDenied, error: locationError } = useLocationStore();
   const [page, setPage] = useState(1);
   const { data, isFetching, isError, error } = useRestaurants(page, coords?.latitude, coords?.longitude);
   const hasMore = data && page < data?.meta.pageCount;
   const [visibleIndex, setVisibleIndex] = useState<number>(0);
   const navigation = useNavigation<HomeNavigationProp>();
   const isScreenFocused = useIsFocused();
+  const isGuest = useAuthStore(state => state.isGuest);
+  const exitGuestMode = useAuthStore(state => state.exitGuestMode);
   const [restaurants, setRestaurants] = useState<RestaurantResponse2[]>([]);
   const { data: ratingsBatch } = useRatings(data?.data.map(r => r.placeId) ?? []);
   const [allRatings, setAllRatings] = useState<RestaurantReviewsResponse>({});
@@ -106,8 +112,37 @@ const HomePageScreen = () => {
     });
   };
 
-  if (!coords) {
+  if (!coords && isLocationLoading) {
     return <PageLoader />;
+  }
+
+  if (!coords) {
+    return (
+      <SafeAreaView style={styles.emptyState}>
+        <Text style={styles.emptyTitle}>
+          {permissionDenied ? 'Location Access Required' : 'Unable to get location'}
+        </Text>
+        <Text style={styles.emptySubtitle}>
+          {permissionDenied
+            ? 'Allow location to view nearby restaurants.'
+            : (locationError || 'Please try again.')}
+        </Text>
+        <Button title="Try Again" onPress={() => void fetchLocation()} />
+      </SafeAreaView>
+    );
+  }
+
+  if (isError || (!isFetching && restaurants.length === 0)) {
+    return (
+      <SafeAreaView style={styles.emptyState}>
+        <Text style={styles.emptyTitle}>Unable to load content</Text>
+        <Text style={styles.emptySubtitle}>Please try again.</Text>
+        <Button title="Retry" onPress={() => {
+          setPage(1);
+          void fetchLocation();
+        }} />
+      </SafeAreaView>
+    );
   }
 
   return (
@@ -128,7 +163,16 @@ const HomePageScreen = () => {
       <SafeAreaView style={styles.headerFixed}>
         <TouchableOpacity
           style={styles.headerIcon}
-          onPress={() => navigation.navigate('Notifications')}
+          onPress={() => {
+            if (isGuest) {
+              Alert.alert('Sign In Required', 'Please sign in to view notifications.', [
+                {text: 'Cancel', style: 'cancel'},
+                {text: 'Sign In', onPress: exitGuestMode},
+              ]);
+              return;
+            }
+            navigation.navigate('Notifications');
+          }}
         >
           <Ionicons
             name="notifications-outline"
@@ -184,6 +228,26 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     top: Platform.select({ ios: 0, android: -5 }),
+  },
+  emptyState: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    gap: 12,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: COLORS.black,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: COLORS.grey30,
+    textAlign: 'center',
+    marginBottom: 6,
   },
 });
 

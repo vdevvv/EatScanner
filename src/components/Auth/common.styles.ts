@@ -90,4 +90,19 @@ export const commonStyles = StyleSheet.create({
   buttonTextActive: {
     color: COLORS.white,
   },
+  guestButton: {
+    borderRadius: 10,
+    height: 48,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+    borderWidth: 1,
+    borderColor: COLORS.red,
+    backgroundColor: COLORS.white,
+  },
+  guestButtonText: {
+    color: COLORS.red,
+    fontSize: 16,
+    fontWeight: "600",
+  },
 })

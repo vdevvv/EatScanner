@@ -1,5 +1,7 @@
 import React from "react";
 import {
+  Alert,
+  Linking,
   View,
   Text,
   StyleSheet,
@@ -180,9 +182,24 @@ const PolicySection: React.FC<PolicySectionProps> = ({ section }) => (
 
 const PrivacyPolicyScreen: React.FC = () => {
   const navigation = useNavigation<NavigationProp>();
+  const privacyPolicyUrl = "https://taaleats.com/privacy-policy";
 
   const handleBack = () => {
     navigation.goBack();
+  };
+
+  const handleOpenPrivacyPolicyUrl = async () => {
+    try {
+      const supported = await Linking.canOpenURL(privacyPolicyUrl);
+      if (!supported) {
+        Alert.alert("Error", "Unable to open privacy policy link.");
+        return;
+      }
+
+      await Linking.openURL(privacyPolicyUrl);
+    } catch {
+      Alert.alert("Error", "Unable to open privacy policy link.");
+    }
   };
 
   return (
@@ -195,6 +212,17 @@ const PrivacyPolicyScreen: React.FC = () => {
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent}>
+        <TouchableOpacity
+          style={styles.externalLinkButton}
+          onPress={() => {
+            void handleOpenPrivacyPolicyUrl();
+          }}
+        >
+          <Text style={styles.externalLinkButtonText}>
+            Open Full Privacy Policy
+          </Text>
+        </TouchableOpacity>
+
         <Text style={styles.introductionText}>
           {privacyPolicyContent.introduction}
         </Text>
@@ -237,6 +265,19 @@ const styles = StyleSheet.create({
     color: "#444",
     marginBottom: 20,
     lineHeight: 24,
+  },
+  externalLinkButton: {
+    alignSelf: "flex-start",
+    backgroundColor: "#F2F5FF",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 16,
+  },
+  externalLinkButtonText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#1D4ED8",
   },
   sectionContainer: {
     marginBottom: 30,

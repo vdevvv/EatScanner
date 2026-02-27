@@ -1,8 +1,9 @@
 import React, {useState, useEffect, useMemo, useRef, useCallback} from 'react';
 import {
+  Button,
   View,
   StyleSheet,
-  ActivityIndicator, FlatList, ViewToken,
+  ActivityIndicator, FlatList, Text, ViewToken,
 } from 'react-native';
 import {
   CompositeNavigationProp,
@@ -39,7 +40,7 @@ const DiscoveryScreen = () => {
   useLocationAlert();
   const isFocused = useIsFocused();
   const navigation = useNavigation<NavigationProp>();
-  const { data, isLoading } = useDiscovery();
+  const { data, isLoading, isError: isDiscoveryError, refetch } = useDiscovery();
   const { address, fetchLocation, permissionDenied } = useLocationStore();
   const route = useRoute<DiscoveryRouteProp>();
   const tags = route.params?.selectedTags ?? [];
@@ -115,10 +116,20 @@ const DiscoveryScreen = () => {
     );
   }, [visibleSectionIndices, handleCardPress, isFocused]);
 
-  if (isLoading || !data) {
+  if (isLoading) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" />
+      </SafeAreaView>
+    );
+  }
+
+  if (isDiscoveryError || !data) {
+    return (
+      <SafeAreaView style={styles.loadingContainer}>
+        <Text style={styles.errorTitle}>Unable to load content</Text>
+        <Text style={styles.errorSubtitle}>Please try again.</Text>
+        <Button title="Retry" onPress={() => void refetch()} />
       </SafeAreaView>
     );
   }
@@ -191,6 +202,17 @@ const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 20,
     paddingTop: 10,
+  },
+  errorTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: COLORS.black,
+    marginBottom: 8,
+  },
+  errorSubtitle: {
+    fontSize: 14,
+    color: COLORS.grey30,
+    marginBottom: 12,
   },
 });
 

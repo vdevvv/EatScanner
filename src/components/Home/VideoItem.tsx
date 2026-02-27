@@ -1,5 +1,5 @@
 import React, {FC, useEffect, useState} from 'react';
-import {StyleSheet, View, Text, TouchableOpacity, Share, Platform, Image} from 'react-native';
+import {StyleSheet, View, Text, TouchableOpacity, Share, Platform, Image, Alert} from 'react-native';
 import {Feather} from '@expo/vector-icons';
 import GoogleLogo from '../icons/GoogleLogo';
 import {useNavigation} from '@react-navigation/native';
@@ -15,6 +15,7 @@ import {useToggleLike} from '../../hooks/likes';
 import {useBottomTabBarHeight} from "@react-navigation/bottom-tabs";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 import {getOptimizedVideoUrl, getVideoThumbnail} from "../../utils/helpers";
+import {useAuthStore} from "../../stores/useAuthStore";
 
 interface VideoItemProps {
   restaurant: {
@@ -63,6 +64,8 @@ const VideoItem: FC<VideoItemProps> = (
   const iconsBottomPosition = containerPaddingBottom + BUTTON_HEIGHT + ICONS_GAP + 50;
 
   const navigation = useNavigation<HomeNavigationProp>();
+  const isGuest = useAuthStore(state => state.isGuest);
+  const exitGuestMode = useAuthStore(state => state.exitGuestMode);
   const [videoError, setVideoError] = useState(false);
   const [isSavedLocal, setIsSavedLocal] = useState(menuItem.isSaved);
   const [isLikedLocal, setIsLikedLocal] = useState(menuItem.isLiked);
@@ -83,6 +86,14 @@ const VideoItem: FC<VideoItemProps> = (
   };
 
   const handleSavePress = () => {
+    if (isGuest) {
+      Alert.alert('Sign In Required', 'Please sign in to save items.', [
+        {text: 'Cancel', style: 'cancel'},
+        {text: 'Sign In', onPress: exitGuestMode},
+      ]);
+      return;
+    }
+
     setIsSavedLocal(prev => !prev);
     onItemUpdate(menuItem.id, 'save');
     saveMutate(menuItem.id, {
@@ -94,6 +105,14 @@ const VideoItem: FC<VideoItemProps> = (
   };
 
   const handleLikePress = () => {
+    if (isGuest) {
+      Alert.alert('Sign In Required', 'Please sign in to like items.', [
+        {text: 'Cancel', style: 'cancel'},
+        {text: 'Sign In', onPress: exitGuestMode},
+      ]);
+      return;
+    }
+
     setIsLikedLocal(prev => !prev);
     onItemUpdate(menuItem.id, 'like');
     likeMutate(menuItem.id, {

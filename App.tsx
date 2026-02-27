@@ -78,16 +78,16 @@ const App = () => {
 };
 
 function AppContent() {
-  const {user, isAuth} = useAuthStore(state => state);
+  const {user, isAuth, isGuest} = useAuthStore(state => state);
   const {top} = useSafeAreaInsets();
 
   const renderContent = () => {
-    if (!isAuth) {
+    if (!isAuth && !isGuest) {
       return <AuthNavigator/>;
     }
 
-    const isProfileComplete = isAuth && user?.userName && user?.fullName;
-    if (!isProfileComplete) {
+    const isProfileComplete = !!(user?.userName && user?.fullName);
+    if (isAuth && !isProfileComplete) {
       return <EditProfileScreen shouldShowHeader={false}/>;
     }
 

@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Controller, useForm} from "react-hook-form";
 import {LoginSchema, loginSchema} from "../../../schemas/auth/login.schema";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {TextInput, View, Text, TouchableOpacity} from "react-native";
+import {Alert, Linking, TextInput, View, Text, TouchableOpacity} from "react-native";
 import {commonStyles} from "../common.styles";
 import {Ionicons} from "@expo/vector-icons";
 import {useNavigation} from "@react-navigation/native";
@@ -20,10 +20,13 @@ type LoginNavigationProp = NativeStackNavigationProp<
 >;
 
 const Login = () => {
+  const privacyPolicyUrl = "https://taaleats.com/privacy-policy";
+  const termsUrl = "https://taaleats.com/terms-and-conditions";
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const navigation = useNavigation<LoginNavigationProp>();
   const {mutate, isPending} = useSignIn()
   const signIn = useAuthStore(store => store.signIn)
+  const continueAsGuest = useAuthStore(store => store.continueAsGuest)
 
   const {
     control,
@@ -46,6 +49,19 @@ const Login = () => {
       onError: (error) => handleApiError(error),
     })
   }
+
+  const openExternalLink = async (url: string) => {
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (!supported) {
+        Alert.alert("Error", "Unable to open link.");
+        return;
+      }
+      await Linking.openURL(url);
+    } catch {
+      Alert.alert("Error", "Unable to open link.");
+    }
+  };
 
   return (
     <View style={commonStyles.container}>
@@ -115,6 +131,14 @@ const Login = () => {
         </Text>
       </TouchableOpacity>
 
+      <TouchableOpacity
+        style={commonStyles.guestButton}
+        onPress={continueAsGuest}
+        activeOpacity={0.8}
+      >
+        <Text style={commonStyles.guestButtonText}>Continue as Guest</Text>
+      </TouchableOpacity>
+
       <View style={commonStyles.resetContainer}>
         <Text style={commonStyles.resetText}>Forgot your password?</Text>
         <TouchableOpacity onPress={() => navigation.navigate("ResetPassword1")}>
@@ -125,8 +149,23 @@ const Login = () => {
       <View style={commonStyles.termsContainer}>
         <Text style={commonStyles.termsText}>
           By logging in, you confirm you agree to{" "}
-          <Text style={commonStyles.link}>Terms and Conditions</Text> and that you
-          have read our <Text style={commonStyles.link}>Privacy Policy</Text>.
+          <Text
+            style={commonStyles.link}
+            onPress={() => {
+              void openExternalLink(termsUrl);
+            }}
+          >
+            Terms and Conditions
+          </Text> and that you
+          have read our{" "}
+          <Text
+            style={commonStyles.link}
+            onPress={() => {
+              void openExternalLink(privacyPolicyUrl);
+            }}
+          >
+            Privacy Policy
+          </Text>.
         </Text>
       </View>
     </View>
