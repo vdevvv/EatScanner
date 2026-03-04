@@ -1,10 +1,14 @@
 import axios, {AxiosError} from "axios";
 import createAuthRefreshInterceptor from "axios-auth-refresh";
 import * as SecureStore from "expo-secure-store";
-import {ACCESS_TOKEN_KEY, REFRESH_TOKEN_KEY, useAuthStore} from "../stores/useAuthStore";
 import {Tokens} from "../components/Auth/Login/types";
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL
+const ACCESS_TOKEN_KEY = "accessToken";
+const REFRESH_TOKEN_KEY = "refreshToken";
+
+let isAuthenticatedSession = false;
+let unauthorizedHandler: null | (() => Promise<void> | void) = null;
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -30,9 +34,16 @@ export const apiPublic = axios.create({
   }
 })
 
+export const setAuthSessionStatus = (isAuthenticated: boolean) => {
+  isAuthenticatedSession = isAuthenticated;
+};
+
+export const setUnauthorizedHandler = (handler: (() => Promise<void> | void) | null) => {
+  unauthorizedHandler = handler;
+};
+
 export const getReadOnlyApiClient = () => {
-  const {isAuth} = useAuthStore.getState();
-  return isAuth ? api : apiPublic;
+  return isAuthenticatedSession ? api : apiPublic;
 }
 
 const refreshAuthLogin = async (failedRequest: AxiosError) => {
@@ -54,9 +65,15 @@ const refreshAuthLogin = async (failedRequest: AxiosError) => {
 
     return Promise.resolve()
   } catch (e) {
-    const {isAuth, signOut} = useAuthStore.getState();
-    if (isAuth) {
-      await signOut();
+    isAuthenticatedSession = false;
+
+    if (unauthorizedHandler) {
+      await unauthorizedHandler();
+    } else {
+      await Promise.all([
+        SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY),
+        SecureStore.deleteItemAsync(REFRESH_TOKEN_KEY),
+      ]);
     }
     return Promise.reject(e);
   }

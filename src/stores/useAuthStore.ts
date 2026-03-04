@@ -2,6 +2,7 @@ import {create} from "zustand";
 import * as SecureStore from "expo-secure-store";
 import {User} from "../types";
 import {userService} from "../services/user.service";
+import {setAuthSessionStatus} from "../utils/api";
 
 export const ACCESS_TOKEN_KEY = "accessToken";
 export const REFRESH_TOKEN_KEY = "refreshToken";
@@ -41,6 +42,7 @@ export const useAuthStore = create<AuthStore>((set) => ({
         SecureStore.setItemAsync(REFRESH_TOKEN_KEY, refreshToken),
       ]);
       const user = await userService.getMe()
+      setAuthSessionStatus(true);
       set({user, isAuth: true, isGuest: false});
     } catch (e) {
       console.error("Error saving tokens:", e);
@@ -56,23 +58,28 @@ export const useAuthStore = create<AuthStore>((set) => ({
     } catch (e) {
       console.error("Failed to sign out", e);
     } finally {
+      setAuthSessionStatus(false);
       set({user: null, isAuth: false, isGuest: false});
     }
   },
 
   continueAsGuest: () => {
+    setAuthSessionStatus(false);
     set({user: null, isAuth: false, isGuest: true});
   },
 
   exitGuestMode: () => {
+    setAuthSessionStatus(false);
     set({user: null, isAuth: false, isGuest: false});
   },
 
   loadUserOnStartup: async () => {
     try {
       const user = await userService.getMe()
+      setAuthSessionStatus(true);
       set({user, isAuth: true, isGuest: false});
     } catch (e) {
+      setAuthSessionStatus(false);
       set({user: null, isAuth: false, isGuest: false})
     }
   },

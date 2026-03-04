@@ -8,6 +8,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {SafeAreaProvider, useSafeAreaInsets} from 'react-native-safe-area-context';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import EditProfileScreen from "./src/screens/MyProfile/MyProfileEdit";
+import {setUnauthorizedHandler} from "./src/utils/api";
 
 export type RootStackParamList = {
   Auth: undefined
@@ -60,11 +61,17 @@ export type RootStackParamList = {
 
 const App = () => {
   const queryClient = new QueryClient();
-  const {loadUserOnStartup} = useAuthStore(state => state);
+  const {loadUserOnStartup, signOut} = useAuthStore(state => state);
 
   useEffect(() => {
     void loadUserOnStartup();
   }, [loadUserOnStartup]);
+
+  useEffect(() => {
+    setUnauthorizedHandler(() => signOut());
+
+    return () => setUnauthorizedHandler(null);
+  }, [signOut]);
 
   return (
     <QueryClientProvider client={queryClient}>

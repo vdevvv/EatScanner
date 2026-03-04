@@ -45,9 +45,9 @@ import ContactFriends from "../screens/MyProfile/ContactFriends";
 
 export type RootTabParamList = {
   Home: NavigatorScreenParams<HomeStackParamList>;
-  Discovery: NavigatorScreenParams<DiscoveryStackParamList>;
-  Friends: NavigatorScreenParams<FriendsStackParamList>;
-  Profile: NavigatorScreenParams<MyProfileStackParamList>;
+  DiscoveryTab: NavigatorScreenParams<DiscoveryStackParamList>;
+  FriendsTab: NavigatorScreenParams<FriendsStackParamList>;
+  ProfileTab: NavigatorScreenParams<MyProfileStackParamList>;
 };
 
 const AppNavigator = () => {
@@ -137,13 +137,13 @@ const AppNavigator = () => {
             case "Home":
               iconName = "home-outline";
               break;
-            case "Discovery":
+            case "DiscoveryTab":
               iconName = "search-outline";
               break;
-            case "Friends":
+            case "FriendsTab":
               iconName = "people-outline";
               break;
-            case "Profile":
+            case "ProfileTab":
               iconName = "person-outline";
               break;
           }
@@ -153,9 +153,25 @@ const AppNavigator = () => {
       })}
     >
       <Tab.Screen name="Home" component={HomeStackNavigator}/>
-      <Tab.Screen name="Discovery" component={DiscoverStackNavigator}/>
-      {!isGuest && <Tab.Screen name="Friends" component={FriendsStackNavigator}/>}
-      {!isGuest && <Tab.Screen name="Profile" component={MyProfileStackNavigator}/>}
+      <Tab.Screen
+        name="DiscoveryTab"
+        component={DiscoverStackNavigator}
+        options={{tabBarLabel: "Discovery"}}
+      />
+      {!isGuest && (
+        <Tab.Screen
+          name="FriendsTab"
+          component={FriendsStackNavigator}
+          options={{tabBarLabel: "Friends"}}
+        />
+      )}
+      {!isGuest && (
+        <Tab.Screen
+          name="ProfileTab"
+          component={MyProfileStackNavigator}
+          options={{tabBarLabel: "Profile"}}
+        />
+      )}
     </Tab.Navigator>
   );
 };

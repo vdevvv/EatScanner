@@ -120,7 +120,6 @@ const ActiveVideo = ({videoSource}: { videoSource: string }) => {
       style={StyleSheet.absoluteFill}
       contentFit="cover"
       nativeControls={false}
-      allowsFullscreen={false}
       allowsPictureInPicture={false}
     />
   );

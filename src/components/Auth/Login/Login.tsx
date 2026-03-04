@@ -41,7 +41,6 @@ const Login = () => {
   });
 
   const onSubmit = async (payload: LoginSchema) => {
-    console.log(payload);
     mutate(payload, {
       onSuccess: async (data) => {
         await signIn(data.accessToken, data.refreshToken)

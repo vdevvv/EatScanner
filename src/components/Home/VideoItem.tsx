@@ -12,7 +12,6 @@ import SaveIcon from '../icons/SaveIcon';
 import Heart from '../icons/Heart';
 import ShareIcon from '../icons/ShareIcon';
 import {useToggleLike} from '../../hooks/likes';
-import {useBottomTabBarHeight} from "@react-navigation/bottom-tabs";
 import {useSafeAreaInsets} from "react-native-safe-area-context";
 import {getOptimizedVideoUrl, getVideoThumbnail} from "../../utils/helpers";
 import {useAuthStore} from "../../stores/useAuthStore";
