@@ -68,6 +68,10 @@ class UserService {
     return api.patch<User>('/users/notifications', {notificationsEnabled})
       .then(({data}) => data);
   }
+
+  async deleteMe() {
+    return api.delete<{ message: string }>('/users/me').then(({data}) => data);
+  }
 }
 
 export const userService = new UserService();

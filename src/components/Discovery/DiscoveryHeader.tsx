@@ -27,7 +27,7 @@ const DiscoveryHeader: FC<DiscoveryHeaderProps> = (
         <Text style={styles.locationLabel}>Current location</Text>
         <View style={styles.locationDetails}>
           <Ionicons name="location-sharp" size={20} color="#000" />
-          <Text style={styles.locationText}>{address}</Text>
+          <Text style={styles.locationText}>{address || "Location not shared"}</Text>
         </View>
       </View>
       <SearchBar

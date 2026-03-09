@@ -163,3 +163,19 @@ export const useToggleNotifications = () => {
     },
   });
 };
+
+export const useDeleteAccount = () => {
+  const logout = useAuthStore((state) => state.signOut);
+
+  return useMutation({
+    mutationFn: () => userService.deleteMe(),
+    onSuccess: async () => {
+      Toast.show({
+        type: 'success',
+        text1: 'Account deleted successfully',
+      });
+      await logout();
+    },
+    onError: (err) => handleApiError(err),
+  });
+};

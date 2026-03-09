@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {ScrollView, StyleSheet, Text, TouchableOpacity, View} from "react-native";
+import {ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View} from "react-native";
 import Login from "../../components/Auth/Login/Login";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {RouteProp, useNavigation, useRoute} from "@react-navigation/native";
@@ -19,6 +19,8 @@ const Auth = () => {
   const initialTab = route.params?.initialTab === "signUp" ? 'signUp' : 'signIn';
   const [activeTab, setActiveTab] = useState<"signIn" | "signUp">(initialTab);
   const navigation = useNavigation<AuthNavigationProp>();
+  const {width} = useWindowDimensions();
+  const isTablet = width >= 768;
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -26,6 +28,7 @@ const Auth = () => {
         contentContainerStyle={{ flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
       >
+        <View style={[styles.contentWrapper, isTablet && styles.contentWrapperTablet]}>
         <View style={styles.logoContainer}>
           <TaalEatLogo style={styles.logo} />
         </View>
@@ -64,6 +67,7 @@ const Auth = () => {
         </View>
 
         {activeTab === "signIn" ? <Login /> : <Register setAuthMode={setActiveTab} />}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -76,6 +80,13 @@ const styles = StyleSheet.create({
   },
   logoContainer: {alignItems: "center",},
   logo: {height: 120, width: 120},
+  contentWrapper: {
+    width: "100%",
+  },
+  contentWrapperTablet: {
+    alignSelf: "center",
+    maxWidth: 640,
+  },
   tabContainer: {
     flexDirection: "row",
     justifyContent: "center",

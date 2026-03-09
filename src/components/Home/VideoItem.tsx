@@ -56,7 +56,8 @@ const VideoItem: FC<VideoItemProps> = (
   },
 ) => {
   const {bottom} = useSafeAreaInsets()
-  // const bottomTabHeight = useBottomTabBarHeight();
+  const isTablet = width >= 768;
+  const overlayContentWidth = isTablet ? Math.min(width, 900) : width;
   const containerPaddingBottom = Platform.OS === 'android' ? 20 : bottom
   const BUTTON_HEIGHT = 56;
   const ICONS_GAP = 20;
@@ -135,7 +136,16 @@ const VideoItem: FC<VideoItemProps> = (
           onError={() => setVideoError(true)}
         />
       )}
-      <View style={[styles.contentContainer, {paddingBottom: containerPaddingBottom}]}>
+      <View
+        style={[
+          styles.contentContainer,
+          {
+            width: overlayContentWidth,
+            alignSelf: 'center',
+            paddingBottom: containerPaddingBottom,
+          },
+        ]}
+      >
         <Text style={styles.title}>{menuItem.name}</Text>
         <View>
           <Text style={styles.restaurantTitle}>{restaurant.name}</Text>
@@ -188,7 +198,7 @@ const VideoItem: FC<VideoItemProps> = (
             </TouchableOpacity>
           </View>
         </View>
-        <View style={[styles.sideIcons, {bottom: iconsBottomPosition}]}>
+        <View style={[styles.sideIcons, {bottom: iconsBottomPosition, right: isTablet ? 28 : 20}]}>
           <TouchableOpacity style={styles.sideIconItem} onPress={onShare}>
             <ShareIcon/>
             <Text style={styles.sideIconText}>Share</Text>

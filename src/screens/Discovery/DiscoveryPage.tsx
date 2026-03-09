@@ -13,7 +13,6 @@ import {
   useRoute,
 } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useLocationAlert } from '../../hooks/useLocationAlert';
 import { useLocationStore } from '../../stores/useLocationStore';
 import { COLORS } from '../../constants/colors';
 import { useDiscovery, useSearchMenuItems } from '../../hooks/restaurants';
@@ -37,11 +36,10 @@ type NavigationProp = CompositeNavigationProp<
 >;
 
 const DiscoveryScreen = () => {
-  useLocationAlert();
   const isFocused = useIsFocused();
   const navigation = useNavigation<NavigationProp>();
   const { data, isLoading, isError: isDiscoveryError, refetch } = useDiscovery();
-  const { address, fetchLocation, permissionDenied } = useLocationStore();
+  const { address, fetchLocation } = useLocationStore();
   const route = useRoute<DiscoveryRouteProp>();
   const tags = route.params?.selectedTags ?? [];
   const [searchQuery, setSearchQuery] = useState('');
@@ -56,7 +54,7 @@ const DiscoveryScreen = () => {
   }, [isError, error]);
 
   useEffect(() => {
-    if (!address && !permissionDenied) {
+    if (!address) {
       void fetchLocation();
     }
   }, []);

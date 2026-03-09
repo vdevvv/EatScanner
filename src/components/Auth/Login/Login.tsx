@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {Controller, useForm} from "react-hook-form";
 import {LoginSchema, loginSchema} from "../../../schemas/auth/login.schema";
 import {zodResolver} from "@hookform/resolvers/zod";
-import {Alert, Linking, TextInput, View, Text, TouchableOpacity} from "react-native";
+import {Alert, Linking, TextInput, View, Text, TouchableOpacity, useWindowDimensions} from "react-native";
 import {commonStyles} from "../common.styles";
 import {Ionicons} from "@expo/vector-icons";
 import {useNavigation} from "@react-navigation/native";
@@ -23,6 +23,8 @@ const Login = () => {
   const privacyPolicyUrl = "https://taaleats.com/privacy-policy";
   const termsUrl = "https://taaleats.com/terms-and-conditions";
   const [showPassword, setShowPassword] = useState<boolean>(false);
+  const {width} = useWindowDimensions();
+  const isTablet = width >= 768;
   const navigation = useNavigation<LoginNavigationProp>();
   const {mutate, isPending} = useSignIn()
   const signIn = useAuthStore(store => store.signIn)
@@ -63,7 +65,7 @@ const Login = () => {
   };
 
   return (
-    <View style={commonStyles.container}>
+    <View style={[commonStyles.container, isTablet && commonStyles.containerTablet]}>
       <View style={commonStyles.descriptionContainer}>
         <Text style={commonStyles.descriptionTitle}>Welcome!</Text>
         <Text style={commonStyles.descriptionSubtitle}>

@@ -7,6 +7,7 @@ import {
   Image,
   ScrollView,
   Keyboard, ActivityIndicator,
+  useWindowDimensions,
 } from 'react-native';
 import {Ionicons, MaterialCommunityIcons} from '@expo/vector-icons';
 import {useNavigation} from '@react-navigation/native';
@@ -32,6 +33,8 @@ import EditProfileBottomSheet from '../../components/Profile/EditProfileBottomSh
 import PhoneVerificationSheet from "../../components/Profile/PhoneVerificationSheet";
 
 const EditProfileScreen = ({shouldShowHeader = true}) => {
+  const {width} = useWindowDimensions();
+  const isTablet = width >= 768;
   const {data, isLoading, isError, error} = useMe();
   const {mutate: updateMe, isPending} = useUpdateMe();
   const {mutate: uploadAvatar, isPending: isUploadingAvatar} = useUploadAvatar();
@@ -141,7 +144,7 @@ const EditProfileScreen = ({shouldShowHeader = true}) => {
         </View>
       )}
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <ScrollView contentContainerStyle={[styles.scrollContent, isTablet && styles.scrollContentTablet]}>
         <View style={styles.avatarSection}>
           <View style={styles.avatarContainer}>
             <TouchableOpacity onPress={handleOpenSheet} disabled={isUploadingAvatar}>
@@ -206,12 +209,14 @@ const EditProfileScreen = ({shouldShowHeader = true}) => {
         </View>
       </ScrollView>
 
-      <View style={styles.footer}>
-        <TouchableOpacity style={styles.saveButton} disabled={isPending} onPress={handleSubmit(handleSave)}>
-          <Text style={styles.saveButtonText}>
-            {isPending ? 'Saving...' : isSendingSms ? 'Sending SMS...' : 'Save changes'}
-          </Text>
-        </TouchableOpacity>
+      <View style={[styles.footer, isTablet && styles.footerTablet]}>
+        <View style={[styles.saveButtonContainer, isTablet && styles.saveButtonContainerTablet]}>
+          <TouchableOpacity style={styles.saveButton} disabled={isPending} onPress={handleSubmit(handleSave)}>
+            <Text style={styles.saveButtonText}>
+              {isPending ? 'Saving...' : isSendingSms ? 'Sending SMS...' : 'Save changes'}
+            </Text>
+          </TouchableOpacity>
+        </View>
       </View>
       <EditProfileBottomSheet
         bottomSheetRef={bottomSheetRef}
@@ -257,6 +262,11 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: 16,
     paddingBottom: 100,
+  },
+  scrollContentTablet: {
+    alignSelf: 'center',
+    width: '100%',
+    maxWidth: 760,
   },
   headerContainer: {
     flexDirection: 'row',
@@ -316,6 +326,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#f5f5f5',
+  },
+  footerTablet: {
+    alignItems: 'center',
+  },
+  saveButtonContainer: {
+    width: '100%',
+  },
+  saveButtonContainerTablet: {
+    maxWidth: 760,
   },
   saveButton: {
     backgroundColor: COLORS.red,

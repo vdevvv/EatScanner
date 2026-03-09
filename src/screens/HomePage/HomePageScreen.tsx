@@ -18,7 +18,6 @@ import { useRatings, useRestaurants } from '../../hooks/restaurants';
 import { RestaurantResponse2, RestaurantReviewsResponse } from '../../types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS } from '../../constants/colors';
-import { useLocationAlert } from '../../hooks/useLocationAlert';
 import { useLocationStore } from '../../stores/useLocationStore';
 import {useAuthStore} from '../../stores/useAuthStore';
 import { HomeNavigationProp } from '../../navigations/app.types';
@@ -26,8 +25,7 @@ import PageLoader from '../../components/Loader/PageLoader';
 import { handleApiError } from '../../utils/handleApiError';
 
 const HomePageScreen = () => {
-  useLocationAlert();
-  const { coords, fetchLocation, loading: isLocationLoading, permissionDenied, error: locationError } = useLocationStore();
+  const { coords, fetchLocation, loading: isLocationLoading } = useLocationStore();
   const [page, setPage] = useState(1);
   const { data, isFetching, isError, error } = useRestaurants(page, coords?.latitude, coords?.longitude);
   const hasMore = data && page < data?.meta.pageCount;
@@ -119,13 +117,9 @@ const HomePageScreen = () => {
   if (!coords) {
     return (
       <SafeAreaView style={styles.emptyState}>
-        <Text style={styles.emptyTitle}>
-          {permissionDenied ? 'Location Access Required' : 'Unable to get location'}
-        </Text>
+        <Text style={styles.emptyTitle}>Unable to get location</Text>
         <Text style={styles.emptySubtitle}>
-          {permissionDenied
-            ? 'Allow location to view nearby restaurants.'
-            : (locationError || 'Please try again.')}
+          Please try again.
         </Text>
         <Button title="Try Again" onPress={() => void fetchLocation()} />
       </SafeAreaView>

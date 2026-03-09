@@ -1,15 +1,18 @@
 import React from "react";
 import {
+  Alert,
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
+  useWindowDimensions,
 } from "react-native";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {useAuthStore} from "../../stores/useAuthStore";
 import { SafeAreaView } from "react-native-safe-area-context";
+import {useDeleteAccount} from "../../hooks/user";
 
 type RootStackParamList = {
   MyProfile: undefined;
@@ -41,6 +44,9 @@ interface SettingItem {
 
 const MyProfileSettings = () => {
   const logout = useAuthStore((state) => state.signOut)
+  const {mutate: deleteAccount, isPending: isDeletingAccount} = useDeleteAccount();
+  const {width} = useWindowDimensions();
+  const isTablet = width >= 768;
   const navigation = useNavigation<MyProfileSettingsNavigationProp>();
 
   const handleBack = () => {
@@ -61,6 +67,16 @@ const MyProfileSettings = () => {
   const handleHelpAndSupport = () => navigation.navigate("MyProfileHelpSuport");
   const handleLogOut = () => logout();
   const handleNotificationPress = () => navigation.navigate('MyProfileNotificationSettings')
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Delete Account",
+      "This action is permanent and cannot be undone. Do you want to permanently delete your account?",
+      [
+        {text: "Cancel", style: "cancel"},
+        {text: "Delete", style: "destructive", onPress: () => deleteAccount()},
+      ],
+    );
+  };
 
   const SETTINGS_OPTIONS: SettingItem[] = [
     {
@@ -113,6 +129,14 @@ const MyProfileSettings = () => {
       action: handleLogOut,
       isDestructive: true,
     },
+    {
+      id: "DeleteAccount",
+      title: isDeletingAccount ? "Deleting Account..." : "Delete Account",
+      iconName: "trash-outline",
+      iconLibrary: "Ionicons",
+      action: handleDeleteAccount,
+      isDestructive: true,
+    },
   ];
 
   return (
@@ -124,7 +148,7 @@ const MyProfileSettings = () => {
         <Text style={styles.screenTitle}>Settings</Text>
         <View style={{ width: 40 }} />
       </View>
-      <View style={styles.listContainer}>
+      <View style={[styles.listContainer, isTablet && styles.listContainerTablet]}>
         {SETTINGS_OPTIONS.map((item) => (
           <SettingRow key={item.id} item={item} />
         ))}
@@ -190,6 +214,11 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingHorizontal: 16,
     paddingTop: 12,
+  },
+  listContainerTablet: {
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: 720,
   },
   rowContainer: {
     flexDirection: "row",

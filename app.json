@@ -18,7 +18,10 @@
       "bundleIdentifier": "com.r1020304050.EatScanner",
       "buildNumber": "3",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocationWhenInUseUsageDescription": "Taal Eat uses your location to show nearby restaurants, display accurate delivery distances, and suggest the most relevant food options available in your area.",
+        "NSCameraUsageDescription": "Taal Eat uses your camera to let you take photos of your food orders and update your profile picture.",
+        "NSPhotoLibraryUsageDescription": "Taal Eat uses your photo library to let you choose an existing photo when updating your profile picture or sharing food content."
       }
     },
     "android": {

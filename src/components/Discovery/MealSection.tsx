@@ -1,5 +1,5 @@
 import React, {FC, useCallback, useRef, useState, memo} from 'react';
-import {FlatList, StyleSheet, Text, TouchableOpacity, View, ViewToken} from 'react-native';
+import {FlatList, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View, ViewToken} from 'react-native';
 import MealCard from './MealCard';
 import {camelToTitle} from '../../utils/helpers';
 import {useNavigation} from '@react-navigation/native';
@@ -22,10 +22,13 @@ interface MealSectionProps {
   };
 }
 
-const CARD_WIDTH = 150;
 const GAP = 15;
 
 const MealSection: FC<MealSectionProps> = ({title, data, handleCardPress, searchParams, isSectionVisible}) => {
+  const {width} = useWindowDimensions();
+  const isTablet = width >= 768;
+  const cardWidth = isTablet ? 190 : 150;
+  const cardHeight = isTablet ? 270 : 220;
   const navigation = useNavigation<DiscoveryNavigationProp>();
   const [visibleIndices, setVisibleIndices] = useState<number[]>([]);
 
@@ -73,9 +76,10 @@ const MealSection: FC<MealSectionProps> = ({title, data, handleCardPress, search
         handleCardPress={() => handleCardPress(item.id)}
         item={item}
         shouldPlay={shouldPlay}
+        cardStyles={{width: cardWidth, height: cardHeight}}
       />
     );
-  }, [isSectionVisible, visibleIndices, handleCardPress]);
+  }, [cardHeight, cardWidth, isSectionVisible, visibleIndices, handleCardPress]);
 
   if (data.length === 0) return null;
 
@@ -102,8 +106,8 @@ const MealSection: FC<MealSectionProps> = ({title, data, handleCardPress, search
         onViewableItemsChanged={onViewableItemsChanged}
         viewabilityConfig={viewabilityConfig}
         getItemLayout={(_, index) => ({
-          length: CARD_WIDTH,
-          offset: (CARD_WIDTH + GAP) * index,
+          length: cardWidth,
+          offset: (cardWidth + GAP) * index,
           index,
         })}
       />

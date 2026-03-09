@@ -6,6 +6,11 @@ export const commonStyles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 25,
   },
+  containerTablet: {
+    alignSelf: "center",
+    width: "100%",
+    maxWidth: 560,
+  },
   descriptionContainer: {
     alignItems: "center",
     marginBottom: 15,

@@ -10,6 +10,11 @@ interface LocationState {
   fetchLocation: () => Promise<void>;
 }
 
+const DEFAULT_COORDS = {
+  latitude: 25.2048,
+  longitude: 55.2708,
+};
+
 export const useLocationStore = create<LocationState>((set) => ({
   coords: null,
   address: null,
@@ -22,7 +27,13 @@ export const useLocationStore = create<LocationState>((set) => ({
 
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
-        set({ loading: false, permissionDenied: true, error: "Permission denied" });
+        set({
+          loading: false,
+          permissionDenied: true,
+          error: "Permission denied",
+          coords: DEFAULT_COORDS,
+          address: "Location not shared",
+        });
         return;
       }
 
