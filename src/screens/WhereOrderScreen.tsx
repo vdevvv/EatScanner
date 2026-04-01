@@ -104,7 +104,7 @@ const RadioItem: React.FC<RadioItemProps> = ({
           <Text style={styles.radioDetailsText}>{item.details}</Text>
           {item.price !== null && (
             <Text style={[styles.radioDetailsText, styles.radioPriceText]}>
-              {" | AED "}
+              {" | ££ "}
               {item.price}
             </Text>
           )}

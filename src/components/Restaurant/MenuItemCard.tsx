@@ -11,7 +11,7 @@ const MenuItemCard: React.FC<{
     <View style={styles.menuItemTextContainer}>
       <Text style={styles.menuItemTitle}>{item.name}</Text>
       <Text style={styles.menuItemDescription}>{item.description}</Text>
-      <Text style={styles.menuItemPrice}>AED {item.price}</Text>
+      <Text style={styles.menuItemPrice}>££ {item.price}</Text>
     </View>
   </TouchableOpacity>
 );

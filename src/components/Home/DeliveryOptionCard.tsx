@@ -51,7 +51,7 @@ const DeliveryOptionCard: FC<DeliveryOptionCardProps> = (
               {' '}
               | {option.deliveryTime}
             </Text>
-            <Text style={styles.deliveryPrice}> | AED {option.price}</Text>
+            <Text style={styles.deliveryPrice}> | ££ {option.price}</Text>
           </View>
         </View>
       </View>
