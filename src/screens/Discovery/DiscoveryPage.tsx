@@ -47,6 +47,43 @@ const DiscoveryScreen = () => {
   const { data: searchData, isError, error } = useSearchMenuItems({ tags, query: debounceSearchQuery }, 5);
   const [visibleSectionIndices, setVisibleSectionIndices] = useState<number[]>([]);
 
+  const UK_CITY_NAMES = useMemo(() => new Set([
+    'london',
+    'manchester',
+    'birmingham',
+    'liverpool',
+    'leeds',
+    'glasgow',
+    'edinburgh',
+    'bristol',
+    'cardiff',
+    'belfast',
+    'newcastle',
+    'sheffield',
+    'nottingham',
+    'leicester',
+    'coventry',
+    'southampton',
+    'portsmouth',
+    'brighton',
+    'oxford',
+    'cambridge',
+  ]), []);
+
+  const isUkRestaurant = useCallback((item: any) => {
+    const countryRaw = item?.category?.menu?.restaurant?.country;
+    const cityRaw = item?.category?.menu?.restaurant?.city;
+
+    const country = typeof countryRaw === 'string' ? countryRaw.trim().toLowerCase() : '';
+    const city = typeof cityRaw === 'string' ? cityRaw.trim().toLowerCase() : '';
+
+    if (country === 'uk' || country === 'united kingdom' || country === 'great britain') {
+      return true;
+    }
+
+    return UK_CITY_NAMES.has(city);
+  }, [UK_CITY_NAMES]);
+
   useEffect(() => {
     if (isError) {
       handleApiError(error);
@@ -60,8 +97,9 @@ const DiscoveryScreen = () => {
   }, []);
 
   const searchResult = useMemo(() => {
-    return searchData?.pages.flatMap(page => page.data) || [];
-  }, [searchData]);
+    const allItems = searchData?.pages.flatMap(page => page.data) || [];
+    return allItems.filter(isUkRestaurant);
+  }, [isUkRestaurant, searchData]);
 
   const debouncedSearch = useDebounce((value: string) => {
     setDebounceSearchQuery(value);
@@ -69,11 +107,13 @@ const DiscoveryScreen = () => {
 
   const listData = useMemo(() => {
     if (!data) return [];
-    return Object.entries(data).map(([groupName, items]) => ({
-      groupName,
-      items,
-    }));
-  }, [data]);
+    return Object.entries(data)
+      .map(([groupName, items]) => ({
+        groupName,
+        items: items.filter(isUkRestaurant),
+      }))
+      .filter(section => section.items.length > 0);
+  }, [data, isUkRestaurant]);
 
   const handleCardPress = (itemId: string) => {
     navigation.navigate({
