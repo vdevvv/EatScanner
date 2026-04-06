@@ -74,9 +74,9 @@ export const useSearchMenuItems = (
 ) => {
   const requestConfig: AxiosRequestConfig<SearchMenuItemsParams> = {
     params: {
-      take: params.take,
+      take,
       ...(params.query ? { query: params.query } : {}),
-      ...(params.tags && params.tags.length > 0 ? { tags: params.tags } : {}),
+      ...(params.tags?.length ? { tags: params.tags } : {}),
     },
     paramsSerializer: (params) => {
       return qs.stringify(params, { arrayFormat: 'repeat' });

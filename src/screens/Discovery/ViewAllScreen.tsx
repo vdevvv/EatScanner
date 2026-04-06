@@ -42,6 +42,50 @@ const ViewAllScreen = () => {
   const [debounceSearchQuery, setDebounceSearchQuery] = useState('');
   const {tagSlug, searchParams} = route.params;
   const [visibleIndices, setVisibleIndices] = useState<number[]>([]);
+  const UK_CITY_NAMES = useMemo(() => new Set([
+    'london',
+    'manchester',
+    'birmingham',
+    'liverpool',
+    'leeds',
+    'glasgow',
+    'edinburgh',
+    'bristol',
+    'cardiff',
+    'belfast',
+    'newcastle',
+    'sheffield',
+    'nottingham',
+    'leicester',
+    'coventry',
+    'southampton',
+    'portsmouth',
+    'brighton',
+    'oxford',
+    'cambridge',
+  ]), []);
+
+  const isUkRestaurant = useCallback((item: any) => {
+    const countryRaw = item?.category?.menu?.restaurant?.country;
+    const cityRaw = item?.category?.menu?.restaurant?.city;
+
+    const country = typeof countryRaw === 'string' ? countryRaw.trim().toLowerCase() : '';
+    const city = typeof cityRaw === 'string' ? cityRaw.trim().toLowerCase() : '';
+
+    if (country === 'uk' || country === 'united kingdom' || country === 'great britain') {
+      return true;
+    }
+
+    return UK_CITY_NAMES.has(city);
+  }, [UK_CITY_NAMES]);
+  const tags = useMemo(() => {
+    if (tagSlug === 'search-result') {
+      return searchParams?.tags ?? [];
+    }
+
+    return tagSlug ? [tagSlug] : [];
+  }, [tagSlug, searchParams?.tags]);
+
   const {
     data,
     fetchNextPage,
@@ -50,13 +94,14 @@ const ViewAllScreen = () => {
     isError,
     error
   } = useSearchMenuItems({
-    tags: [tagSlug ?? ''].filter(s => s !== 'search-result'),
+    tags,
     query: debounceSearchQuery || searchParams?.query
   }, 10);
 
   const items = useMemo(() => {
-    return data?.pages.flatMap(page => page.data) || [];
-  }, [data]);
+    const allItems = data?.pages.flatMap(page => page.data) || [];
+    return allItems.filter(isUkRestaurant);
+  }, [data, isUkRestaurant]);
 
   useEffect(() => {
     if (isError) {
