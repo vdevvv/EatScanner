@@ -20,63 +20,72 @@ import { usePlaceOrder } from '../../hooks/orders';
 const { width } = Dimensions.get('window');
 
 type DiscoverRestoranRouteProp = RouteProp<HomeStackParamList, 'DiscoverRestoranWhere'>
+type DeliveryServiceName = 'Deliveroo' | 'Uber Eats' | 'Just Eat';
 
 const DiscoverRestoranWhere = () => {
   const navigation = useNavigation<HomeNavigationProp>();
   const route = useRoute<DiscoverRestoranRouteProp>();
   const { mutate } = usePlaceOrder();
   const data = route.params;
-  const [selectedUrl, setSelectedUrl] = useState<string | null>(null);
-  const isButtonActive = selectedUrl !== null;
+  const [selectedOptionId, setSelectedOptionId] = useState<string | null>(null);
 
-  const handleSelectOption = (url: string | null) => {
-    if (!url) return;
-    setSelectedUrl(url);
-  };
+  const normalizeProvider = (provider: string) =>
+    provider.trim().toLowerCase().replace(/[\s_-]/g, '');
 
-  const handleMakeOrder = async () => {
-    if (!isButtonActive) return;
-    await Linking.openURL(selectedUrl);
-    mutate({
-      menuItemId: data.itemId,
-      deliveryService: 'Talabat',
-    });
+  const getProviderPrice = (provider: 'deliveroo' | 'ubereats' | 'justeat') => {
+    const target = normalizeProvider(provider);
+    const matched = data.deliveryPrices?.find((entry) => normalizeProvider(entry.provider) === target);
+    return matched?.price ?? data.price;
   };
 
   const deliveryOptions = [
     {
-      id: 'careem',
-      url: data.careemUrl,
-      name: 'Careem',
-      description: 'Estimated delivery:',
-      deliveryTime: '25–35 min',
-      price: data.price,
-    },
-    {
       id: 'deliveroo',
+      label: 'Deliveroo' as const,
       url: data.deliverooUrl,
-      description: 'Estimated delivery:',
-      name: 'Deliveroo',
-      deliveryTime: '20–30 min',
-      price: data.price,
     },
     {
-      id: 'noonfood',
-      url: data.noonFoodUrl,
-      description: 'Estimated delivery:',
-      name: 'Noon Food',
-      deliveryTime: '30–40 min',
-      price: data.price,
+      id: 'uberEats',
+      label: 'Uber Eats' as const,
+      url: data.uberEatsUrl,
     },
     {
-      id: 'talabat',
-      url: data.talabatUrl,
-      description: 'Estimated delivery:',
-      name: 'Talabat',
-      deliveryTime: '15–25 min',
-      price: data.price,
+      id: 'justEat',
+      label: 'Just Eat' as const,
+      url: data.justEatUrl,
     },
-  ].filter(opt => opt.url);
+  ]
+    .filter(option => !!option.url)
+    .map(option => ({
+      id: option.id,
+      url: option.url as string,
+      name: option.label as DeliveryServiceName,
+      description: 'Estimated delivery:',
+      deliveryTime: '20–40 min',
+      price: getProviderPrice(
+        option.id === 'uberEats'
+          ? 'ubereats'
+          : option.id === 'justEat'
+            ? 'justeat'
+            : 'deliveroo',
+      ),
+    }));
+
+  const selectedOption = deliveryOptions.find(option => option.id === selectedOptionId) ?? null;
+  const isButtonActive = !!selectedOption;
+
+  const handleSelectOption = (optionId: string) => {
+    setSelectedOptionId(optionId);
+  };
+
+  const handleMakeOrder = async () => {
+    if (!selectedOption) return;
+    await Linking.openURL(selectedOption.url);
+    mutate({
+      menuItemId: data.itemId,
+      deliveryService: selectedOption.name,
+    });
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -110,8 +119,8 @@ const DiscoverRestoranWhere = () => {
               <DeliveryOptionCard
                 key={option.id}
                 option={option}
-                isSelected={selectedUrl === option.url}
-                onSelect={() => handleSelectOption(option.url)}
+                isSelected={selectedOptionId === option.id}
+                onSelect={() => handleSelectOption(option.id)}
               />
             ))}
           </View>

@@ -22,5 +22,5 @@ export type Order = {
 
 export type OrderDto = {
   menuItemId: string,
-  deliveryService: 'Talabat' | 'Deliveroo' | 'Careem' | 'Noon Food'
+  deliveryService: 'Talabat' | 'Deliveroo' | 'Careem' | 'Noon Food' | 'Uber Eats' | 'Just Eat'
 }

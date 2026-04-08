@@ -39,6 +39,12 @@ export type HomeStackParamList = {
     restaurantName: string
     rating: number
     price: string
+    uberEatsUrl: string | null,
+    justEatUrl: string | null,
+    deliveryPrices?: Array<{
+      provider: string;
+      price: string;
+    }>,
     talabatUrl: string | null,
     careemUrl: string | null,
     noonFoodUrl: string | null,

@@ -137,9 +137,12 @@ const DishDetailScreen = () => {
             price: data.price,
             restaurantName: data.restaurant.name,
             rating: data.restaurant.rating,
+            uberEatsUrl: data.uberEatsUrl ?? data.restaurant.uberEatsUrl ?? null,
+            justEatUrl: data.justEatUrl ?? data.restaurant.justEatUrl ?? null,
+            deliveryPrices: data.deliveryPrices ?? [],
             careemUrl: data.restaurant.careemUrl,
             talabatUrl: data.restaurant.talabatUrl,
-            deliverooUrl: data.restaurant.deliverooUrl,
+            deliverooUrl: data.deliverooUrl ?? data.restaurant.deliverooUrl,
             noonFoodUrl: data.restaurant.noonFoodUrl,
           })}
         >

@@ -103,15 +103,25 @@ export interface SearchMenuItemsParams extends PaginateOptions {
 }
 
 export interface MenuItemResponse {
+  id: string;
   name: string;
   description: string | null;
   image: string;
   video: string | null;
+  deliverooUrl?: string | null;
+  uberEatsUrl?: string | null;
+  justEatUrl?: string | null;
   price: string;
+  deliveryPrices?: Array<{
+    provider: string;
+    price: string;
+  }>;
   restaurant: {
     name: string
     placeId: string
     rating: number
+    uberEatsUrl: string | null,
+    justEatUrl: string | null,
     talabatUrl: string | null,
     careemUrl: string | null,
     noonFoodUrl: string | null,
