@@ -4,6 +4,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   Image,
   ScrollView,
   Keyboard, ActivityIndicator,
@@ -133,7 +134,8 @@ const EditProfileScreen = ({shouldShowHeader = true}) => {
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, {marginBottom: shouldShowHeader ? 0 : 25}]}>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <SafeAreaView style={[styles.safeArea, {marginBottom: shouldShowHeader ? 0 : 25}]}>
       {shouldShowHeader && (
         <View style={styles.headerContainer}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
@@ -144,7 +146,10 @@ const EditProfileScreen = ({shouldShowHeader = true}) => {
         </View>
       )}
 
-      <ScrollView contentContainerStyle={[styles.scrollContent, isTablet && styles.scrollContentTablet]}>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, isTablet && styles.scrollContentTablet]}
+        keyboardShouldPersistTaps="handled"
+      >
         <View style={styles.avatarSection}>
           <View style={styles.avatarContainer}>
             <TouchableOpacity onPress={handleOpenSheet} disabled={isUploadingAvatar}>
@@ -250,7 +255,8 @@ const EditProfileScreen = ({shouldShowHeader = true}) => {
         onSubmitCode={handleVerifyCode}
         onResendCode={() => pendingPhone && initiatePhoneUpdate(pendingPhone)}
       />
-    </SafeAreaView>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 

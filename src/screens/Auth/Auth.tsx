@@ -1,5 +1,14 @@
 import React, {useState} from 'react';
-import {ScrollView, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View} from "react-native";
+import {
+  Keyboard,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  useWindowDimensions,
+  View
+} from "react-native";
 import Login from "../../components/Auth/Login/Login";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {RouteProp, useNavigation, useRoute} from "@react-navigation/native";
@@ -23,53 +32,56 @@ const Auth = () => {
   const isTablet = width >= 768;
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={[styles.contentWrapper, isTablet && styles.contentWrapperTablet]}>
-        <View style={styles.logoContainer}>
-          <TaalEatLogo style={styles.logo} />
-        </View>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <SafeAreaView style={styles.safeArea}>
+        <ScrollView
+          contentContainerStyle={{flexGrow: 1}}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={[styles.contentWrapper, isTablet && styles.contentWrapperTablet]}>
+            <View style={styles.logoContainer}>
+              <TaalEatLogo style={styles.logo}/>
+            </View>
 
-        <View style={styles.tabContainer}>
-          <TouchableOpacity
-            style={[styles.tab, activeTab === "signIn" && styles.activeTab]}
-            onPress={() => setActiveTab("signIn")}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === "signIn" && styles.activeTabText,
-              ]}
-            >
-              Sign In
-            </Text>
-          </TouchableOpacity>
+            <View style={styles.tabContainer}>
+              <TouchableOpacity
+                style={[styles.tab, activeTab === "signIn" && styles.activeTab]}
+                onPress={() => setActiveTab("signIn")}
+              >
+                <Text
+                  style={[
+                    styles.tabText,
+                    activeTab === "signIn" && styles.activeTabText,
+                  ]}
+                >
+                  Sign In
+                </Text>
+              </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.tab, activeTab === "signUp" && styles.activeTab]}
-            onPress={() => {
-              setActiveTab("signUp");
-              navigation.replace('OnBoarding1Screen')
-            }}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === "signUp" && styles.activeTabText,
-              ]}
-            >
-              Sign Up
-            </Text>
-          </TouchableOpacity>
-        </View>
+              <TouchableOpacity
+                style={[styles.tab, activeTab === "signUp" && styles.activeTab]}
+                onPress={() => {
+                  setActiveTab("signUp");
+                  navigation.replace('OnBoarding1Screen')
+                }}
+              >
+                <Text
+                  style={[
+                    styles.tabText,
+                    activeTab === "signUp" && styles.activeTabText,
+                  ]}
+                >
+                  Sign Up
+                </Text>
+              </TouchableOpacity>
+            </View>
 
-        {activeTab === "signIn" ? <Login /> : <Register setAuthMode={setActiveTab} />}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+            {activeTab === "signIn" ? <Login/> : <Register setAuthMode={setActiveTab}/>}
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   );
 };
 
