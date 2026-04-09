@@ -4,8 +4,6 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 export interface DeliveryOption {
   id: string;
   name: string;
-  description: string;
-  deliveryTime: string;
   price: string;
 }
 
@@ -45,14 +43,7 @@ const DeliveryOptionCard: FC<DeliveryOptionCardProps> = (
             {option.name}
           </Text>
 
-          <View style={styles.deliveryDetails}>
-            <Text style={styles.deliveryDescription}>{option.description}</Text>
-            <Text style={styles.deliveryTime}>
-              {' '}
-              | {option.deliveryTime}
-            </Text>
-            <Text style={styles.deliveryPrice}> | ££ {option.price}</Text>
-          </View>
+          <Text style={styles.deliveryPrice}>£ {option.price}</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -95,15 +86,7 @@ const styles = StyleSheet.create({
   deliveryTextWrapper: { flex: 1 },
   deliveryName: { fontSize: 15, fontWeight: '500', color: '#333' },
   deliveryNameSelected: { fontWeight: '600' },
-  deliveryDetails: { flexDirection: 'row', flexWrap: 'wrap', marginTop: 2 },
-  deliveryDescription: { fontSize: 13, color: '#888' },
-  deliveryTime: {
-    fontSize: 13,
-    color: '#333',
-    fontWeight: '500',
-    marginLeft: 5,
-  },
-  deliveryPrice: { fontSize: 13, color: '#333', fontWeight: '500' },
+  deliveryPrice: { fontSize: 14, color: '#333', fontWeight: '600', marginTop: 4 },
 });
 
 export default DeliveryOptionCard;

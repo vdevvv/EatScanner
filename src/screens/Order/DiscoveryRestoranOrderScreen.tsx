@@ -147,7 +147,7 @@ const DishDetailScreen = () => {
           })}
         >
           <Text style={styles.orderButtonText}>
-            Order Now | ££ {data.price}
+            Order Now | £ {data.price}
           </Text>
         </TouchableOpacity>
       </View>

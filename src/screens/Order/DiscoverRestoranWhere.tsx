@@ -60,8 +60,6 @@ const DiscoverRestoranWhere = () => {
       id: option.id,
       url: option.url as string,
       name: option.label as DeliveryServiceName,
-      description: 'Estimated delivery:',
-      deliveryTime: '20–40 min',
       price: getProviderPrice(
         option.id === 'uberEats'
           ? 'ubereats'

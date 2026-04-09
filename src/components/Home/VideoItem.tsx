@@ -193,7 +193,7 @@ const VideoItem: FC<VideoItemProps> = (
               }}
             >
               <Text style={styles.orderNowText}>
-                Order Now | ££ {menuItem.price}
+                Order Now | £ {menuItem.price}
               </Text>
             </TouchableOpacity>
           </View>
